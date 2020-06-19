@@ -1,0 +1,32 @@
+{
+    "data" : [
+        {
+            "backImage" : "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcR0R4ktuCBPWKYZbLAXzGPm2PKI-CMSlIUsBH4FWa8n7Scw9nO0&usqp=CAU",
+            "name" : "Boyarskii Andrey",
+            "price" : "344",
+            "stars" : "4.5",
+            "isNew" : true
+        },
+        {
+            "backImage" : "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcR0R4ktuCBPWKYZbLAXzGPm2PKI-CMSlIUsBH4FWa8n7Scw9nO0&usqp=CAU",
+            "name" : "Andrey Pogorelovskii",
+            "price" : "343",
+            "stars" : "3.5",
+            "isNew" : false
+        },
+        {
+            "backImage" : "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcR0R4ktuCBPWKYZbLAXzGPm2PKI-CMSlIUsBH4FWa8n7Scw9nO0&usqp=CAU",
+            "name" : "Anatolii Vaslyaeevskii",
+            "price" : "905",
+            "stars" : "4.5",
+            "isNew" : true
+        },
+        {
+            "backImage" : "https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcR0R4ktuCBPWKYZbLAXzGPm2PKI-CMSlIUsBH4FWa8n7Scw9nO0&usqp=CAU",
+            "name" : "Anton Vodopoiskii",
+            "price" : "000",
+            "stars" : "5.0",
+            "isNew" : false
+        }
+    ]
+}

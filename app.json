@@ -1,0 +1,17 @@
+{
+  "name": "mozgoParty",
+  "displayName": "mozgoParty",
+  "expo": {
+    "name": "mozgoParty",
+    "slug": "mozgoParty",
+    "version": "1.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
