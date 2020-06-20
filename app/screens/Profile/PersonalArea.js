@@ -132,8 +132,8 @@ class PersonalArea extends React.Component {
 }
 
 const mapStateToProps = state => {
-  console.log("mapStateToProps >>>>>>>>");
-  console.log(JSON.stringify(state));
+  // console.log("mapStateToProps >>>>>>>>");
+  // console.log(JSON.stringify(state));
   return {
     user: state.userData
   };

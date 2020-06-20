@@ -5,6 +5,8 @@ import { createSwitchNavigator, createAppContainer } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
 import { createDrawerNavigator } from "react-navigation-drawer";
 
+import drawerContentComponents from "../components/DrawerNavigation"
+
 import StartedScreen from "../screens/AuthScreens/StartedScreen";
 import AuthScreen from "../screens/AuthScreens/AuthScreen";
 import AuthLoadingScreen from "../screens/AuthScreens/AuthLoadingScreen";
@@ -165,13 +167,18 @@ const Profile = createStackNavigator({
   ShopCardStack: ShopCardStack
 });
 
-const MyDrawerNavigator = createDrawerNavigator({
-  Profile,
-  Shop: ShopStack,
-  MyGames: MyGames,
-  SettingsStack,
-  Favorites
-});
+const MyDrawerNavigator = createDrawerNavigator(
+  {
+    Profile,
+    Shop: ShopStack,
+    MyGames: MyGames,
+    SettingsStack,
+    Favorites,
+  }, 
+  {
+    contentComponent: drawerContentComponents
+  }
+);
 
 export const Navigation = createAppContainer(
   createSwitchNavigator(
