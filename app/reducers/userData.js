@@ -1,9 +1,5 @@
 let userState = {
     loading : false,
-    userInfo : {
-        name : '',
-        email : ''
-    }
 }
 
 export function userData(state = userState, action) {
