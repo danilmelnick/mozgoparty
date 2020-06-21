@@ -19,17 +19,6 @@ export default class CardGameScreen  extends Component{
         let arrGames = AsyncStorage.getItem('cardGames')
             .then(res => JSON.parse(res))
         console.log(arrGames)
-        // arr.push(id)
-        // this.setState({favGames : arr})
-        // console.log(this.state.favGames)
-        // if(this.state.like === false) {
-        //     await AsyncStorage.setItem('favArray', JSON.stringify(this.state.favGames))
-        //     setTimeout(() => {
-        //         console.log(AsyncStorage.getItem('favArray'))
-        //     },1000)
-        // } else {
-        //     console.log('remove Array' + arr)
-        // }
     }
     
     renderFootBtn(){

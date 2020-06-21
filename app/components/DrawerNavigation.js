@@ -39,22 +39,27 @@ class drawerContentComponents extends Component {
 
 		const {name, email} = this.props.user.userInfo
 
+		const { token } = this.state
+
 		return (
 			<View style={styles.container}>
-				<View style={styles.headerContainer}>
+				<TouchableOpacity 
+					style={styles.headerContainer}
+					onPress={() => token ? this.props.navigation.navigate('Profile') : this.props.navigation.navigate('AuthRoute')}
+				>
 					<View style={{flex: 1, justifyContent: 'center'}} >
 						<Image
-							source={require('../src/PersonAvatar.png')}
-							style={{width : 48, height: 48, marginBottom : 16}}
+							source={require('../src/noAuth.png')}
+							style={{width : 48, height: 48, marginBottom : 12}}
 						/>
-						<Text style={styles.headerText}>{name}</Text>
-						<Text style={styles.subText}>{email}</Text>
+						<Text style={styles.headerText}>{token ? name : 'Войти в аккаунт'}</Text>
+						<Text style={styles.subText}>{token ? email : ""}</Text>
 					</View>
-				</View>
+				</TouchableOpacity>
 				<View style={styles.screenContainer}>
 					
 					<TouchableOpacity 
-						style={[styles.screenStyle, (this.props.activeItemKey=='ScreenA') ? styles.activeBackgroundColor : null]}
+						style={[styles.screenStyle, (this.props.activeItemKey=='MyGames') ? styles.activeBackgroundColor : null]}
 						onPress={() => this.props.navigation.navigate('MyGames')}
 					>
 						<Icon
@@ -63,11 +68,11 @@ class drawerContentComponents extends Component {
 							w={24}
 						/>
 						<Text 
-							style={[styles.screenTextStyle, styles.selectedTextStyle ]} 
+							style={[styles.screenTextStyle, (this.props.activeItemKey=='MyGames') ? styles.activeBackgroundColor : styles.selectedTextStyle ]} 
 							>Мои игры</Text>
 					</TouchableOpacity>
 					<TouchableOpacity 
-						style={[styles.screenStyle, (this.props.activeItemKey=='ScreenA') ? styles.activeBackgroundColor : null]}
+						style={[styles.screenStyle, (this.props.activeItemKey=='Shop') ? styles.activeBackgroundColor : styles.selectedTextStyle]}
 						onPress={() => this.props.navigation.navigate('Shop')}
 					>
 						<Icon
@@ -76,7 +81,7 @@ class drawerContentComponents extends Component {
 							w={24}
 						/>
 						<Text 
-							style={[styles.screenTextStyle, styles.selectedTextStyle ]} 
+							style={[styles.screenTextStyle, (this.props.activeItemKey=='Shop') ? styles.activeBackgroundColor : styles.selectedTextStyle ]} 
 							>Магазин MozgoParty</Text>
 					</TouchableOpacity>
 
@@ -94,7 +99,7 @@ class drawerContentComponents extends Component {
 							w={24}
 						/>
 						<Text 
-							style={[styles.screenTextStyle, styles.selectedTextStyle ]} 
+							style={[styles.screenTextStyle, (this.props.activeItemKey=='SupportGroup') ? styles.activeBackgroundColor : styles.selectedTextStyle ]} 
 							>Служба поддержки</Text>
 					</TouchableOpacity>
 					<TouchableOpacity 
@@ -107,7 +112,7 @@ class drawerContentComponents extends Component {
 							w={24}
 						/>
 						<Text 
-							style={[styles.screenTextStyle, styles.selectedTextStyle ]} 
+							style={[styles.screenTextStyle, (this.props.activeItemKey=='Faq') ? styles.activeBackgroundColor : styles.selectedTextStyle ]} 
 							>FAQ</Text>
 					</TouchableOpacity>
 
@@ -121,7 +126,7 @@ class drawerContentComponents extends Component {
 							w={24}
 						/>
 						<Text 
-							style={[styles.screenTextStyle, styles.selectedTextStyle ]} 
+							style={[styles.screenTextStyle, (this.props.activeItemKey=='GamesGuide') ? styles.activeBackgroundColor : styles.selectedTextStyle ]} 
 							>Рукводство к играм</Text>
 					</TouchableOpacity>
 
@@ -136,7 +141,7 @@ class drawerContentComponents extends Component {
 						h={24}
 						w={24}
 					/>
-					<Text style={[styles.screenTextStyle, styles.selectedTextStyle ]} >Настройки</Text>
+					<Text style={[styles.screenTextStyle, (this.props.activeItemKey=='SettingsStack') ? styles.activeBackgroundColor : styles.selectedTextStyle ]} >Настройки</Text>
 				</TouchableOpacity>
 			</View>
 			)
@@ -145,7 +150,7 @@ class drawerContentComponents extends Component {
 
 const mapStateToProps = state => {
 	console.log("mapStateToProps >>>>>>>>");
-	console.log(JSON.stringify(state));
+	// alert(JSON.stringify(state));
 	return {
 	  user: state.userData
 	};
@@ -172,8 +177,8 @@ const styles = StyleSheet.create({
 		paddingHorizontal : 16
     },
     headerText: {
-		color: '#000',
-		fontWeight : '800',
+		color: 'rgba(0, 0, 0, 0.87)',
+		fontWeight : '500',
 		fontSize : 20,
 		fontFamily : "Montserrat-Regular",
 		marginBottom : 5
@@ -182,7 +187,7 @@ const styles = StyleSheet.create({
 		color: 'rgba(0, 0, 0, 0.54)',
 		fontWeight : '500',
 		fontSize : 14,
-		fontFamily : "Roboto"
+		fontFamily : "Montserrat-Regular"
     },
     screenContainer: { 
         paddingTop: 20,
@@ -207,11 +212,14 @@ const styles = StyleSheet.create({
     },
     selectedTextStyle: {
         fontWeight: '600',
-		color: '#0B2A5B',
+		color: '#333333',
 		fontFamily : 'Montserrat-Regular',
 		fontSize : 14
     },
     activeBackgroundColor: {
-        backgroundColor: 'grey'
+        fontWeight: '600',
+		color: '#0B2A5B',
+		fontFamily : 'Montserrat-Regular',
+		fontSize : 14
     }
 });

@@ -6,7 +6,8 @@ import {
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  Keyboard
+  Keyboard,
+  Alert
 } from "react-native";
 import { connect } from "react-redux";
 import AsyncStorage from "@react-native-community/async-storage";
@@ -47,12 +48,17 @@ class AuthScreen extends Component {
           "userToken",
           JSON.stringify(json.access_token)
         );
-        await this.props.navigation.navigate("Profile");
+        await this.props.navigation.navigate("Shop");
       } else {
-        alert("Упс... Что-то пошло не так");
+        Alert.alert(`${json.errors.email}`, "", [
+          {
+            text: "Закрыть",
+            style: "default"
+          }
+        ]);
       }
     } catch (error) {
-      alert(error);
+      Alert.alert(error);
     }
   };
 

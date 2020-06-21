@@ -38,7 +38,7 @@ export default class StartedScreen extends Component {
             </Text>
             <TouchableOpacity
               style={styles.nextBtn}
-              onPress={() => this.props.navigation.navigate("AuthScreen")}
+              onPress={() => this.props.navigation.navigate("Shop")}
             >
               <Text
                 style={{

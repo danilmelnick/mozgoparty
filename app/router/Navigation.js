@@ -140,24 +140,7 @@ const Auth = createStackNavigator(
         headerShown: false
       }
     },
-    AuthScreen: {
-      screen: AuthScreen,
-      navigationOptions: {
-        headerShown: false
-      }
-    },
-    RecoverScreeen: {
-      screen: RecoverScreeen,
-      navigationOptions: {
-        headerShown: false
-      }
-    },
-    RegistrationScreeen: {
-      screen: RegistrationScreeen,
-      navigationOptions: {
-        headerShown: false
-      }
-    }
+   
   },
   {
     initialRouteName: "StartedScreen"
@@ -186,19 +169,47 @@ const Profile = createStackNavigator({
   ShopCardStack: ShopCardStack
 });
 
+const AuthRoute = createStackNavigator({
+  AuthScreen: {
+    screen: AuthScreen,
+    navigationOptions: {
+      headerShown: false
+    }
+  },
+  RecoverScreeen: {
+    screen: RecoverScreeen,
+    navigationOptions: {
+      headerShown: false
+    }
+  },
+  RegistrationScreeen: {
+    screen: RegistrationScreeen,
+    navigationOptions: {
+      headerShown: false
+    }
+  }
+},
+{
+  initialRouteName : 'AuthScreen'
+});
+
+
+
 const MyDrawerNavigator = createDrawerNavigator(
   {
-    Profile,
     Shop: ShopStack,
+    Profile,
     MyGames: MyGames,
     SettingsStack,
     Favorites,
     SupportGroup,
     Faq : FAQ,
     GamesGuide,
+    AuthLoadingScreen
   }, 
   {
     contentComponent: drawerContentComponents,
+    initialRouteName : 'Shop'
   }
 );
 
@@ -207,6 +218,7 @@ export const Navigation = createAppContainer(
     {
       AuthLoading: AuthLoadingScreen,
       Loading: Auth,
+      AuthRoute,
       MyDrawerNavigator: MyDrawerNavigator
     },
     {

@@ -44,21 +44,15 @@ class PersonalArea extends React.Component {
   }
 
   outGoing = async () => {
-    await AsyncStorage.removeItem("userToken");
+    AsyncStorage.getAllKeys()
+      .then(keys => AsyncStorage.multiRemove(keys))
     await this.props.navigation.navigate("Loading");
   };
 
   render() {
-    // const { name, email, phone } = this.props.user.userInfo;
+    const { name, email, phone } = this.props.user.userInfo;
     let { loading } = this.props.user;
-
-    if (!loading == true) {
-      return (
-        <View style={styles.preloader}>
-          <ActivityIndicator color={"#000"} />
-        </View>
-      );
-    }
+    const {token} = this.state
 
     return (
       <>
@@ -78,7 +72,7 @@ class PersonalArea extends React.Component {
         <View style={styles.PersonalAreaWrapper}>
           <View style={styles.PersonAvatarImage}>
             <Image
-              source={require("../../src/PersonAvatar.png")}
+              source={require("../../src/noAuth.png")}
               style={{
                 width: 80,
                 height: 80,
@@ -89,7 +83,6 @@ class PersonalArea extends React.Component {
           </View>
           <View style={styles.PersonInfoWrapper}>
             <Text style={styles.PersonInfoTitle}>Имя и фамилия</Text>
-            {/* <Text style={styles.PersonInfoDesc}>{name}</Text> */}
           </View>
           <View style={styles.PersonInfoWrapper}>
             <Text style={styles.PersonInfoTitle}>Номер телефона</Text>
@@ -102,28 +95,36 @@ class PersonalArea extends React.Component {
             {/* <Text style={styles.PersonInfoDesc}>{email}</Text> */}
           </View>
           <View style={styles.PersonalActionButtonsWrapper}>
-            <TouchableOpacity
-              onPress={() => this.props.navigation.navigate("EditPersonalArea")}
-              style={styles.PersonalActionButton}
-            >
-              <Text style={styles.PersonalActionButtonText}>
-                Изменить данные
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => this.props.navigation.navigate("ChangePass")}
-              style={styles.PersonalActionButton}
-            >
-              <Text style={styles.PersonalActionButtonText}>
-                Изменить пароль
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => this.outGoing()}
-              style={styles.PersonalActionButton}
-            >
-              <Text style={styles.PersonalLogoutButtonText}>Выйти</Text>
-            </TouchableOpacity>
+           
+            
+            {
+              token ? (
+                <>
+                 <TouchableOpacity
+                    onPress={() => this.props.navigation.navigate("EditPersonalArea")}
+                    style={styles.PersonalActionButton}
+                  >
+                    <Text style={styles.PersonalActionButtonText}>
+                      Изменить данные
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => this.props.navigation.navigate("ChangePass")}
+                    style={styles.PersonalActionButton}
+                  >
+                    <Text style={styles.PersonalActionButtonText}>
+                      Изменить пароль
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => this.outGoing()}
+                    style={styles.PersonalActionButton}
+                  >
+                    <Text style={styles.PersonalLogoutButtonText}>Выйти</Text>
+                  </TouchableOpacity>
+                </>
+              ) : null
+            }
           </View>
         </View>
       </>
