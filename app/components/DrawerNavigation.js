@@ -86,7 +86,7 @@ class drawerContentComponents extends Component {
 					
 					<TouchableOpacity 
 						style={[styles.screenStyle, (this.props.activeItemKey=='ScreenA') ? styles.activeBackgroundColor : null]}
-						onPress={() => this.props.navigation.navigate('SettingsStack')}
+						onPress={() => this.props.navigation.navigate('SupportGroup')}
 					>
 						<Icon
 							src={require('../src/help.png')}
@@ -99,7 +99,7 @@ class drawerContentComponents extends Component {
 					</TouchableOpacity>
 					<TouchableOpacity 
 						style={[styles.screenStyle, (this.props.activeItemKey=='ScreenA') ? styles.activeBackgroundColor : null]}
-						onPress={this.props.navigation.navigate('SettingsStack')}
+						onPress={() => this.props.navigation.navigate('Faq')}
 					>
 						<Icon
 							src={require('../src/faq.png')}
@@ -113,7 +113,7 @@ class drawerContentComponents extends Component {
 
 					<TouchableOpacity 
 						style={[styles.screenStyle, (this.props.activeItemKey=='ScreenA') ? styles.activeBackgroundColor : null]}
-						onPress={() => this.props.navigation.navigate('SettingsStack')}
+						onPress={() => this.props.navigation.navigate('GamesGuide')}
 					>
 						<Icon
 							src={require('../src/information.png')}

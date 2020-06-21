@@ -48,19 +48,29 @@ const ShopStack = createStackNavigator({
   }
 });
 
-const SettingsStack = createStackNavigator({
-  FAQScreen: {
-    screen: FAQScreen,
+const SupportGroup = createStackNavigator({
+  SupportScreen: {
+    screen: SupportScreen,
     navigationOptions: {
       headerShown: false
     }
   },
-  SupportScreen: {
-    screen: SupportScreen,
+ 
+});
+
+
+const FAQ = createStackNavigator({
+  FAQScreen: {
+    screen: FAQScreen,
     navigationOptions: {
       headerShown: true
     }
   },
+ 
+});
+
+const SettingsStack = createStackNavigator({
+  
   SettingsScreen: {
     screen: SettingsScreen,
     navigationOptions: {
@@ -81,11 +91,20 @@ const SettingsStack = createStackNavigator({
   }
 });
 
+const GamesGuide = createStackNavigator({
+  GamesGuideScreen: {
+    screen: GamesGuideScreen,
+    navigationOptions: {
+      headerShown: true
+    }
+  },
+});
+
 const MyGames = createStackNavigator({
   MyGamesScreen: {
     screen: MyGamesScreen,
     navigationOptions: {
-      headerShown: false
+      headerShown: true
     }
   },
   LikeScreen: {
@@ -174,9 +193,12 @@ const MyDrawerNavigator = createDrawerNavigator(
     MyGames: MyGames,
     SettingsStack,
     Favorites,
+    SupportGroup,
+    Faq : FAQ,
+    GamesGuide,
   }, 
   {
-    contentComponent: drawerContentComponents
+    contentComponent: drawerContentComponents,
   }
 );
 
