@@ -5,20 +5,35 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator
+  ActivityIndicator,
+  TextInput,
+  TouchableWithoutFeedback,
+  Keyboard,
+  ActionSheetIOS,
+  Alert,
+  ImageBackground
 } from "react-native";
+import ImagePicker from "react-native-image-picker";
 import AsyncStorage from "@react-native-community/async-storage";
 import userDataAction from "../../actions/userDataAction";
 import { connect } from "react-redux";
 import { Header } from "react-native-elements";
 import Icon from "../../components/Icon";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 class PersonalArea extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      token: null
+      token: null,
+      hasChanges: false,
+      nameChanged: undefined,
+      emailChanged: undefined,
+      phoneChanged: undefined,
+      name: undefined,
+      email: undefined,
+      phone: undefined
     };
   }
 
@@ -48,8 +63,176 @@ class PersonalArea extends React.Component {
     await this.props.navigation.navigate("Loading");
   };
 
+  componentWillReceiveProps(nextprops) {
+    if (nextprops.user.userInfo) {
+      const { name, email, phone } = nextprops.user.userInfo;
+      this.setState({ name, email, phone });
+    }
+  }
+
+  change = async () => {
+    const { email, phone, name } = this.state;
+    const settings = {
+      method: "PATCH",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + this.state.token
+      },
+      body: JSON.stringify({
+        email: email,
+        phone,
+        name
+      })
+    };
+    try {
+      const data = await fetch(
+        `https://api.base.mozgo.com/api/users/` + this.props.user.userInfo.id,
+        settings
+      );
+      const json = await data.json();
+      console.log("Update >>>>>>>>>>>" + JSON.stringify(json), data);
+
+      if (data.status == 422) {
+        let error = "";
+        if (json.errors.password) {
+          error = json.errors.password[0];
+        } else if (json.errors.name) {
+          error = json.errors.name[0];
+        } else if (json.errors.phone) {
+          error = json.errors.phone[0];
+        } else if (json.errors.email) {
+          error = json.errors.email[0];
+        }
+
+        Alert.alert(error, "", [
+          {
+            text: "OK",
+            style: "default"
+          }
+        ]);
+      } else {
+        Alert.alert("Данные успешно изменены", undefined, [
+          {
+            text: "OK"
+          }
+        ]);
+
+        await this.props.userDataAction(this.state.token);
+      }
+    } catch (error) {
+      alert(error);
+    }
+  };
+
+  showActionMenu = () => {
+    ActionSheetIOS.showActionSheetWithOptions(
+      {
+        options: ["Отменить", "Изменить пароль", "Выйти"],
+        destructiveButtonIndex: 2,
+        cancelButtonIndex: 0
+      },
+      buttonIndex => {
+        if (buttonIndex === 1) {
+          this.props.navigation.navigate("ChangePass");
+        } else if (buttonIndex === 2) {
+          AsyncStorage.clear();
+          this.props.navigation.navigate("AuthScreen");
+        }
+      }
+    );
+  };
+
+  loadAvatar = async url => {
+    let body = new FormData();
+    body.append("avatar", {
+      uri: url,
+      name: "photo.png",
+      filename: "imageName.png",
+      type: "image/png"
+    });
+    body.append("Content-Type", "image/png");
+
+    const settings = {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "multipart/form-data",
+        Authorization: "Bearer " + this.state.token
+      },
+      body
+    };
+    try {
+      const data = await fetch(
+        `https://api.base.mozgo.com/partners/avatar/`,
+        settings
+      );
+      const json = await data.json();
+
+      console.log(data);
+      console.log(json);
+
+      await this.props.userDataAction(this.state.token);
+    } catch (error) {
+      alert(error);
+    }
+  };
+
+  deleteAvatar = async () => {
+    const settings = {
+      method: "DELETE",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + this.state.token
+      }
+    };
+    try {
+      const data = await fetch(
+        `https://api.base.mozgo.com/partners/avatar/`,
+        settings
+      );
+      const json = await data.json();
+
+      console.log(json);
+
+      await this.props.userDataAction(this.state.token);
+    } catch (error) {
+      alert(error);
+    }
+  };
+
+  showActionImageMenu = () => {
+    let options = ["Отменить", "Загрузить из галереи", "Сделать снимок"];
+
+    if (this.props.user.userInfo.avatar_url) {
+      options.push("Удалить фото");
+    }
+
+    ActionSheetIOS.showActionSheetWithOptions(
+      {
+        title: "Выбрать фото",
+        options,
+        destructiveButtonIndex: 3,
+        cancelButtonIndex: 0
+      },
+      buttonIndex => {
+        if (buttonIndex === 2) {
+          ImagePicker.launchCamera(options, response => {
+            this.loadAvatar(response.uri);
+          });
+        } else if (buttonIndex === 1) {
+          ImagePicker.launchImageLibrary(options, response => {
+            this.loadAvatar(response.uri);
+          });
+        } else if (buttonIndex === 3) {
+          this.deleteAvatar();
+        }
+      }
+    );
+  };
+
   render() {
-    // const { name, email, phone } = this.props.user.userInfo;
     let { loading } = this.props.user;
 
     if (!loading == true) {
@@ -61,72 +244,178 @@ class PersonalArea extends React.Component {
     }
 
     return (
-      <>
-        <Header
-          leftComponent={
-            <Icon
-              src={require("../../src/shape.png")}
-              press={() => this.props.navigation.openDrawer()}
-            />
-          }
-          centerComponent={{
-            text: "Аккаунт",
-            style: { color: "#000", fontSize: 18 }
-          }}
-          containerStyle={styles.header}
-        />
-        <View style={styles.PersonalAreaWrapper}>
-          <View style={styles.PersonAvatarImage}>
-            <Image
-              source={require("../../src/PersonAvatar.png")}
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>
+          <Header
+            leftComponent={
+              <TouchableOpacity
+                style={{ marginLeft: 8 }}
+                onPress={() => this.props.navigation.openDrawer()}
+              >
+                <Image source={require("../../src/burgerMenu.png")} />
+              </TouchableOpacity>
+            }
+            rightComponent={
+              <TouchableOpacity
+                style={{ marginRight: 6 }}
+                onPress={() => this.showActionMenu()}
+              >
+                <Image source={require("../../src/more.png")} />
+              </TouchableOpacity>
+            }
+            containerStyle={styles.header}
+          />
+          <Text
+            style={{
+              fontFamily: "Montserrat-Bold",
+              fontSize: 34,
+              marginLeft: 16
+            }}
+          >
+            Аккаунт
+          </Text>
+
+          <View style={styles.PersonalAreaWrapper}>
+            <View style={{ width: 80, height: 80, marginBottom: 25 }}>
+              <View
+                style={{
+                  borderRadius: 40,
+                  overflow: "hidden",
+                  width: 80,
+                  height: 80
+                }}
+              >
+                <ImageBackground
+                  source={
+                    this.props.user.userInfo.avatar_url
+                      ? { uri: this.props.user.userInfo.avatar_url }
+                      : require("../../src/PersonAvatar.png")
+                  }
+                  style={{
+                    width: 80,
+                    height: 80,
+                    borderRadius: 40,
+                    marginBottom: 29
+                  }}
+                />
+              </View>
+              <TouchableOpacity
+                style={{ position: "absolute", right: -5, bottom: -5 }}
+                onPress={this.showActionImageMenu}
+              >
+                <Image source={require("../../src/edit.png")} />
+              </TouchableOpacity>
+            </View>
+            <Text
               style={{
-                width: 80,
-                height: 80,
-                borderRadius: 40,
-                marginBottom: 29
+                color: "#979797",
+                fontSize: 12,
+                fontFamily: "Montserrat-Regular",
+                paddingLeft: 10
+              }}
+            >
+              Имя и фамилия
+            </Text>
+            <TextInput
+              style={[
+                styles.inputForm,
+                {
+                  borderBottomColor: this.state.nameChanged
+                    ? "#0B2A5B"
+                    : "rgba(0, 0, 0, 0.38)"
+                }
+              ]}
+              value={this.state.name}
+              onChangeText={name =>
+                this.setState({ name, hasChanges: true, nameChanged: true })
+              }
+            />
+
+            <Text
+              style={{
+                color: "#979797",
+                fontSize: 12,
+                fontFamily: "Montserrat-Regular",
+                paddingLeft: 10
+              }}
+            >
+              Номер телефона
+            </Text>
+            <TextInput
+              style={[
+                styles.inputForm,
+                {
+                  borderBottomColor: this.state.phoneChanged
+                    ? "#0B2A5B"
+                    : "rgba(0, 0, 0, 0.38)"
+                }
+              ]}
+              value={this.state.phone}
+              onChangeText={phone =>
+                this.setState({ phone, hasChanges: true, phoneChanged: true })
+              }
+            />
+
+            <Text
+              style={{
+                color: "#979797",
+                fontSize: 12,
+                fontFamily: "Montserrat-Regular",
+                paddingLeft: 10
+              }}
+            >
+              E-mail
+            </Text>
+            <TextInput
+              style={[
+                styles.inputForm,
+                {
+                  borderBottomColor: this.state.emailChanged
+                    ? "#0B2A5B"
+                    : "rgba(0, 0, 0, 0.38)"
+                }
+              ]}
+              value={this.state.email}
+              onChangeText={email => {
+                this.setState({ email, hasChanges: true, emailChanged: true });
               }}
             />
-          </View>
-          <View style={styles.PersonInfoWrapper}>
-            <Text style={styles.PersonInfoTitle}>Имя и фамилия</Text>
-            {/* <Text style={styles.PersonInfoDesc}>{name}</Text> */}
-          </View>
-          <View style={styles.PersonInfoWrapper}>
-            <Text style={styles.PersonInfoTitle}>Номер телефона</Text>
-            {/* <Text style={styles.PersonInfoDesc}>
-              {!phone ? <Text>...</Text> : phone}
-            </Text> */}
-          </View>
-          <View style={styles.PersonInfoWrapper}>
-            <Text style={styles.PersonInfoTitle}>E-mail</Text>
-            {/* <Text style={styles.PersonInfoDesc}>{email}</Text> */}
-          </View>
-          <View style={styles.PersonalActionButtonsWrapper}>
-            <TouchableOpacity
-              onPress={() => this.props.navigation.navigate("EditPersonalArea")}
-              style={styles.PersonalActionButton}
+
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "flex-end",
+                marginBottom: 30
+              }}
             >
-              <Text style={styles.PersonalActionButtonText}>
-                Изменить данные
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => this.props.navigation.navigate("ChangePass")}
-              style={styles.PersonalActionButton}
-            >
-              <Text style={styles.PersonalActionButtonText}>
-                Изменить пароль
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => this.outGoing()}
-              style={styles.PersonalActionButton}
-            >
-              <Text style={styles.PersonalLogoutButtonText}>Выйти</Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                disabled={!this.state.hasChanges}
+                onPress={() => this.change()}
+                style={{
+                  backgroundColor: !this.state.hasChanges
+                    ? "#DADADA"
+                    : "#0B2A5B",
+                  height: 44,
+                  borderRadius: 5,
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              >
+                <Text
+                  style={{
+                    textAlign: "center",
+                    color: "#fff",
+                    fontFamily: "Montserrat-Regular",
+                    fontSize: 17
+                  }}
+                >
+                  Сохранить изменения
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </>
+        </SafeAreaView>
+      </TouchableWithoutFeedback>
     );
   }
 }
@@ -148,13 +437,25 @@ export default connect(mapStateToProps, mapDispatchToProps)(PersonalArea);
 
 const styles = StyleSheet.create({
   PersonalAreaWrapper: {
+    flex: 1,
     paddingTop: 24,
+    marginTop: 60,
     paddingHorizontal: 16,
     paddingBottom: 24
   },
   PersonInfoWrapper: {
     paddingHorizontal: 12,
     marginBottom: 32
+  },
+  inputForm: {
+    height: 40,
+    fontFamily: "Montserrat-Regular",
+    borderBottomWidth: 1,
+    paddingLeft: 9,
+    paddingRight: 15,
+    borderBottomColor: "rgba(0, 0, 0, 0.38)",
+    fontSize: 16,
+    marginBottom: 25
   },
   PersonInfoTitle: {
     color: "#979797",
@@ -191,9 +492,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderBottomWidth: 0.4,
     paddingBottom: 0,
-    borderBottomColor: "#000",
+    borderBottomColor: "white",
     paddingTop: 0,
-    height: 60
+    height: 44
   },
   preloader: {
     flex: 1,
