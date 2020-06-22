@@ -21,7 +21,7 @@ import LikeScreen from "../screens/Liked/LikeScreen";
 
 import PersonalArea from "../screens/Profile/PersonalArea";
 import { EditPersonalArea } from "../screens/Profile/EditPersonalArea";
-import { ChangePass } from "../screens/Profile/ChangePass";
+import ChangePass from "../screens/Profile/ChangePass";
 
 import FAQScreen from "../screens/Settings/FAQScreen";
 import SupportScreen from "../screens/Settings/SupportScreen";
@@ -159,7 +159,13 @@ const Profile = createStackNavigator({
   ChangePass: {
     screen: ChangePass,
     navigationOptions: {
-      headerShown: true
+      headerShown: false
+    }
+  },
+  RecoverProfileScreeen: {
+    screen: RecoverScreeen,
+    navigationOptions: {
+      headerShown: false
     }
   },
   ShopCardStack: ShopCardStack
