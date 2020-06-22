@@ -50,7 +50,7 @@ export default class RecoverScreeen extends Component {
 
       if (data.status == 200) {
         Alert.alert(
-          "Письмо с сылкой на сброс пароля отправленно на почту",
+          "Письмо с ссылкой на сброс пароля отправленно на почту",
           "",
           [
             {
