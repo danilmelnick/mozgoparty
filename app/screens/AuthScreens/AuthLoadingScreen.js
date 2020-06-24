@@ -6,7 +6,18 @@ class AuthLoadingScreen extends React.Component {
   constructor() {
     super();
     this._bootstrapAsync();
+
+    this.checkFirstEnter();
   }
+
+  checkFirstEnter = async () => {
+    if (await AsyncStorage.getItem("firstEnter")) {
+      this.props.navigation.navigate("MyDrawerNavigator");
+    } else {
+      AsyncStorage.setItem("firstEnter", "true");
+      this.setState({ showButton: true });
+    }
+  };
 
   _bootstrapAsync = async () => {
     const userToken = await AsyncStorage.getItem("userToken");
