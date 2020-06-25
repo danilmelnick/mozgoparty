@@ -332,7 +332,7 @@ export default class ShopScreen extends Component {
                     age_rating: item.party.age_rating,
                     price: item.party.price,
                     id: item.id,
-                  
+                    currency : item.party.currency
                   })
                 }
               />

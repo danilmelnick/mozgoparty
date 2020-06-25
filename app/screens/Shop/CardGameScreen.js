@@ -82,7 +82,7 @@ export default class CardGameScreen  extends Component{
 
         <View style={styles.aboutGame}>
 
-            <Text style={{color : "#BD006C",fontFamily: "Montserrat-Regular", fontSize : 12, fontWeight : '600',  marginRight : 24}}>{`${navigationProps.price} ₽`}</Text>
+            <Text style={{color : "#BD006C",fontFamily: "Montserrat-Regular", fontSize : 12, fontWeight : '600',  marginRight : 24}}>{navigationProps.price + ' '  + navigationProps.currency}</Text>
 
             <Text style={{color : "#333",fontFamily: "Montserrat-Regular", fontSize : 12, fontWeight : '600', marginRight : 24}}>122 Мб</Text>
 
