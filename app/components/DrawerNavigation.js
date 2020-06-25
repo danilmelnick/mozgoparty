@@ -45,7 +45,7 @@ class drawerContentComponents extends Component {
           onPress={() =>
             token
               ? this.props.navigation.navigate("Profile")
-              : this.props.navigation.navigate("AuthRoute")
+              : this.props.navigation.navigate("AuthScreen")
           }
         >
           <View style={{ flex: 1, justifyContent: "center" }}>
@@ -115,7 +115,7 @@ class drawerContentComponents extends Component {
             onPress={() =>
               token
                 ? this.props.navigation.navigate("SupportGroup")
-                : this.props.navigation.navigate("AuthRoute")
+                : this.props.navigation.navigate("AuthScreen")
             }
           >
             <Icon src={require("../src/help.png")} h={24} w={24} />
@@ -170,7 +170,7 @@ class drawerContentComponents extends Component {
                   : styles.selectedTextStyle
               ]}
             >
-              Рукводство к играм
+              Руководство к играм
             </Text>
           </TouchableOpacity>
         </View>
