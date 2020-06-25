@@ -18,7 +18,6 @@ import {
   Constants
 } from "react-native-ui-lib";
 import { Header } from "react-native-elements";
-import Icon from "../../components/Icon";
 import { AsyncStorage } from "react-native";
 
 import CardItem from "../../components/CardItem";

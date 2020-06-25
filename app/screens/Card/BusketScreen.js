@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Header } from "react-native-elements";
 
 
 export default class BusketScreen  extends Component{
@@ -7,6 +9,20 @@ export default class BusketScreen  extends Component{
   render() {
 
     return (
+
+    <SafeAreaView>
+        <Header
+          leftComponent={
+            <TouchableOpacity
+              style={{ marginLeft: 8 }}
+              onPress={() => this.props.navigation.openDrawer()}
+            >
+              <Image source={require("../../src/burgerMenu.png")} />
+            </TouchableOpacity>
+          }
+          
+          containerStyle={styles.header}
+        />
       
       <View style={styles.container}>
 
@@ -78,8 +94,9 @@ export default class BusketScreen  extends Component{
             </TouchableOpacity>
         </View>
 
+
       </View>
-     
+      </SafeAreaView>     
     )
 
   }
@@ -90,13 +107,22 @@ const styles = StyleSheet.create({
     container : {
         paddingHorizontal : 16,
         paddingVertical : 16,
-        height : '100%'
+        height : '92%',
+        backgroundColor : '#fff'
     },
     logo: {
         width : 94,
         height : 94,
         borderRadius : 5,
         marginRight : 10
+    },
+    header: {
+        backgroundColor: "#fff",
+        borderBottomWidth: 0.4,
+        paddingBottom: 0,
+        borderBottomColor: "white",
+        paddingTop: 0,
+        height: 44
     },
     btnAuth : {
         backgroundColor : '#0B2A5B',

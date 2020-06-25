@@ -104,7 +104,7 @@ const MyGames = createStackNavigator({
   MyGamesScreen: {
     screen: MyGamesScreen,
     navigationOptions: {
-      headerShown: true
+      headerShown: false
     }
   },
   LikeScreen: {

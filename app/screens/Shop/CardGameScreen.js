@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView , TouchableOpacity, Image } from 'react-native';
 import { AsyncStorage } from 'react-native';
 import { Header } from "react-native-elements";
 
@@ -20,6 +20,7 @@ export default class CardGameScreen  extends Component{
         let arrGames = AsyncStorage.getItem('cardGames')
             .then(res => JSON.parse(res))
         console.log(arrGames)
+        this.renderFootBtn()
     }
     
     renderFootBtn(){
@@ -30,11 +31,11 @@ export default class CardGameScreen  extends Component{
             <TouchableOpacity
             style={styles.btnAuth2}
             onPress={() => this.props.navigation.navigate('BusketScreen')}
-        >
-            <Text style={{textAlign : 'left', color : '#fff', fontSize : 14}}>
-                КОРЗИНА
-            </Text>
-        </TouchableOpacity>
+            >
+                <Text style={{textAlign : 'left', color : '#fff', fontSize : 14}}>
+                    КОРЗИНА
+                </Text>
+            </TouchableOpacity>
         )
     }
   render() {
@@ -44,9 +45,7 @@ export default class CardGameScreen  extends Component{
     
 
     return (
-
-        <>
-
+        <SafeAreaView>
         <Header
           leftComponent={
             <TouchableOpacity
@@ -59,8 +58,10 @@ export default class CardGameScreen  extends Component{
           
           containerStyle={styles.header}
         />
+
+      <SafeAreaView style={styles.container}>
+
       
-      <View style={styles.container}>
 
         <View style={styles.headerGames}>
             <Image
@@ -111,7 +112,7 @@ export default class CardGameScreen  extends Component{
             onPress={() => this.addItemToCard(navigationProps.id)}
         >
             <Text style={{textAlign : 'center',textTransform : 'none' , color : '#fff',fontFamily: "Montserrat-Regular", fontSize : 17}}>
-                ДОБАВИТЬ В КОРЗИНУ
+                {! this.state.addGames ? 'Добавить в корзину' : 'В корзине'}
             </Text>
         </TouchableOpacity>
 
@@ -127,11 +128,12 @@ export default class CardGameScreen  extends Component{
                     Топ-5
                 </Text>
             </TouchableOpacity>
+           
         </View>
-
-        {this.renderFootBtn()}
-      </View>
-     </>
+        
+      </SafeAreaView>
+      {this.renderFootBtn()}
+      </SafeAreaView>
     )
 
   }
@@ -142,7 +144,7 @@ const styles = StyleSheet.create({
     container : {
         paddingHorizontal : 16,
         paddingVertical : 22,
-        height : '100%',
+        height : '95%',
         backgroundColor : '#fff'
     },
     title : {
@@ -180,7 +182,7 @@ const styles = StyleSheet.create({
         borderRadius : 24
     },
     description : {
-        marginVertical : 30
+        marginVertical : 30,
     },
     btnAuth2 :{
         backgroundColor : '#0B2A5B',

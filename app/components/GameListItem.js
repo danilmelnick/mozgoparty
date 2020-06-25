@@ -1,11 +1,9 @@
 import React, {Component} from 'react'
-import { View, Image, ScrollView, Text, StyleSheet, ProgressBarAndroid, TouchableOpacity } from 'react-native'
+import { View, Image, ScrollView, Text, StyleSheet, ProgressBarAndroid, TouchableOpacity, Alert } from 'react-native'
 
 export const GamesListItem = ({press, price, name, rating}) => {
     return(
-        <TouchableOpacity
-            onPress={() => press()}
-        >
+        <View>
             <View style={styles.SingleGameWrapper}>
                 <View style={styles.SingleGameImage}>
                     <TouchableOpacity
@@ -34,18 +32,28 @@ export const GamesListItem = ({press, price, name, rating}) => {
                         <Text style={styles.SingleGameTopTitle}>Кино и Музыка. Эпоха VHS</Text>
                     </View>
                     <View style={styles.SingleGameBottomInfo}>
-                        <View style={styles.DownloadStatus}>
+                        {/* <View style={styles.DownloadStatus}>
                             <View style={styles.PercentStatus}>
                                 <Text style={styles.ProcessTitle}>В процессе</Text>
                                 <Text style={styles.PercentStage}>27%</Text>
                             </View>
                             <ProgressBarAndroid styleAttr="Horizontal" indeterminate={false} color="#EB5757" progress={0.25}/>
+                        </View> */}
+                        <View style={{flexDirection : 'row', justifyContent : 'flex-end'}}>
+                            <TouchableOpacity
+                                onPress={() => alert('Start Download ...')}
+                            >
+                                <Image
+                                    source={require('../src/Icon.png')}
+                                    style={{height: 18, width: 18}}
+                                />
+                            </TouchableOpacity>
                         </View>
                     </View>
 
                 </View>
             </View>
-        </TouchableOpacity>
+        </View>
     )
 }
 
@@ -73,13 +81,16 @@ const styles = StyleSheet.create({
         color: '#979797',
         fontSize: 10,
         lineHeight: 12,
-        marginBottom: 6
+        fontWeight : '600',
+        fontFamily: "Montserrat-Regular",
     },
     SingleGameTopTitle : {
         color: '#333333',
+        fontFamily: "Montserrat-Regular",
         fontSize: 12,
         lineHeight: 15,
-        fontWeight: 'bold'
+        fontWeight: '600',
+        marginTop : 5
     },
     RaitingStarWrapper : {
         flexDirection: 'row',
