@@ -43,7 +43,7 @@ const ShopStack = createStackNavigator({
   CardGameScreen: {
     screen: CardGameScreen,
     navigationOptions: {
-      headerShown: true
+      headerShown: false
     }
   }
 });
