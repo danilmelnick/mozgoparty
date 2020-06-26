@@ -5,7 +5,7 @@ import { createSwitchNavigator, createAppContainer } from "react-navigation";
 import { createStackNavigator } from "react-navigation-stack";
 import { createDrawerNavigator } from "react-navigation-drawer";
 
-import drawerContentComponents from "../components/DrawerNavigation"
+import drawerContentComponents from "../components/DrawerNavigation";
 
 import StartedScreen from "../screens/AuthScreens/StartedScreen";
 import AuthScreen from "../screens/AuthScreens/AuthScreen";
@@ -45,6 +45,24 @@ const ShopStack = createStackNavigator({
     navigationOptions: {
       headerShown: true
     }
+  },
+  AuthScreen: {
+    screen: AuthScreen,
+    navigationOptions: {
+      headerShown: false
+    }
+  },
+  RecoverScreeen: {
+    screen: RecoverScreeen,
+    navigationOptions: {
+      headerShown: false
+    }
+  },
+  RegistrationScreeen: {
+    screen: RegistrationScreeen,
+    navigationOptions: {
+      headerShown: false
+    }
   }
 });
 
@@ -54,10 +72,8 @@ const SupportGroup = createStackNavigator({
     navigationOptions: {
       headerShown: false
     }
-  },
- 
+  }
 });
-
 
 const FAQ = createStackNavigator({
   FAQScreen: {
@@ -66,27 +82,61 @@ const FAQ = createStackNavigator({
       headerShown: true
     }
   },
- 
+  AuthScreen: {
+    screen: AuthScreen,
+    navigationOptions: {
+      headerShown: false
+    }
+  },
+  RecoverScreeen: {
+    screen: RecoverScreeen,
+    navigationOptions: {
+      headerShown: false
+    }
+  },
+  RegistrationScreeen: {
+    screen: RegistrationScreeen,
+    navigationOptions: {
+      headerShown: false
+    }
+  }
 });
 
 const SettingsStack = createStackNavigator({
-  
   SettingsScreen: {
     screen: SettingsScreen,
     navigationOptions: {
-      headerShown: true
+      headerShown: false
     }
   },
   GamesGuideScreen: {
     screen: GamesGuideScreen,
     navigationOptions: {
-      headerShown: true
+      headerShown: false
     }
   },
   GameProgressScreen: {
     screen: GameProgressScreen,
     navigationOptions: {
-      headerShown: true
+      headerShown: false
+    }
+  },
+  AuthScreen: {
+    screen: AuthScreen,
+    navigationOptions: {
+      headerShown: false
+    }
+  },
+  RecoverScreeen: {
+    screen: RecoverScreeen,
+    navigationOptions: {
+      headerShown: false
+    }
+  },
+  RegistrationScreeen: {
+    screen: RegistrationScreeen,
+    navigationOptions: {
+      headerShown: false
     }
   }
 });
@@ -95,9 +145,27 @@ const GamesGuide = createStackNavigator({
   GamesGuideScreen: {
     screen: GamesGuideScreen,
     navigationOptions: {
-      headerShown: true
+      headerShown: false
     }
   },
+  AuthScreen: {
+    screen: AuthScreen,
+    navigationOptions: {
+      headerShown: false
+    }
+  },
+  RecoverScreeen: {
+    screen: RecoverScreeen,
+    navigationOptions: {
+      headerShown: false
+    }
+  },
+  RegistrationScreeen: {
+    screen: RegistrationScreeen,
+    navigationOptions: {
+      headerShown: false
+    }
+  }
 });
 
 const MyGames = createStackNavigator({
@@ -139,8 +207,7 @@ const Auth = createStackNavigator(
       navigationOptions: {
         headerShown: false
       }
-    },
-   
+    }
   },
   {
     initialRouteName: "StartedScreen"
@@ -175,31 +242,31 @@ const Profile = createStackNavigator({
   ShopCardStack: ShopCardStack
 });
 
-const AuthRoute = createStackNavigator({
-  AuthScreen: {
-    screen: AuthScreen,
-    navigationOptions: {
-      headerShown: false
+const AuthRoute = createStackNavigator(
+  {
+    AuthScreen: {
+      screen: AuthScreen,
+      navigationOptions: {
+        headerShown: false
+      }
+    },
+    RecoverScreeen: {
+      screen: RecoverScreeen,
+      navigationOptions: {
+        headerShown: false
+      }
+    },
+    RegistrationScreeen: {
+      screen: RegistrationScreeen,
+      navigationOptions: {
+        headerShown: false
+      }
     }
   },
-  RecoverScreeen: {
-    screen: RecoverScreeen,
-    navigationOptions: {
-      headerShown: false
-    }
-  },
-  RegistrationScreeen: {
-    screen: RegistrationScreeen,
-    navigationOptions: {
-      headerShown: false
-    }
+  {
+    initialRouteName: "AuthScreen"
   }
-},
-{
-  initialRouteName : 'AuthScreen'
-});
-
-
+);
 
 const MyDrawerNavigator = createDrawerNavigator(
   {
@@ -209,13 +276,14 @@ const MyDrawerNavigator = createDrawerNavigator(
     SettingsStack,
     Favorites,
     SupportGroup,
-    Faq : FAQ,
+    Faq: FAQ,
     GamesGuide,
-    AuthLoadingScreen
-  }, 
+    AuthLoadingScreen,
+    AuthRoute
+  },
   {
     contentComponent: drawerContentComponents,
-    initialRouteName : 'Shop'
+    initialRouteName: "Shop"
   }
 );
 
@@ -224,7 +292,6 @@ export const Navigation = createAppContainer(
     {
       AuthLoading: AuthLoadingScreen,
       Loading: Auth,
-      AuthRoute,
       MyDrawerNavigator: MyDrawerNavigator
     },
     {
