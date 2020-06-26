@@ -7,7 +7,10 @@ import {
   Image,
   SafeAreaView,
   TouchableOpacity,
-  ScrollView
+  ScrollView,
+  Dimensions,
+  Modal,
+  TextInput
 } from "react-native";
 import { CheckBox } from "react-native-elements";
 import {
@@ -43,6 +46,10 @@ export default class ShopScreen extends Component {
       showDialog: false,
       like: false,
       favGames: [],
+      showSearch: false,
+      searchText: "",
+      showenTab: 0,
+      selectedTab: 0,
       categories: []
     };
   }
@@ -70,48 +77,123 @@ export default class ShopScreen extends Component {
   };
 
   hideDialog = () => {
-    this.setState({ showDialog: false });
+    this.setState({ showDialog: false, showenTab: this.state.selectedTab });
   };
 
   renderContent = () => {
     return (
       <>
         <View style={styles.modalWrapper}>
-          <Text style={{ color: "#333333", fontSize: 14, fontWeight: "bold" }}>
+          <Text
+            style={{
+              color: "#333333",
+              fontSize: 14,
+              fontWeight: "600",
+              fontFamily: "Montserrat-Medium",
+              marginTop: 24,
+              marginBottom: 10
+            }}
+          >
             Какие игры показать сначала?
           </Text>
 
-          <CheckBox
-            left
-            iconRight
-            title={<Text style={styles.sort}>С высоким рейтингом </Text>}
-            checkedIcon={<Image source={require("../../src/check.png")} />}
-            uncheckedIcon={<Image source={require("../../src/check.png")} />}
-            checked={this.state.checked}
-            onPress={() => this.props.navigation.navigate("ShopCardStack")}
-          />
-          <CheckBox
-            left
-            iconRight
-            title={<Text style={styles.sort}>Новые</Text>}
-            checkedIcon={<Image source={require("../../src/sort.png")} />}
-            uncheckedIcon={<Image source={require("../../src/check.png")} />}
-            checked={this.state.checked}
-            onPress={() => this.props.navigation.navigate("MyGames")}
-          />
-          <CheckBox
-            left
-            iconRight
-            title={<Text style={styles.sort}>Старые</Text>}
-            checkedIcon={<Image source={require("../../src/check.png")} />}
-            uncheckedIcon={<Image source={require("../../src/check.png")} />}
-            checked={this.state.checked}
-            style={{ backgroundColor: "transparent" }}
-          />
+          <TouchableOpacity
+            onPress={() => this.setState({ showenTab: 0 })}
+            style={{
+              height: 40,
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor:
+                this.state.showenTab == 0 ? "rgba(0, 0, 0, 0.03)" : "white",
+              left: -16,
+              paddingLeft: 16,
+              paddingRight: 20,
+              width: Dimensions.get("window").width,
+              justifyContent: "space-between"
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: "Montserrat-Regular",
+                fontSize: 12,
+                color: "#333333"
+              }}
+            >
+              С высоким рейтингом
+            </Text>
+            {this.state.showenTab == 0 && (
+              <Image source={require("../../src/checkItem.png")} />
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => this.setState({ showenTab: 1 })}
+            style={{
+              height: 40,
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor:
+                this.state.showenTab == 1 ? "rgba(0, 0, 0, 0.03)" : "white",
+              left: -16,
+              paddingHorizontal: 16,
+              width: Dimensions.get("window").width,
+              justifyContent: "space-between"
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: "Montserrat-Regular",
+                fontSize: 12,
+                color: "#333333"
+              }}
+            >
+              Новые
+            </Text>
+            {this.state.showenTab == 1 && (
+              <Image source={require("../../src/checkItem.png")} />
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => this.setState({ showenTab: 2 })}
+            style={{
+              height: 40,
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor:
+                this.state.showenTab == 2 ? "rgba(0, 0, 0, 0.03)" : "white",
+              left: -16,
+              paddingHorizontal: 16,
+              justifyContent: "space-between",
+              width: Dimensions.get("window").width
+            }}
+          >
+            <Text
+              style={{
+                fontFamily: "Montserrat-Regular",
+                fontSize: 12,
+                color: "#333333"
+              }}
+            >
+              Старые
+            </Text>
+            {this.state.showenTab == 2 && (
+              <Image source={require("../../src/checkItem.png")} />
+            )}
+          </TouchableOpacity>
 
           <TouchableOpacity style={styles.btnAuth}>
-            <Text style={{ textAlign: "center", color: "#fff", fontSize: 14 }}>
-              ПОКАЗАТЬ
+            <Text
+              style={{
+                textAlign: "center",
+                color: "#fff",
+                fontSize: 17,
+                fontFamily: "Montserrat-Regular"
+              }}
+              onPress={() => {
+                this.hideDialog();
+                this.setState({ selectedTab: this.state.showenTab });
+              }}
+            >
+              Показать
             </Text>
           </TouchableOpacity>
         </View>
@@ -146,8 +228,8 @@ export default class ShopScreen extends Component {
         top={position === "top"}
         bottom={position === "bottom"}
         height={height}
-        panDirection={panDirection}
-        containerStyle={isRounded ? styles.roundedDialog : styles.dialog}
+        panDirection={"down"}
+        containerStyle={styles.dialog}
         visible={showDialog}
         onDismiss={this.hideDialog}
         renderPannableHeader={renderPannableHeader}
@@ -172,6 +254,8 @@ export default class ShopScreen extends Component {
       const json = await response.json();
       this.setState({ data: json });
 
+      console.log(json[0]);
+
       const categories = Object.entries(
         json
           .map(item => item.category.toUpperCase())
@@ -190,6 +274,99 @@ export default class ShopScreen extends Component {
     }
   };
 
+  showSearch = () => {
+    this.setState({ showSearch: true });
+  };
+
+  renderSearch = () => {
+    const data = this.state.data.filter(item => {
+      return item.party.name.includes(this.state.searchText);
+    });
+
+    return (
+      <Modal visible={this.state.showSearch}>
+        <SafeAreaView>
+          <View
+            style={{
+              marginTop: 10,
+              flexDirection: "row",
+              marginLeft: 19,
+              marginRight: 16,
+              marginBottom: 25,
+              alignItems: "flex-end"
+            }}
+          >
+            <Image source={require("../../src/search.png")} />
+            <TextInput
+              style={{
+                flex: 1,
+                color: "#979797",
+                marginLeft: 20,
+                top: 2,
+                marginRight: 8,
+                fontSize: 17,
+                fontFamily: "Montserrat-Regular"
+              }}
+              onChangeText={text => this.setState({ searchText: text })}
+              placeholder={"Найти в Магазине"}
+              placeholderTextColor={"#979797"}
+            />
+            <TouchableOpacity
+              onPress={() => {
+                this.setState({ showSearch: false, searchText: "" });
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 12,
+                  fontFamily: "Montserrat-Regular",
+                  textDecorationLine: "underline",
+                  color: "#979797"
+                }}
+              >
+                Отмена
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {this.state.searchText != "" && (
+            <View style={styles.shopContainer}>
+              <FlatList
+                data={data}
+                numColumns={2}
+                renderItem={({ item, index }) => (
+                  <CardItem
+                    isSecond={index % 2 == 1}
+                    raiting={item.rating}
+                    title={item.party.name}
+                    url={item.media.avatar}
+                    addFav={() => this.addItemToFavorite(item.id)}
+                    like={this.state.like}
+                    price={item.party.price}
+                    press={() => {
+                      this.setState({ showSearch: false });
+
+                      this.props.navigation.navigate("CardGameScreen", {
+                        title: item.party.name,
+                        image: item.media.avatar,
+                        description: item.description,
+                        age_rating: item.age_rating,
+                        price: item.party.price,
+                        id: item.id
+                      });
+                    }}
+                  />
+                )}
+                keyExtractor={item => item.id}
+                contentContainerStyle={{ margin: 1 }}
+              />
+            </View>
+          )}
+        </SafeAreaView>
+      </Modal>
+    );
+  };
+
   async componentDidMount() {
     const token = await AsyncStorage.getItem("userToken");
     await this.getGamesData(token);
@@ -197,11 +374,43 @@ export default class ShopScreen extends Component {
   }
 
   render() {
-    const data = this.state.filteredBy
+    let data = this.state.filteredBy
       ? this.state.data.filter(
           item => item.category.toUpperCase() == this.state.filteredBy
         )
       : this.state.data;
+
+    if (this.state.selectedTab == 0) {
+      data = data.sort((a, b) => {
+        if (a.rating < b.rating) {
+          return 1;
+        }
+        if (a.rating > b.rating) {
+          return -1;
+        }
+        return 0;
+      });
+    } else if (this.state.selectedTab == 1) {
+      data = data.sort((a, b) => {
+        if (a.published_at < b.published_at) {
+          return 1;
+        }
+        if (a.published_at > b.published_at) {
+          return -1;
+        }
+        return 0;
+      });
+    } else if (this.state.selectedTab == 2) {
+      data = data.sort((a, b) => {
+        if (a.published_at < b.published_at) {
+          return -1;
+        }
+        if (a.published_at > b.published_at) {
+          return 1;
+        }
+        return 0;
+      });
+    }
 
     return (
       <SafeAreaView style={styles.container}>
@@ -217,7 +426,7 @@ export default class ShopScreen extends Component {
           rightComponent={
             <TouchableOpacity
               style={{ marginRight: 12 }}
-              onPress={() => this.props.navigation.openDrawer()}
+              onPress={() => this.showSearch()}
             >
               <Image source={require("../../src/search.png")} />
             </TouchableOpacity>
@@ -339,6 +548,7 @@ export default class ShopScreen extends Component {
             contentContainerStyle={{ margin: 1 }}
           />
         </View>
+        {this.renderSearch()}
       </SafeAreaView>
     );
   }
@@ -357,10 +567,11 @@ const styles = StyleSheet.create({
     marginRight: 10
   },
   btnAuth: {
-    marginTop: 10,
+    marginTop: 20,
     backgroundColor: "#0B2A5B",
     padding: 16,
-    borderRadius: 5
+    borderRadius: 5,
+    marginBottom: 24
   },
   shopContainer: {
     marginTop: 3,
@@ -385,7 +596,12 @@ const styles = StyleSheet.create({
     marginBottom: 25
   },
   dialog: {
-    backgroundColor: Colors.white
+    borderTopLeftRadius: 14,
+    borderTopRightRadius: 14,
+    backgroundColor: Colors.white,
+    width: Dimensions.get("window").width,
+    marginLeft: -20,
+    marginBottom: -60
   },
   roundedDialog: {
     backgroundColor: Colors.white,
@@ -409,7 +625,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start"
   },
   modalWrapper: {
-    padding: 10
+    padding: 16
   },
   buttonTitle: {
     marginLeft: 10,

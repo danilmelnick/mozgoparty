@@ -37,7 +37,7 @@ export default class CardItem extends Component {
           <TouchableOpacity onPress={() => press()}>
             <>
               <View style={{ position: "relative" }}>
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   onPress={() => this.handleLike(addFav)}
                   style={{
                     top: 0,
@@ -59,7 +59,7 @@ export default class CardItem extends Component {
                       height: 16
                     }}
                   />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
                 <Image
                   source={{ uri: `${url}` }}
                   style={{
@@ -83,7 +83,7 @@ export default class CardItem extends Component {
             <Text style={styles.cardItemStatus}>NEW!</Text>
           </View>
           <Text style={styles.cardItemTitle}>{title}</Text>
-          <Text style={styles.cardItemPrice}>{`${price} P`}</Text>
+          <Text style={styles.cardItemPrice}>{`${price / 100} P`}</Text>
         </View>
       </View>
     );
