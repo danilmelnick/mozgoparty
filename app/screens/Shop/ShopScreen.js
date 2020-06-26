@@ -21,7 +21,6 @@ import {
   Constants
 } from "react-native-ui-lib";
 import { Header } from "react-native-elements";
-import Icon from "../../components/Icon";
 import { AsyncStorage } from "react-native";
 
 import CardItem from "../../components/CardItem";
@@ -370,6 +369,7 @@ export default class ShopScreen extends Component {
   async componentDidMount() {
     const token = await AsyncStorage.getItem("userToken");
     await this.getGamesData(token);
+    console.log(this.state.data)
     // await AsyncStorage.setItem("cardGames", [1]);
   }
 
@@ -537,9 +537,10 @@ export default class ShopScreen extends Component {
                     title: item.party.name,
                     image: item.media.avatar,
                     description: item.description,
-                    age_rating: item.age_rating,
+                    age_rating: item.party.age_rating,
                     price: item.party.price,
-                    id: item.id
+                    id: item.id,
+                    currency : item.party.currency
                   })
                 }
               />

@@ -43,7 +43,7 @@ const ShopStack = createStackNavigator({
   CardGameScreen: {
     screen: CardGameScreen,
     navigationOptions: {
-      headerShown: true
+      headerShown: false
     }
   },
   AuthScreen: {
@@ -172,7 +172,7 @@ const MyGames = createStackNavigator({
   MyGamesScreen: {
     screen: MyGamesScreen,
     navigationOptions: {
-      headerShown: true
+      headerShown: false
     }
   },
   LikeScreen: {

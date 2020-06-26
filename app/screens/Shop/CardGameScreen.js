@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, Text, View, SafeAreaView , TouchableOpacity, Image } from 'react-native';
 import { AsyncStorage } from 'react-native';
+import { Header } from "react-native-elements";
 
 export default class CardGameScreen  extends Component{
 
@@ -19,6 +20,7 @@ export default class CardGameScreen  extends Component{
         let arrGames = AsyncStorage.getItem('cardGames')
             .then(res => JSON.parse(res))
         console.log(arrGames)
+        this.renderFootBtn()
     }
     
     renderFootBtn(){
@@ -29,11 +31,11 @@ export default class CardGameScreen  extends Component{
             <TouchableOpacity
             style={styles.btnAuth2}
             onPress={() => this.props.navigation.navigate('BusketScreen')}
-        >
-            <Text style={{textAlign : 'left', color : '#fff', fontSize : 14}}>
-                КОРЗИНА
-            </Text>
-        </TouchableOpacity>
+            >
+                <Text style={{textAlign : 'left', color : '#fff', fontSize : 14}}>
+                    КОРЗИНА
+                </Text>
+            </TouchableOpacity>
         )
     }
   render() {
@@ -43,27 +45,51 @@ export default class CardGameScreen  extends Component{
     
 
     return (
+        <SafeAreaView>
+        <Header
+          leftComponent={
+            <TouchableOpacity
+              style={{ marginLeft: 8 }}
+              onPress={() => this.props.navigation.goBack()}
+            >
+              <Image source={require("../../src/back.png")} />
+            </TouchableOpacity>
+          }
+          
+          containerStyle={styles.header}
+        />
+
+      <SafeAreaView style={styles.container}>
+
       
-      <View style={styles.container}>
 
         <View style={styles.headerGames}>
             <Image
                 source={{uri : navigationProps.image}}
                 style={styles.logo}
             />
+          <View style={{width : '60%'}}>
+            <View style={{flexDirection : 'row', marginBottom : 4}}>
+                <Image
+                    source={require('../../src/rating.png')}
+                    style={{width : 13.33, height: 13.33}}
+                />
+                <Text style={styles.rating}>4.3</Text>
+            </View>
+            <Text style={styles.title}>{navigationProps.title}</Text>
 
-            <Text style={{color : "#333333", fontSize : 18, fontWeight : 'bold'}}>{navigationProps.title}</Text>
+          </View>
         </View>
 
         <View style={styles.aboutGame}>
 
-            <Text style={{color : "#BD006C", fontSize : 12, fontWeight : 'bold', marginRight : 24}}>{`${navigationProps.price} ₽`}</Text>
+            <Text style={{color : "#BD006C",fontFamily: "Montserrat-Regular", fontSize : 12, fontWeight : '600',  marginRight : 24}}>{navigationProps.price + ' '  + navigationProps.currency}</Text>
 
-            <Text style={{color : "#333", fontSize : 12, fontWeight : 'bold', marginRight : 24}}>122 Мб</Text>
+            <Text style={{color : "#333",fontFamily: "Montserrat-Regular", fontSize : 12, fontWeight : '600', marginRight : 24}}>122 Мб</Text>
 
-            <Text style={{color : "#333", fontSize : 12, fontWeight : 'bold', marginRight : 24}}>{navigationProps.age_rating}</Text>
+            <Text style={{color : "#333",fontFamily: "Montserrat-Regular", fontSize : 12, fontWeight : '600', marginRight : 24}}>{navigationProps.age_rating + '+'}</Text>
 
-            <TouchableOpacity
+            {/* <TouchableOpacity
                 style={{flexDirection : 'row', alignItems : 'center'}}
             >
                 <Image
@@ -77,7 +103,7 @@ export default class CardGameScreen  extends Component{
                     }
                 />
                 <Text>В избранное</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
         </View>
             
 
@@ -85,14 +111,14 @@ export default class CardGameScreen  extends Component{
             style={styles.btnAuth}
             onPress={() => this.addItemToCard(navigationProps.id)}
         >
-            <Text style={{textAlign : 'center', color : '#fff', fontSize : 14}}>
-                ДОБАВИТЬ В КОРЗИНУ
+            <Text style={{textAlign : 'center',textTransform : 'none' , color : '#fff',fontFamily: "Montserrat-Regular", fontSize : 17}}>
+                {! this.state.addGames ? 'Добавить в корзину' : 'В корзине'}
             </Text>
         </TouchableOpacity>
 
         <View style={styles.description}>
-            <Text style={{fontSize : 14, fontWeight : 'bold', marginBottom : 10}}>Описание</Text>
-            <Text style={{fontSize : 12, fontWeight : '200', marginBottom : 10}}>
+            <Text style={{fontSize : 14, fontWeight : '600', marginBottom : 10, fontFamily: "Montserrat-Regular",}}>Описание</Text>
+            <Text style={{fontSize : 12, fontWeight : 'normal', marginBottom : 10, fontFamily: "Montserrat-Regular",}}>
                 {navigationProps.description}
             </Text>
             <TouchableOpacity
@@ -102,11 +128,12 @@ export default class CardGameScreen  extends Component{
                     Топ-5
                 </Text>
             </TouchableOpacity>
+           
         </View>
-
-        {this.renderFootBtn()}
-      </View>
-     
+        
+      </SafeAreaView>
+      {this.renderFootBtn()}
+      </SafeAreaView>
     )
 
   }
@@ -116,8 +143,14 @@ export default class CardGameScreen  extends Component{
 const styles = StyleSheet.create({
     container : {
         paddingHorizontal : 16,
-        paddingVertical : 16,
-        height : '100%'
+        paddingVertical : 22,
+        height : '95%',
+        backgroundColor : '#fff'
+    },
+    title : {
+        color : "#333333", fontSize : 18, fontWeight : '600', 
+        fontFamily: "Montserrat-Regular",
+        lineHeight : 18
     },
     logo: {
         width : 94,
@@ -133,7 +166,7 @@ const styles = StyleSheet.create({
     headerGames : {
         flexDirection : 'row',
         justifyContent : 'flex-start',
-        alignItems : 'center'
+        alignItems : 'flex-start',
     },
     aboutGame : {
         marginVertical : 30,
@@ -149,7 +182,7 @@ const styles = StyleSheet.create({
         borderRadius : 24
     },
     description : {
-        marginVertical : 30
+        marginVertical : 30,
     },
     btnAuth2 :{
         backgroundColor : '#0B2A5B',
@@ -160,5 +193,19 @@ const styles = StyleSheet.create({
         left : 18,
          right : 18,
         bottom : 20
+    },
+    header: {
+        backgroundColor: "#fff",
+        borderBottomWidth: 0.4,
+        paddingBottom: 0,
+        borderBottomColor: "white",
+        paddingTop: 0,
+        height: 44
+    },
+    rating : {
+        color : "#979797", fontSize : 12, fontWeight : '600', 
+        fontFamily: "Montserrat-Regular",
+        alignItems : 'center',
+
     }
 })
