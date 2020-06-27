@@ -1,31 +1,79 @@
 import React from "react";
-import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  SafeAreaView,
+  Image
+} from "react-native";
+import { Header } from "react-native-elements";
 
 class SettingsScreen extends React.Component {
   render() {
     return (
-      <View style={styles.container}>
-        <TouchableOpacity>
+      <SafeAreaView style={styles.container}>
+        <Header
+          leftComponent={
+            <TouchableOpacity
+              style={{ marginLeft: 8 }}
+              onPress={() => this.props.navigation.openDrawer()}
+            >
+              <Image source={require("../../src/burgerMenu.png")} />
+            </TouchableOpacity>
+          }
+          containerStyle={styles.header}
+        />
+
+        <Text
+          style={{
+            fontFamily: "Montserrat-Bold",
+            fontSize: 34,
+            marginLeft: 16
+          }}
+        >
+          Настройки
+        </Text>
+
+        <TouchableOpacity
+          onPress={() =>
+            this.props.navigation.navigate("PdfScreen", {
+              url: "https://party.mozgo.com/userAgr.pdf"
+            })
+          }
+        >
           <Text
-            style={{ fontSize: 16, fontWeight: "bold", paddingVertical: 20 }}
+            style={{
+              fontSize: 14,
+              fontWeight: "600",
+              paddingHorizontal: 16,
+              paddingTop: 32,
+              color: "#333333"
+            }}
           >
             Пользовательское соглашение
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() =>
+            this.props.navigation.navigate("PdfScreen", {
+              url: "https://party.mozgo.com/confidence.pdf"
+            })
+          }
+        >
           <Text
-            style={{ fontSize: 16, fontWeight: "bold", paddingVertical: 20 }}
+            style={{
+              fontSize: 14,
+              fontWeight: "600",
+              paddingHorizontal: 16,
+              paddingTop: 24,
+              color: "#333333"
+            }}
           >
             Политика конфиденциальности
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => this.props.navigation.navigate("GamesGuideScreen")}
-          style={{ marginTop: 30 }}
-        >
-          <Text>GamesGuideScreen</Text>
-        </TouchableOpacity>
-      </View>
+      </SafeAreaView>
     );
   }
 }
@@ -34,8 +82,10 @@ export default SettingsScreen;
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: "white",
     paddingHorizontal: 16,
-    marginVertical: 20
+    flex: 1
+    // paddingVertical : 16
   },
   header: {
     paddingVertical: 28,
@@ -48,5 +98,13 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingVertical: 20
+  },
+  header: {
+    backgroundColor: "#fff",
+    borderBottomWidth: 0.4,
+    paddingBottom: 0,
+    borderBottomColor: "white",
+    paddingTop: 0,
+    height: 44
   }
 });

@@ -276,6 +276,8 @@ PODS:
     - React
   - RNGestureHandler (1.6.1):
     - React
+  - RNPDF (0.10.2):
+    - React
   - RNReanimated (1.9.0):
     - React
   - RNScreens (2.9.0):
@@ -350,6 +352,7 @@ DEPENDENCIES:
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
   - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
+  - RNPDF (from `../node_modules/react-native-view-pdf`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - UMAppLoader (from `../node_modules/unimodules-app-loader/ios`)
@@ -466,6 +469,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/datetimepicker"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
+  RNPDF:
+    :path: "../node_modules/react-native-view-pdf"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
@@ -548,6 +553,7 @@ SPEC CHECKSUMS:
   RNCMaskedView: f5c7d14d6847b7b44853f7acb6284c1da30a3459
   RNDateTimePicker: aae6a45c4ddb5125f3c7a39683e21c34c25cda45
   RNGestureHandler: 8f09cd560f8d533eb36da5a6c5a843af9f056b38
+  RNPDF: f6adfcb6299b2ad7f7d14600c578764ab472ff54
   RNReanimated: b5ccb50650ba06f6e749c7c329a1bc3ae0c88b43
   RNScreens: c526239bbe0e957b988dacc8d75ac94ec9cb19da
   UMAppLoader: ae5eaee9f3c8cc847c631a579fed20d217de5913
