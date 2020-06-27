@@ -24,7 +24,16 @@ export default class CardItem extends Component {
   }
 
   render() {
-    const { raiting, title, url, price, press, addFav, isSecond } = this.props;
+    const {
+      raiting,
+      isNew,
+      title,
+      url,
+      price,
+      press,
+      addFav,
+      isSecond
+    } = this.props;
 
     return (
       <View
@@ -80,7 +89,7 @@ export default class CardItem extends Component {
               {raiting && <Image source={require("../src/star.png")} />}
               <Text style={styles.cardItemRaiting}>{raiting}</Text>
             </View>
-            <Text style={styles.cardItemStatus}>NEW!</Text>
+            {isNew && <Text style={styles.cardItemStatus}>NEW!</Text>}
           </View>
           <Text style={styles.cardItemTitle}>{title}</Text>
           <Text style={styles.cardItemPrice}>{`${price / 100} P`}</Text>

@@ -253,8 +253,6 @@ export default class ShopScreen extends Component {
       const json = await response.json();
       this.setState({ data: json });
 
-      console.log(json[0]);
-
       const categories = Object.entries(
         json
           .map(item => item.category.toUpperCase())
@@ -267,7 +265,6 @@ export default class ShopScreen extends Component {
       categories.unshift(["ВСЕ", json.length]);
 
       this.setState({ categories });
-      console.log(categories);
     } catch (error) {
       console.error("Ошибка:", error);
     }
@@ -333,29 +330,32 @@ export default class ShopScreen extends Component {
               <FlatList
                 data={data}
                 numColumns={2}
-                renderItem={({ item, index }) => (
-                  <CardItem
-                    isSecond={index % 2 == 1}
-                    raiting={item.rating}
-                    title={item.party.name}
-                    url={item.media.avatar}
-                    addFav={() => this.addItemToFavorite(item.id)}
-                    like={this.state.like}
-                    price={item.party.price}
-                    press={() => {
-                      this.setState({ showSearch: false });
+                renderItem={({ item, index }) => {
+                  return (
+                    <CardItem
+                      isSecond={index % 2 == 1}
+                      raiting={item.rating}
+                      title={item.party.name}
+                      url={item.media.avatar}
+                      addFav={() => this.addItemToFavorite(item.id)}
+                      like={this.state.like}
+                      price={item.party.price}
+                      isNew={item.party.show_on_main_page}
+                      press={() => {
+                        this.setState({ showSearch: false });
 
-                      this.props.navigation.navigate("CardGameScreen", {
-                        title: item.party.name,
-                        image: item.media.avatar,
-                        description: item.description,
-                        age_rating: item.age_rating,
-                        price: item.party.price,
-                        id: item.id
-                      });
-                    }}
-                  />
-                )}
+                        this.props.navigation.navigate("CardGameScreen", {
+                          title: item.party.name,
+                          image: item.media.avatar,
+                          description: item.description,
+                          age_rating: item.age_rating,
+                          price: item.party.price,
+                          id: item.id
+                        });
+                      }}
+                    />
+                  );
+                }}
                 keyExtractor={item => item.id}
                 contentContainerStyle={{ margin: 1 }}
               />
@@ -369,7 +369,6 @@ export default class ShopScreen extends Component {
   async componentDidMount() {
     const token = await AsyncStorage.getItem("userToken");
     await this.getGamesData(token);
-    console.log(this.state.data)
     // await AsyncStorage.setItem("cardGames", [1]);
   }
 
@@ -531,18 +530,26 @@ export default class ShopScreen extends Component {
                 url={item.media.avatar}
                 addFav={() => this.addItemToFavorite(item.id)}
                 like={this.state.like}
+                isNew={item.party.show_on_main_page}
                 price={item.party.price}
-                press={() =>
+                press={() => {
+                  console.log(item);
+
                   this.props.navigation.navigate("CardGameScreen", {
+                    item: item,
                     title: item.party.name,
                     image: item.media.avatar,
                     description: item.description,
                     age_rating: item.party.age_rating,
                     price: item.party.price,
+                    rating: item.rating,
                     id: item.id,
-                    currency : item.party.currency
-                  })
-                }
+                    size: item.size,
+                    isTop: item.popular_rank != null,
+                    isNew: item.party.show_on_main_page,
+                    currency: item.party.currency
+                  });
+                }}
               />
             )}
             keyExtractor={item => item.id}

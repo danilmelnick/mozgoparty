@@ -239,7 +239,12 @@ const Profile = createStackNavigator({
       headerShown: false
     }
   },
-  ShopCardStack: ShopCardStack
+  ShopCardStack: {
+    screen: ShopCardStack,
+    navigationOptions: {
+      headerShown: false
+    }
+  }
 });
 
 const AuthRoute = createStackNavigator(

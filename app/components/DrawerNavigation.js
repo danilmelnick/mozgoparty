@@ -88,7 +88,11 @@ class drawerContentComponents extends Component {
                 ? styles.activeBackgroundColor
                 : styles.selectedTextStyle
             ]}
-            onPress={() => this.props.navigation.navigate("Shop")}
+            onPress={() => {
+              this.props.navigation.navigate("Shop", {
+                token: token
+              });
+            }}
           >
             <Icon src={require("../src/joystick.png")} h={24} w={24} />
             <Text

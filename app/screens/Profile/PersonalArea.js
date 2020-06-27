@@ -58,11 +58,6 @@ class PersonalArea extends React.Component {
     await this.props.userDataAction(this.state.token);
   }
 
-  outGoing = async () => {
-    await AsyncStorage.removeItem("userToken");
-    await this.props.navigation.navigate("Loading");
-  };
-
   componentWillReceiveProps(nextprops) {
     if (nextprops.user.userInfo) {
       const { name, email, phone } = nextprops.user.userInfo;
