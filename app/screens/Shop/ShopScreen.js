@@ -21,7 +21,7 @@ import {
   Constants
 } from "react-native-ui-lib";
 import { Header } from "react-native-elements";
-import { AsyncStorage } from "react-native";
+import AsyncStorage from "@react-native-community/async-storage";
 
 import CardItem from "../../components/CardItem";
 
@@ -37,6 +37,7 @@ export default class ShopScreen extends Component {
 
     this.state = {
       data: [],
+      count: 0,
       panDirection: PanningProvider.Directions.UP,
       position: "bottom",
       scroll: this.SCROLL_TYPE.NONE,
@@ -52,6 +53,11 @@ export default class ShopScreen extends Component {
       categories: []
     };
   }
+
+  getItems = async () => {
+    let items = JSON.parse(await AsyncStorage.getItem("cardGames"));
+    this.setState({ count: items ? items.length : 0 });
+  };
 
   addItemToFavorite = async id => {
     let arr = this.state.favGames;
@@ -240,14 +246,14 @@ export default class ShopScreen extends Component {
     );
   };
 
-  getGamesData = async token => {
+  getGamesData = async () => {
     try {
       const response = await fetch("https://api.party.mozgo.com/api/games", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          Authorization: "Bearer " + token
+          Authorization: "Bearer " + this.state.token
         }
       });
       const json = await response.json();
@@ -328,6 +334,7 @@ export default class ShopScreen extends Component {
           {this.state.searchText != "" && (
             <View style={styles.shopContainer}>
               <FlatList
+                style={{ flex: 1 }}
                 data={data}
                 numColumns={2}
                 renderItem={({ item, index }) => {
@@ -345,12 +352,18 @@ export default class ShopScreen extends Component {
                         this.setState({ showSearch: false });
 
                         this.props.navigation.navigate("CardGameScreen", {
+                          item: item,
                           title: item.party.name,
                           image: item.media.avatar,
                           description: item.description,
-                          age_rating: item.age_rating,
+                          age_rating: item.party.age_rating,
                           price: item.party.price,
-                          id: item.id
+                          rating: item.rating,
+                          id: item.id,
+                          size: item.size,
+                          isTop: item.popular_rank != null,
+                          isNew: item.party.show_on_main_page,
+                          currency: item.party.currency
                         });
                       }}
                     />
@@ -366,9 +379,20 @@ export default class ShopScreen extends Component {
     );
   };
 
+  getToken = async () => {
+    const res = await AsyncStorage.getItem("userToken");
+    const token = res.slice(1, -1);
+    this.setState({ token });
+  };
+
   async componentDidMount() {
-    const token = await AsyncStorage.getItem("userToken");
-    await this.getGamesData(token);
+    await this.getToken();
+    await this.getGamesData();
+    this.getItems();
+
+    this.props.navigation.addListener("didFocus", () => {
+      this.getItems();
+    });
     // await AsyncStorage.setItem("cardGames", [1]);
   }
 
@@ -557,7 +581,64 @@ export default class ShopScreen extends Component {
           />
         </View>
         {this.renderSearch()}
+        {this.renderFootBtn()}
       </SafeAreaView>
+    );
+  }
+
+  renderFootBtn() {
+    console.log("(this.state.count ", this.state.count);
+
+    if (this.state.count === 0) {
+      return null;
+    }
+
+    return (
+      <TouchableOpacity
+        style={{
+          flexDirection: "row",
+          backgroundColor: "#0B2A5B",
+          padding: 16,
+          marginHorizontal: 16,
+          borderRadius: 5,
+          textAlign: "left",
+          marginTop: 16
+        }}
+        onPress={() => this.props.navigation.navigate("BusketScreen")}
+      >
+        <Text
+          style={{
+            textAlign: "left",
+            color: "#fff",
+            fontSize: 17,
+            fontFamily: "Montserrat-Regular"
+          }}
+        >
+          Корзина
+        </Text>
+        <View
+          style={{
+            width: 24,
+            height: 24,
+            borderRadius: 12,
+            backgroundColor: "rgba(255, 255, 255, 0.3)",
+            justifyContent: "center",
+            alignItems: "center",
+            marginLeft: 8
+          }}
+        >
+          <Text
+            style={{
+              textAlign: "left",
+              color: "#fff",
+              fontSize: 12,
+              fontFamily: "Montserrat-Regular"
+            }}
+          >
+            {this.state.count}
+          </Text>
+        </View>
+      </TouchableOpacity>
     );
   }
 }
@@ -565,7 +646,8 @@ export default class ShopScreen extends Component {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",
-    paddingHorizontal: 16
+    paddingHorizontal: 16,
+    flex: 1
     // paddingVertical : 16
   },
   sort: {
@@ -583,8 +665,8 @@ const styles = StyleSheet.create({
   },
   shopContainer: {
     marginTop: 3,
-    height: "100%",
-    backgroundColor: "white"
+    backgroundColor: "white",
+    flex: 1
   },
   listChatWrapper: {
     width: "100%",

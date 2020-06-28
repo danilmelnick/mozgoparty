@@ -34,16 +34,21 @@ class CardGameScreen extends Component {
     let id = this.props.navigation.state.params.id;
     let items = JSON.parse(await AsyncStorage.getItem("cardGames"));
     this.setState({ count: items ? items.length : 0 });
-    items.forEach(item => {
-      if (item.id == id) {
-        this.setState({ addGames: true });
-      }
-    });
+    items &&
+      items.forEach(item => {
+        if (item.id == id) {
+          this.setState({ addGames: true });
+        }
+      });
   };
 
   async componentDidMount() {
     await this.getItems();
     this.getToken();
+
+    this.props.navigation.addListener("didFocus", () => {
+      this.getItems();
+    });
   }
 
   addItemToCard = async element => {
@@ -106,7 +111,7 @@ class CardGameScreen extends Component {
   };
 
   renderFootBtn() {
-    if (this.state.addGames === false) {
+    if (this.state.count === 0) {
       return null;
     }
     return (
@@ -230,7 +235,11 @@ class CardGameScreen extends Component {
               {
                 borderWidth: 1,
                 borderColor: "#DADADA",
-                backgroundColor: !this.state.addGames ? "#0B2A5B" : "white"
+                backgroundColor: !this.state.addGames
+                  ? navigationProps.isMyGame
+                    ? "white"
+                    : "#0B2A5B"
+                  : "white"
               }
             ]}
             onPress={() => this.addItemToCard(navigationProps.item)}
@@ -239,12 +248,20 @@ class CardGameScreen extends Component {
               style={{
                 textAlign: "center",
                 textTransform: "none",
-                color: !this.state.addGames ? "#fff" : "#333333",
+                color: !this.state.addGames
+                  ? navigationProps.isMyGame
+                    ? "#333333"
+                    : "#fff"
+                  : "#333333",
                 fontFamily: "Montserrat-Regular",
                 fontSize: 17
               }}
             >
-              {!this.state.addGames ? "Добавить в корзину" : "В корзине"}
+              {!this.state.addGames
+                ? navigationProps.isMyGame
+                  ? "Загрузить игру"
+                  : "Добавить в корзину"
+                : "В корзине"}
             </Text>
           </TouchableOpacity>
 

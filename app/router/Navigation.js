@@ -41,6 +41,12 @@ const ShopStack = createStackNavigator({
       headerShown: false
     }
   },
+  BusketScreen: {
+    screen: BusketScreen,
+    navigationOptions: {
+      headerShown: false
+    }
+  },
   CardGameScreen: {
     screen: CardGameScreen,
     navigationOptions: {
@@ -178,6 +184,12 @@ const GamesGuide = createStackNavigator({
 const MyGames = createStackNavigator({
   MyGamesScreen: {
     screen: MyGamesScreen,
+    navigationOptions: {
+      headerShown: false
+    }
+  },
+  CardGameScreen: {
+    screen: CardGameScreen,
     navigationOptions: {
       headerShown: false
     }

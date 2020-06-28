@@ -67,9 +67,9 @@ export default class BusketScreen extends Component {
             leftComponent={
               <TouchableOpacity
                 style={{ marginLeft: 8 }}
-                onPress={() => this.props.navigation.openDrawer()}
+                onPress={() => this.props.navigation.goBack()}
               >
-                <Image source={require("../../src/burgerMenu.png")} />
+                <Image source={require("../../src/back.png")} />
               </TouchableOpacity>
             }
             containerStyle={styles.header}

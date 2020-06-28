@@ -15,7 +15,10 @@ import AsyncStorage from "@react-native-community/async-storage";
 export default class GameCard extends Component {
   render() {
     return (
-      <View>
+      <TouchableOpacity
+        disabled={this.props.onPress == undefined}
+        onPress={this.props.onPress}
+      >
         <View
           style={{
             flexDirection: "row",
@@ -63,16 +66,18 @@ export default class GameCard extends Component {
             </View>
           </View>
 
-          <TouchableOpacity
-            onPress={() => this.showActionImageMenu(this.props.item)}
-          >
-            <Image source={require("../../src/moreButtons.png")} />
-          </TouchableOpacity>
+          {!this.props.isMyGame && (
+            <TouchableOpacity
+              onPress={() => this.showActionImageMenu(this.props.item)}
+            >
+              <Image source={require("../../src/moreButtons.png")} />
+            </TouchableOpacity>
+          )}
         </View>
         <View
           style={{ backgroundColor: "#DADADA", height: 1, width: "100%" }}
         />
-      </View>
+      </TouchableOpacity>
     );
   }
 
