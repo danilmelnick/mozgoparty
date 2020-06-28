@@ -8,22 +8,84 @@ import {
   Image,
   FlatList,
   Modal,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  Alert
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Header } from "react-native-elements";
 import GameCard from "./GameCard";
 import AsyncStorage from "@react-native-community/async-storage";
 import { Linking } from "expo";
+import userDataAction from "../../actions/userDataAction";
+import { connect } from "react-redux";
 
-export default class BusketScreen extends Component {
+class BusketScreen extends Component {
   state = {
     games: [],
     promoCode: false,
-    promoCodeEnter: ""
+    promoCodeEnter: "",
+    promoId: 0
   };
 
-  promocodeEnable = async () => {};
+  promocodeEnable = async () => {
+    try {
+      const response = await fetch(
+        "https://api.party.mozgo.com/check-promo?email=" +
+          this.props.user.userInfo.email +
+          "&model_type=game&code=" +
+          this.state.promoCodeEnter +
+          "&game_id=" +
+          this.state.promoId,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: "Bearer " + this.state.token
+          }
+        }
+      );
+      const json = await response.json();
+      console.log(response);
+      console.log(json);
+
+      if (json.status == "error") {
+        Alert.alert(json.text, undefined, [
+          {
+            text: "OK",
+            style: "default"
+          }
+        ]);
+      } else if (json.status == "success") {
+        Alert.alert(json.text, undefined, [
+          {
+            text: "OK",
+            style: "default",
+            onPress: () => {
+              const games = [...this.state.games];
+              const index = games.findIndex(
+                item => item.id == this.state.promoId
+              );
+              console.log(index);
+              games[index].party.price -=
+                games[index].party.price * (json.discount.value / 100);
+
+              this.setState({ games });
+
+              AsyncStorage.setItem(
+                "cardGames",
+                JSON.stringify(this.state.games)
+              );
+
+              this.setState({ promoCode: false, promoCodeEnter: "" });
+            }
+          }
+        ]);
+      }
+    } catch (error) {
+      console.error("Ошибка:", error);
+    }
+  };
 
   getToken = async () => {
     const res = await AsyncStorage.getItem("userToken");
@@ -182,7 +244,12 @@ export default class BusketScreen extends Component {
               return (
                 <GameCard
                   onDelete={element => this.delete(element)}
-                  onPromoCode={() => this.setState({ promoCode: true })}
+                  onPromoCode={() =>
+                    this.setState({
+                      promoCode: true,
+                      promoId: itemProps.item.id
+                    })
+                  }
                   item={itemProps.item}
                   title={itemProps.item.party.name}
                   image={itemProps.item.media.avatar}
@@ -316,6 +383,21 @@ export default class BusketScreen extends Component {
     );
   }
 }
+
+const mapStateToProps = state => {
+  console.log("mapStateToProps >>>>>>>>");
+  console.log(JSON.stringify(state));
+  return {
+    user: state.userData
+  };
+};
+const mapDispatchToProps = dispatch => {
+  return {
+    userDataAction: token => dispatch(userDataAction(token))
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(BusketScreen);
 
 const styles = StyleSheet.create({
   container: {
