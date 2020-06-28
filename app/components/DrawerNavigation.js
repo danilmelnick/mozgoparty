@@ -67,7 +67,11 @@ class drawerContentComponents extends Component {
                 ? styles.activeBackgroundColor
                 : null
             ]}
-            onPress={() => this.props.navigation.navigate("MyGames")}
+            onPress={() =>
+              token
+                ? this.props.navigation.navigate("MyGames")
+                : this.props.navigation.navigate("AuthScreen")
+            }
           >
             <Icon src={require("../src/purchases.png")} h={24} w={24} />
             <Text

@@ -381,8 +381,10 @@ export default class ShopScreen extends Component {
 
   getToken = async () => {
     const res = await AsyncStorage.getItem("userToken");
-    const token = res.slice(1, -1);
-    this.setState({ token });
+    if (res) {
+      const token = res.slice(1, -1);
+      this.setState({ token });
+    }
   };
 
   async componentDidMount() {

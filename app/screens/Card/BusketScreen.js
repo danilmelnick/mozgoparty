@@ -19,7 +19,16 @@ export default class BusketScreen extends Component {
     games: []
   };
 
+  getToken = async () => {
+    const res = await AsyncStorage.getItem("userToken");
+    if (res) {
+      const token = res.slice(1, -1);
+      this.setState({ token });
+    }
+  };
+
   async componentDidMount() {
+    await this.getToken();
     let items = JSON.parse(await AsyncStorage.getItem("cardGames"));
     console.log(items);
     this.setState({ games: items });
@@ -50,6 +59,14 @@ export default class BusketScreen extends Component {
       } catch (error) {
         console.error("Ошибка:", error);
       }
+    }
+  };
+
+  pay = () => {
+    if (!this.state.token) {
+      this.props.navigation.navigate("AuthScreen");
+    } else {
+      Linking.openURL("https://party.mozgo.com/cart");
     }
   };
 
@@ -206,7 +223,7 @@ export default class BusketScreen extends Component {
             </Text>
             <TouchableOpacity
               style={styles.btnAuths}
-              onPress={() => Linking.openURL("https://party.mozgo.com/cart")}
+              onPress={() => this.pay()}
             >
               <Text
                 style={{
