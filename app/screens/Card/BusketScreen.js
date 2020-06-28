@@ -6,7 +6,9 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
-  FlatList
+  FlatList,
+  Modal,
+  TouchableWithoutFeedback
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Header } from "react-native-elements";
@@ -16,8 +18,12 @@ import { Linking } from "expo";
 
 export default class BusketScreen extends Component {
   state = {
-    games: []
+    games: [],
+    promoCode: false,
+    promoCodeEnter: ""
   };
+
+  promocodeEnable = async () => {};
 
   getToken = async () => {
     const res = await AsyncStorage.getItem("userToken");
@@ -25,6 +31,72 @@ export default class BusketScreen extends Component {
       const token = res.slice(1, -1);
       this.setState({ token });
     }
+  };
+
+  renderPromoCode = () => {
+    return (
+      <Modal visible={this.state.promoCode} transparent={true}>
+        <TouchableWithoutFeedback
+          onPress={() => this.setState({ promoCode: false })}
+        >
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: "rgba(4, 4, 15, 0.4)",
+              justifyContent: "center",
+              alignItems: "center"
+            }}
+          >
+            <View
+              style={{
+                width: "100%"
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: "white",
+                  marginHorizontal: 50,
+                  paddingHorizontal: 24,
+                  paddingVertical: 29
+                }}
+              >
+                <Text
+                  style={{
+                    color: "#979797",
+                    fontSize: 12,
+                    fontFamily: "Montserrat-Regular",
+                    paddingLeft: 10
+                  }}
+                >
+                  Промокод
+                </Text>
+                <TextInput
+                  style={styles.inputForm}
+                  onChangeText={promoCodeEnter =>
+                    this.setState({ promoCodeEnter })
+                  }
+                />
+                <TouchableOpacity
+                  onPress={() => this.promocodeEnable()}
+                  style={styles.btnAuth}
+                >
+                  <Text
+                    style={{
+                      textAlign: "center",
+                      color: "#fff",
+                      fontFamily: "Montserrat-Regular",
+                      fontSize: 17
+                    }}
+                  >
+                    Применить
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+    );
   };
 
   async componentDidMount() {
@@ -110,6 +182,7 @@ export default class BusketScreen extends Component {
               return (
                 <GameCard
                   onDelete={element => this.delete(element)}
+                  onPromoCode={() => this.setState({ promoCode: true })}
                   item={itemProps.item}
                   title={itemProps.item.party.name}
                   image={itemProps.item.media.avatar}
@@ -238,6 +311,7 @@ export default class BusketScreen extends Component {
             </TouchableOpacity>
           </View>
         </View>
+        {this.renderPromoCode()}
       </SafeAreaView>
     );
   }
@@ -249,6 +323,16 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     flex: 1,
     backgroundColor: "#fff"
+  },
+  inputForm: {
+    height: 40,
+    fontFamily: "Montserrat-Regular",
+    borderBottomWidth: 1,
+    paddingLeft: 9,
+    paddingRight: 15,
+    borderBottomColor: "rgba(0, 0, 0, 0.38)",
+    fontSize: 16,
+    marginBottom: 25
   },
   logo: {
     width: 94,
@@ -280,7 +364,13 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "flex-start"
   },
-
+  btnAuth: {
+    backgroundColor: "#0B2A5B",
+    height: 44,
+    borderRadius: 5,
+    justifyContent: "center",
+    alignItems: "center"
+  },
   isues: {
     flexDirection: "row"
   }

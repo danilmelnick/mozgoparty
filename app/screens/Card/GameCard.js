@@ -94,6 +94,7 @@ export default class GameCard extends Component {
         if (buttonIndex === 2) {
           this.props.onDelete(element);
         } else if (buttonIndex === 1) {
+          this.props.onPromoCode();
         }
       }
     );
