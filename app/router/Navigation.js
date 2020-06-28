@@ -28,6 +28,7 @@ import ChangePass from "../screens/Profile/ChangePass";
 import FAQScreen from "../screens/Settings/FAQScreen";
 import SupportScreen from "../screens/Settings/SupportScreen";
 import SettingsScreen from "../screens/Settings/SettingsScreen";
+import PdfScreen from "../screens/Settings/PdfScreen";
 import GamesGuideScreen from "../screens/Settings/GamesGuideScreen";
 import GameProgressScreen from "../screens/Settings/GameProgressScreen";
 
@@ -79,7 +80,7 @@ const FAQ = createStackNavigator({
   FAQScreen: {
     screen: FAQScreen,
     navigationOptions: {
-      headerShown: true
+      headerShown: false
     }
   },
   AuthScreen: {
@@ -105,6 +106,12 @@ const FAQ = createStackNavigator({
 const SettingsStack = createStackNavigator({
   SettingsScreen: {
     screen: SettingsScreen,
+    navigationOptions: {
+      headerShown: false
+    }
+  },
+  PdfScreen: {
+    screen: PdfScreen,
     navigationOptions: {
       headerShown: false
     }
