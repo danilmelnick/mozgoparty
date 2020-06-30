@@ -67,8 +67,11 @@ class BusketScreen extends Component {
                 item => item.id == this.state.promoId
               );
               console.log(index);
-              games[index].party.price -=
+              const discount =
                 games[index].party.price * (json.discount.value / 100);
+              games[index].party.price -= discount;
+
+              games[index].party.discount = discount / 100;
 
               this.setState({ games });
 
@@ -211,6 +214,14 @@ class BusketScreen extends Component {
       price += item / 100;
     });
 
+    const discounts = this.state.games.map(item => item.party.discount);
+    let discount = 0;
+    discounts.forEach(item => {
+      if (item) {
+        discount += item;
+      }
+    });
+
     return (
       <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>
         <View>
@@ -336,7 +347,7 @@ class BusketScreen extends Component {
                   fontWeight: "600"
                 }}
               >
-                0 ₽
+                {discount} ₽
               </Text>
             </View>
           </View>
