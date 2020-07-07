@@ -13,6 +13,7 @@
 #import <UMCore/UMModuleRegistry.h>
 #import <UMReactNativeAdapter/UMNativeModulesProxy.h>
 #import <UMReactNativeAdapter/UMModuleRegistryAdapter.h>
+#import "../../node_modules/react-native-orientation/iOS/RCTOrientation/Orientation.h"
 
 @interface AppDelegate ()
 
@@ -23,6 +24,10 @@
 @implementation AppDelegate
 
 @synthesize window = _window;
+
+- (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window {
+   return [Orientation getOrientation];
+ }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -39,13 +44,13 @@
   }
 
   self.window = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-#ifdef DEBUG
+//#ifdef DEBUG
   [self initializeReactNativeApp];
-#else
-  EXUpdatesAppController *controller = [EXUpdatesAppController sharedInstance];
-  controller.delegate = self;
-  [controller startAndShowLaunchScreen:self.window];
-#endif
+//#else
+//  EXUpdatesAppController *controller = [EXUpdatesAppController sharedInstance];
+//  controller.delegate = self;
+//  [controller startAndShowLaunchScreen:self.window];
+//#endif
 
   [super application:application didFinishLaunchingWithOptions:launchOptions];
 
@@ -65,7 +70,7 @@
 
   return bridge;
 }
-
+//
 - (NSArray<id<RCTBridgeModule>> *)extraModulesForBridge:(RCTBridge *)bridge
 {
   NSArray<id<RCTBridgeModule>> *extraModules = [_moduleRegistryAdapter extraModulesForBridge:bridge];
@@ -75,11 +80,11 @@
 }
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge {
-#ifdef DEBUG
+//#ifdef DEBUG
   return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
-#else
-  return [[EXUpdatesAppController sharedInstance] launchAssetUrl];
-#endif
+//#else
+//  return [[EXUpdatesAppController sharedInstance] launchAssetUrl];
+//#endif
 }
 
 - (void)appController:(EXUpdatesAppController *)appController didStartWithSuccess:(BOOL)success

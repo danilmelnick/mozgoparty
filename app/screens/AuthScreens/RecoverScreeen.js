@@ -9,6 +9,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback
 } from "react-native";
+import Loader from "../../components/Loader";
 import Header from "../../components/Header";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -17,7 +18,8 @@ export default class RecoverScreeen extends Component {
     super(props);
 
     this.state = {
-      email: ""
+      email: "",
+      visible: false
     };
   }
 
@@ -27,6 +29,8 @@ export default class RecoverScreeen extends Component {
   };
 
   recoverAction = async () => {
+    this.setState({ visible: true });
+
     const { email } = this.state;
 
     const settings = {
@@ -50,7 +54,7 @@ export default class RecoverScreeen extends Component {
 
       if (data.status == 200) {
         Alert.alert(
-          "Письмо с ссылкой на сброс пароля отправленно на почту",
+          "Письмо для восстановления пароля отправлено на почту",
           "",
           [
             {
@@ -70,12 +74,16 @@ export default class RecoverScreeen extends Component {
     } catch (error) {
       console.log(error);
     }
+
+    this.setState({ visible: false });
   };
 
   render() {
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <SafeAreaView style={styeles.container}>
+          <Loader visible={this.state.visible} />
+
           <Header
             title={"Восстановить пароль"}
             onPressLeftButton={() => {

@@ -26,12 +26,26 @@ export default class StartedScreen extends Component {
               }}
             >
               <Text>Нажимая «Продолжить», вы соглашаетесь на</Text>
-              <Text style={{ color: "#FFCE42", fontWeight: "600" }}>
+              <Text
+                style={{ color: "#FFCE42", fontWeight: "600" }}
+                onPress={() =>
+                  this.props.navigation.navigate("PdfScreen", {
+                    url: "https://party.mozgo.com/confidence.pdf"
+                  })
+                }
+              >
                 {" "}
                 обработку персональных данных
               </Text>
               <Text> и принимаете условия</Text>
-              <Text style={{ color: "#FFCE42", fontWeight: "600" }}>
+              <Text
+                style={{ color: "#FFCE42", fontWeight: "600" }}
+                onPress={() =>
+                  this.props.navigation.navigate("PdfScreen", {
+                    url: "https://party.mozgo.com/userAgr.pdf"
+                  })
+                }
+              >
                 {" "}
                 пользовательского соглашения
               </Text>

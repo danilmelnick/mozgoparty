@@ -53,16 +53,18 @@ export default class GameCard extends Component {
               {this.props.title}
             </Text>
             <View style={{ flex: 1, justifyContent: "flex-end" }}>
-              <Text
-                style={{
-                  fontSize: 12,
-                  fontWeight: "600",
-                  fontFamily: "Montserrat-Medium",
-                  color: "#BD006C"
-                }}
-              >
-                {this.props.price / 100} {this.props.currency}
-              </Text>
+              {!this.props.isMyGame && (
+                <Text
+                  style={{
+                    fontSize: 12,
+                    fontWeight: "600",
+                    fontFamily: "Montserrat-Medium",
+                    color: "#BD006C"
+                  }}
+                >
+                  {this.props.price / 100} {this.props.currency}
+                </Text>
+              )}
             </View>
           </View>
 

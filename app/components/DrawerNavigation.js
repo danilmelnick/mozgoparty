@@ -28,13 +28,23 @@ class drawerContentComponents extends Component {
     this.setState({ token });
   };
 
+  async componentDidUpdate(prevProps) {
+    const isDrawerOpen = this.props.navigation.state.isDrawerOpen;
+    const wasDrawerOpen = prevProps.navigation.state.isDrawerOpen;
+
+    if (!wasDrawerOpen && isDrawerOpen) {
+      await this.getToken();
+      await this.props.userDataAction(this.state.token);
+    }
+  }
+
   async componentDidMount() {
     await this.getToken();
     await this.props.userDataAction(this.state.token);
   }
 
   render() {
-    const { name, email } = this.props.user.userInfo;
+    const { name, email, avatar_url } = this.props.user.userInfo;
 
     const { token } = this.state;
 
@@ -42,16 +52,26 @@ class drawerContentComponents extends Component {
       <View style={styles.container}>
         <TouchableOpacity
           style={styles.headerContainer}
-          onPress={() =>
-            token
-              ? this.props.navigation.navigate("Profile")
-              : this.props.navigation.navigate("AuthScreen")
-          }
+          onPress={() => {
+            if (token) {
+              this.props.navigation.navigate("Profile");
+              this.props.navigation.goBack();
+            } else {
+              this.props.navigation.navigate("AuthScreen");
+            }
+          }}
         >
           <View style={{ flex: 1, justifyContent: "center" }}>
             <Image
-              source={require("../src/noAuth.png")}
-              style={{ width: 48, height: 48, marginBottom: 12 }}
+              source={
+                avatar_url ? { uri: avatar_url } : require("../src/noAuth.png")
+              }
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: 24,
+                marginBottom: 12
+              }}
             />
             <Text style={styles.headerText}>
               {token ? name : "Войти в аккаунт"}
@@ -67,11 +87,14 @@ class drawerContentComponents extends Component {
                 ? styles.activeBackgroundColor
                 : null
             ]}
-            onPress={() =>
-              token
-                ? this.props.navigation.navigate("MyGames")
-                : this.props.navigation.navigate("AuthScreen")
-            }
+            onPress={() => {
+              if (token) {
+                this.props.navigation.navigate("MyGames");
+                this.props.navigation.goBack();
+              } else {
+                this.props.navigation.navigate("AuthScreen");
+              }
+            }}
           >
             <Icon src={require("../src/purchases.png")} h={24} w={24} />
             <Text
@@ -96,6 +119,7 @@ class drawerContentComponents extends Component {
               this.props.navigation.navigate("Shop", {
                 token: token
               });
+              this.props.navigation.goBack();
             }}
           >
             <Icon src={require("../src/joystick.png")} h={24} w={24} />
@@ -120,11 +144,14 @@ class drawerContentComponents extends Component {
                 ? styles.activeBackgroundColor
                 : null
             ]}
-            onPress={() =>
-              token
-                ? this.props.navigation.navigate("SupportGroup")
-                : this.props.navigation.navigate("AuthScreen")
-            }
+            onPress={() => {
+              if (token) {
+                this.props.navigation.navigate("SupportGroup");
+                this.props.navigation.goBack();
+              } else {
+                this.props.navigation.navigate("AuthScreen");
+              }
+            }}
           >
             <Icon src={require("../src/help.png")} h={24} w={24} />
             <Text
@@ -167,7 +194,10 @@ class drawerContentComponents extends Component {
                 ? styles.activeBackgroundColor
                 : null
             ]}
-            onPress={() => this.props.navigation.navigate("GamesGuide")}
+            onPress={() => {
+              this.props.navigation.navigate("GamesGuide");
+              this.props.navigation.goBack();
+            }}
           >
             <Icon src={require("../src/information.png")} h={24} w={24} />
             <Text
@@ -191,7 +221,10 @@ class drawerContentComponents extends Component {
               ? styles.activeBackgroundColor
               : null
           ]}
-          onPress={() => this.props.navigation.navigate("SettingsStack")}
+          onPress={() => {
+            this.props.navigation.navigate("SettingsStack");
+            this.props.navigation.goBack();
+          }}
         >
           <Icon src={require("../src/settings.png")} h={24} w={24} />
           <Text

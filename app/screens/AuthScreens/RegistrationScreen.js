@@ -7,13 +7,15 @@ import {
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  Keyboard
+  Keyboard,
+  Alert
 } from "react-native";
 import { CheckBox } from "react-native-elements";
 import { connect } from "react-redux";
 import registrationUser, {
   registrationSuccess
 } from "../../actions/registrationUser";
+import Loader from "../../components/Loader";
 import Header from "../../components/Header";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -24,6 +26,7 @@ class RegistrationScreeen extends Component {
     this.state = {
       checked: false,
       name: "",
+      visible: false,
       email: "",
       phone: "",
       password: "",
@@ -38,30 +41,56 @@ class RegistrationScreeen extends Component {
     password_confirmation,
     phone
   ) => {
-    fetch("https://api.base.mozgo.com/players", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json"
-      },
-      body: JSON.stringify({
-        name: name,
-        email: email,
-        password: password,
-        password_confirmation: password_confirmation,
-        phone: phone
-      })
-    })
-      .then(res => {
-        if (res.status !== 200) {
-          alert(res.statusText);
+    this.setState({ visible: true });
+
+    try {
+      const data = await fetch("https://api.base.mozgo.com/players", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json"
+        },
+        body: JSON.stringify({
+          name: name,
+          email: email,
+          password: password,
+          password_confirmation: password_confirmation,
+          phone: phone
+        })
+      });
+      const json = await data.json();
+      console.log("Resp >>>>>>>>>>>" + JSON.stringify(json));
+      console.log(data);
+
+      if (data.status == 200) {
+        await this.props.navigation.goBack();
+      } else {
+        let error = "";
+        if (json.errors.email) {
+          error = json.errors.email[0];
+        } else if (json.errors.name) {
+          error = json.errors.name[0];
+        } else if (json.errors.phone) {
+          error = json.errors.phone[0];
+        } else if (json.errors.password) {
+          error = json.errors.password[0];
         }
-        return res;
-      })
-      .then(res => res.json())
-      .then(data => console.log(data))
-      .then(() => this.props.navigation.navigate("AuthScreen"))
-      .catch(e => console.log("Error" + e));
+
+        this.setState({ visible: false }, () => {
+          setTimeout(() => {
+            Alert.alert(error, "", [
+              {
+                text: "OK",
+                style: "default"
+              }
+            ]);
+          }, 200);
+        });
+      }
+    } catch (error) {
+      this.setState({ visible: false });
+      Alert.alert(error);
+    }
   };
 
   render() {
@@ -71,6 +100,7 @@ class RegistrationScreeen extends Component {
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <SafeAreaView style={styeles.container}>
+          <Loader visible={this.state.visible} />
           <Header
             title={"Регистрация"}
             onPressLeftButton={() => {

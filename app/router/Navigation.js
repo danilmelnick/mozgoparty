@@ -15,6 +15,7 @@ import RegistrationScreeen from "../screens/AuthScreens/RegistrationScreen";
 
 import ShopScreen from "../screens/Shop/ShopScreen";
 import CardGameScreen from "../screens/Shop/CardGameScreen";
+import GameScreen from "../screens/Shop/GameScreen";
 
 import BusketScreen from "../screens/Card/BusketScreen";
 
@@ -49,6 +50,12 @@ const ShopStack = createStackNavigator({
   },
   CardGameScreen: {
     screen: CardGameScreen,
+    navigationOptions: {
+      headerShown: false
+    }
+  },
+  GameScreen: {
+    screen: GameScreen,
     navigationOptions: {
       headerShown: false
     }
@@ -223,6 +230,12 @@ const Auth = createStackNavigator(
   {
     StartedScreen: {
       screen: StartedScreen,
+      navigationOptions: {
+        headerShown: false
+      }
+    },
+    PdfScreen: {
+      screen: PdfScreen,
       navigationOptions: {
         headerShown: false
       }

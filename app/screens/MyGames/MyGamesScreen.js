@@ -13,14 +13,18 @@ import GameListItem from "../../components/GameListItem";
 import GameCard from "../Card/GameCard";
 import userDataAction from "../../actions/userDataAction";
 import { connect } from "react-redux";
+import Loader from "../../components/Loader";
 import AsyncStorage from "@react-native-community/async-storage";
 
 class MyGamesScreen extends React.Component {
   state = {
-    games: []
+    games: [],
+    visible: false
   };
 
   getGamesData = async () => {
+    this.setState({ visible: true });
+
     try {
       const response = await fetch("https://api.party.mozgo.com/api/games", {
         method: "GET",
@@ -32,14 +36,16 @@ class MyGamesScreen extends React.Component {
       });
       const json = await response.json();
 
-      const ids = this.props.user.userInfo.purchases.map(item => item.game_id);
-      console.log(ids);
-      console.log(json.map(item => item.party.id));
+      const idsAndHash = this.props.user.userInfo.purchases.map(item => ({
+        id: item.game_id,
+        hash: item.hash
+      }));
 
       let games = [];
       json.forEach(element => {
-        ids.forEach(id => {
+        idsAndHash.forEach(({ id, hash }) => {
           if (element.party.id == id) {
+            element.hash = hash;
             games.push(element);
           }
         });
@@ -49,6 +55,8 @@ class MyGamesScreen extends React.Component {
     } catch (error) {
       console.error("Ошибка:", error);
     }
+
+    this.setState({ visible: false });
   };
 
   getToken = async () => {
@@ -65,13 +73,17 @@ class MyGamesScreen extends React.Component {
   render() {
     return (
       <SafeAreaView style={{ backgroundColor: "#fff", height: "100%" }}>
+        <Loader visible={this.state.visible} />
         <Header
           leftComponent={
             <TouchableOpacity
               style={{ marginLeft: 8 }}
               onPress={() => this.props.navigation.openDrawer()}
             >
-              <Image source={require("../../src/burgerMenu.png")} />
+              <Image
+                style={{ width: 20, height: 14 }}
+                source={require("../../src/burgerMenu.png")}
+              />
             </TouchableOpacity>
           }
           containerStyle={styles.header}
@@ -91,6 +103,8 @@ class MyGamesScreen extends React.Component {
           style={{ flex: 1 }}
           data={this.state.games}
           renderItem={itemProps => {
+            console.log(itemProps.item);
+
             return (
               <GameCard
                 isMyGame={true}

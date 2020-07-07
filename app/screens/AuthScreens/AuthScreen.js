@@ -10,6 +10,7 @@ import {
   Alert
 } from "react-native";
 import { connect } from "react-redux";
+import Loader from "../../components/Loader";
 import AsyncStorage from "@react-native-community/async-storage";
 import userDataAction from "../../actions/userDataAction";
 import Header from "../../components/Header";
@@ -21,11 +22,14 @@ class AuthScreen extends Component {
 
     this.state = {
       email: "",
-      password: ""
+      password: "",
+      visible: false
     };
   }
 
   auth = async () => {
+    this.setState({ visible: true });
+
     const { email, password } = this.state;
     const settings = {
       method: "POST",
@@ -48,7 +52,7 @@ class AuthScreen extends Component {
           "userToken",
           JSON.stringify(json.access_token)
         );
-        await this.props.navigation.navigate("Shop");
+        await this.props.navigation.goBack();
       } else {
         Alert.alert(`${json.errors.email}`, "", [
           {
@@ -60,6 +64,8 @@ class AuthScreen extends Component {
     } catch (error) {
       Alert.alert(error);
     }
+
+    this.setState({ visible: false });
   };
 
   render() {
@@ -67,6 +73,8 @@ class AuthScreen extends Component {
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <SafeAreaView style={styeles.container}>
+          <Loader visible={this.state.visible} />
+
           <Header
             title={"Авторизация"}
             onPressLeftButton={() => {

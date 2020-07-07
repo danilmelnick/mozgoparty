@@ -14,6 +14,7 @@ import { connect } from "react-redux";
 import Header from "../../components/Header";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-community/async-storage";
+import Loader from "../../components/Loader";
 
 class ChangePass extends React.Component {
   constructor(props) {
@@ -21,6 +22,7 @@ class ChangePass extends React.Component {
     this.state = {
       oldPass: "",
       newPass: "",
+      visible: false,
       repeatPass: ""
     };
   }
@@ -36,6 +38,8 @@ class ChangePass extends React.Component {
   };
 
   savePassword = async () => {
+    this.setState({ visible: true });
+
     const { oldPass, newPass, repeatPass } = this.state;
     console.log(oldPass, newPass, repeatPass);
 
@@ -89,12 +93,15 @@ class ChangePass extends React.Component {
     } catch (error) {
       alert(error);
     }
+
+    this.setState({ visible: false });
   };
 
   render() {
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <SafeAreaView style={styles.ChangePassWrapper}>
+          <Loader visible={this.state.visible} />
           <Header
             title={"Изменить пароль"}
             onPressLeftButton={() => {

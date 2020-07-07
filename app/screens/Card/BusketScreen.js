@@ -18,16 +18,20 @@ import AsyncStorage from "@react-native-community/async-storage";
 import { Linking } from "expo";
 import userDataAction from "../../actions/userDataAction";
 import { connect } from "react-redux";
+import Loader from "../../components/Loader";
 
 class BusketScreen extends Component {
   state = {
     games: [],
     promoCode: false,
+    visible: false,
     promoCodeEnter: "",
     promoId: 0
   };
 
   promocodeEnable = async () => {
+    this.setState({ visible: true });
+
     try {
       const response = await fetch(
         "https://api.party.mozgo.com/check-promo?email=" +
@@ -88,6 +92,8 @@ class BusketScreen extends Component {
     } catch (error) {
       console.error("Ошибка:", error);
     }
+
+    this.setState({ visible: false });
   };
 
   getToken = async () => {
@@ -172,6 +178,8 @@ class BusketScreen extends Component {
   }
 
   delete = async element => {
+    this.setState({ visible: true });
+
     this.setState({ addGames: false });
     let items = JSON.parse(await AsyncStorage.getItem("cardGames"));
     items = items.filter(item => item.id != element.id);
@@ -197,6 +205,8 @@ class BusketScreen extends Component {
         console.error("Ошибка:", error);
       }
     }
+
+    this.setState({ visible: false });
   };
 
   pay = () => {
@@ -224,6 +234,8 @@ class BusketScreen extends Component {
 
     return (
       <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>
+        <Loader visible={this.state.visible} />
+
         <View>
           <Header
             leftComponent={

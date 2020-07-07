@@ -15,6 +15,7 @@ import {
 import { Header } from "react-native-elements";
 import userDataAction from "../../actions/userDataAction";
 import { connect } from "react-redux";
+import Loader from "../../components/Loader";
 
 class SupportScreen extends React.Component {
   state = {
@@ -22,7 +23,8 @@ class SupportScreen extends React.Component {
     showDropDown: false,
     reasonRequest: "",
     y: 0,
-    comment: ""
+    comment: "",
+    visible: false
   };
 
   send = async () => {
@@ -36,6 +38,8 @@ class SupportScreen extends React.Component {
 
       return;
     }
+
+    this.setState({ visible: true });
 
     const settings = {
       method: "POST",
@@ -81,6 +85,8 @@ class SupportScreen extends React.Component {
     } catch (error) {
       console.log(error);
     }
+
+    this.setState({ visible: false });
   };
 
   renderDropDown = () => {
@@ -178,13 +184,17 @@ class SupportScreen extends React.Component {
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <SafeAreaView style={styles.container}>
+          <Loader visible={this.state.visible} />
           <Header
             leftComponent={
               <TouchableOpacity
                 style={{ marginLeft: 8 }}
                 onPress={() => this.props.navigation.openDrawer()}
               >
-                <Image source={require("../../src/burgerMenu.png")} />
+                <Image
+                  style={{ width: 20, height: 14 }}
+                  source={require("../../src/burgerMenu.png")}
+                />
               </TouchableOpacity>
             }
             containerStyle={styles.header}

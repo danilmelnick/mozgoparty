@@ -17,6 +17,7 @@ import ImagePicker from "react-native-image-picker";
 import AsyncStorage from "@react-native-community/async-storage";
 import userDataAction from "../../actions/userDataAction";
 import { connect } from "react-redux";
+import Loader from "../../components/Loader";
 import { Header } from "react-native-elements";
 import Icon from "../../components/Icon";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -27,6 +28,7 @@ class PersonalArea extends React.Component {
 
     this.state = {
       token: null,
+      visible: false,
       hasChanges: false,
       nameChanged: undefined,
       emailChanged: undefined,
@@ -66,6 +68,8 @@ class PersonalArea extends React.Component {
   }
 
   change = async () => {
+    this.setState({ visible: true });
+
     const { email, phone, name } = this.state;
     const settings = {
       method: "PATCH",
@@ -118,6 +122,8 @@ class PersonalArea extends React.Component {
     } catch (error) {
       alert(error);
     }
+
+    this.setState({ visible: false });
   };
 
   showActionMenu = () => {
@@ -139,6 +145,8 @@ class PersonalArea extends React.Component {
   };
 
   loadAvatar = async url => {
+    this.setState({ visible: true });
+
     let body = new FormData();
     body.append("avatar", {
       uri: url,
@@ -171,9 +179,13 @@ class PersonalArea extends React.Component {
     } catch (error) {
       alert(error);
     }
+
+    this.setState({ visible: false });
   };
 
   deleteAvatar = async () => {
+    this.setState({ visible: true });
+
     const settings = {
       method: "DELETE",
       headers: {
@@ -195,6 +207,8 @@ class PersonalArea extends React.Component {
     } catch (error) {
       alert(error);
     }
+
+    this.setState({ visible: false });
   };
 
   showActionImageMenu = () => {
@@ -241,13 +255,17 @@ class PersonalArea extends React.Component {
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <SafeAreaView style={{ backgroundColor: "white", flex: 1 }}>
+          <Loader visible={this.state.visible} />
           <Header
             leftComponent={
               <TouchableOpacity
                 style={{ marginLeft: 8 }}
                 onPress={() => this.props.navigation.openDrawer()}
               >
-                <Image source={require("../../src/burgerMenu.png")} />
+                <Image
+                  style={{ width: 20, height: 14 }}
+                  source={require("../../src/burgerMenu.png")}
+                />
               </TouchableOpacity>
             }
             rightComponent={
@@ -284,7 +302,7 @@ class PersonalArea extends React.Component {
                   source={
                     this.props.user.userInfo.avatar_url
                       ? { uri: this.props.user.userInfo.avatar_url }
-                      : require("../../src/PersonAvatar.png")
+                      : require("../../src/avatarDefault.png")
                   }
                   style={{
                     width: 80,

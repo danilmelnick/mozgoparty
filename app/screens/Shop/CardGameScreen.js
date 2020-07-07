@@ -51,6 +51,29 @@ class CardGameScreen extends Component {
     });
   }
 
+  playGame = async item => {
+    console.log("playGame", item.hash);
+
+    try {
+      const response = await fetch(
+        "https://api.party.mozgo.com/game-content/" + item.hash,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: "Bearer " + this.state.token
+          }
+        }
+      );
+      const json = await response.json();
+
+      this.props.navigation.navigate("GameScreen", { data: json });
+    } catch (error) {
+      console.error("Ошибка:", error);
+    }
+  };
+
   addItemToCard = async element => {
     if (this.state.addGames) {
       this.setState({ addGames: false });
@@ -192,17 +215,19 @@ class CardGameScreen extends Component {
           </View>
 
           <View style={styles.aboutGame}>
-            <Text
-              style={{
-                color: "#BD006C",
-                fontFamily: "Montserrat-Regular",
-                fontSize: 12,
-                fontWeight: "600",
-                marginRight: 24
-              }}
-            >
-              {navigationProps.price / 100 + " " + navigationProps.currency}
-            </Text>
+            {!navigationProps.isMyGame && (
+              <Text
+                style={{
+                  color: "#BD006C",
+                  fontFamily: "Montserrat-Regular",
+                  fontSize: 12,
+                  fontWeight: "600",
+                  marginRight: 24
+                }}
+              >
+                {navigationProps.price / 100 + " " + navigationProps.currency}
+              </Text>
+            )}
 
             <Text
               style={{
@@ -237,12 +262,18 @@ class CardGameScreen extends Component {
                 borderColor: "#DADADA",
                 backgroundColor: !this.state.addGames
                   ? navigationProps.isMyGame
-                    ? "white"
+                    ? "#0B2A5B"
                     : "#0B2A5B"
                   : "white"
               }
             ]}
-            onPress={() => this.addItemToCard(navigationProps.item)}
+            onPress={() =>
+              !this.state.addGames
+                ? navigationProps.isMyGame
+                  ? this.playGame(navigationProps.item)
+                  : this.addItemToCard(navigationProps.item)
+                : this.addItemToCard(navigationProps.item)
+            }
           >
             <Text
               style={{
@@ -250,7 +281,7 @@ class CardGameScreen extends Component {
                 textTransform: "none",
                 color: !this.state.addGames
                   ? navigationProps.isMyGame
-                    ? "#333333"
+                    ? "#fff"
                     : "#fff"
                   : "#333333",
                 fontFamily: "Montserrat-Regular",
@@ -259,7 +290,7 @@ class CardGameScreen extends Component {
             >
               {!this.state.addGames
                 ? navigationProps.isMyGame
-                  ? "Загрузить игру"
+                  ? "Играть"
                   : "Добавить в корзину"
                 : "В корзине"}
             </Text>
@@ -287,7 +318,7 @@ class CardGameScreen extends Component {
               {navigationProps.description}
             </Text>
             <View style={{ flexDirection: "row" }}>
-              {navigationProps.isTop == null && (
+              {navigationProps.isTop && (
                 <TouchableOpacity style={styles.categor}>
                   <Text
                     style={{

@@ -5,7 +5,6 @@ import AsyncStorage from "@react-native-community/async-storage";
 class AuthLoadingScreen extends React.Component {
   constructor() {
     super();
-    this._bootstrapAsync();
 
     this.checkFirstEnter();
   }
@@ -14,15 +13,10 @@ class AuthLoadingScreen extends React.Component {
     if (await AsyncStorage.getItem("firstEnter")) {
       this.props.navigation.navigate("MyDrawerNavigator");
     } else {
+      this.props.navigation.navigate("StartedScreen");
       AsyncStorage.setItem("firstEnter", "true");
       this.setState({ showButton: true });
     }
-  };
-
-  _bootstrapAsync = async () => {
-    const userToken = await AsyncStorage.getItem("userToken");
-
-    this.props.navigation.navigate(userToken ? "Profile" : "Loading");
   };
 
   render() {

@@ -452,7 +452,10 @@ class GamesGuideScreen extends React.Component {
                 style={{ marginLeft: 8 }}
                 onPress={() => this.props.navigation.openDrawer()}
               >
-                <Image source={require("../../src/burgerMenu.png")} />
+                <Image
+                  style={{ width: 20, height: 14 }}
+                  source={require("../../src/burgerMenu.png")}
+                />
               </TouchableOpacity>
             }
             containerStyle={styles.header}

@@ -13,6 +13,8 @@ import {
   TextInput
 } from "react-native";
 import { CheckBox } from "react-native-elements";
+import Orientation from "react-native-orientation";
+import Loader from "../../components/Loader";
 import {
   Button,
   Dialog,
@@ -38,6 +40,7 @@ export default class ShopScreen extends Component {
     this.state = {
       data: [],
       count: 0,
+      visible: false,
       panDirection: PanningProvider.Directions.UP,
       position: "bottom",
       scroll: this.SCROLL_TYPE.NONE,
@@ -52,6 +55,10 @@ export default class ShopScreen extends Component {
       selectedTab: 0,
       categories: []
     };
+  }
+
+  componentDidUpdate() {
+    Orientation.lockToPortrait();
   }
 
   getItems = async () => {
@@ -247,6 +254,8 @@ export default class ShopScreen extends Component {
   };
 
   getGamesData = async () => {
+    this.setState({ visible: true });
+
     try {
       const response = await fetch("https://api.party.mozgo.com/api/games", {
         method: "GET",
@@ -274,6 +283,8 @@ export default class ShopScreen extends Component {
     } catch (error) {
       console.error("Ошибка:", error);
     }
+
+    this.setState({ visible: false });
   };
 
   showSearch = () => {
@@ -284,10 +295,11 @@ export default class ShopScreen extends Component {
     const data = this.state.data.filter(item => {
       return item.party.name.includes(this.state.searchText);
     });
+    console.log(data);
 
     return (
       <Modal visible={this.state.showSearch}>
-        <SafeAreaView>
+        <SafeAreaView style={{ flex: 1 }}>
           <View
             style={{
               marginTop: 10,
@@ -439,13 +451,17 @@ export default class ShopScreen extends Component {
 
     return (
       <SafeAreaView style={styles.container}>
+        <Loader visible={this.state.visible} />
         <Header
           leftComponent={
             <TouchableOpacity
               style={{ marginLeft: 8 }}
               onPress={() => this.props.navigation.openDrawer()}
             >
-              <Image source={require("../../src/burgerMenu.png")} />
+              <Image
+                style={{ width: 20, height: 14 }}
+                source={require("../../src/burgerMenu.png")}
+              />
             </TouchableOpacity>
           }
           rightComponent={
@@ -548,36 +564,42 @@ export default class ShopScreen extends Component {
           <FlatList
             data={data}
             numColumns={2}
-            renderItem={({ item, index }) => (
-              <CardItem
-                isSecond={index % 2 == 1}
-                raiting={item.rating}
-                title={item.party.name}
-                url={item.media.avatar}
-                addFav={() => this.addItemToFavorite(item.id)}
-                like={this.state.like}
-                isNew={item.party.show_on_main_page}
-                price={item.party.price}
-                press={() => {
-                  console.log(item);
+            renderItem={({ item, index }) => {
+              console.log(
+                "isNew",
+                item.party.show_on_main_page,
+                item.party.name
+              );
 
-                  this.props.navigation.navigate("CardGameScreen", {
-                    item: item,
-                    title: item.party.name,
-                    image: item.media.avatar,
-                    description: item.description,
-                    age_rating: item.party.age_rating,
-                    price: item.party.price,
-                    rating: item.rating,
-                    id: item.id,
-                    size: item.size,
-                    isTop: item.popular_rank != null,
-                    isNew: item.party.show_on_main_page,
-                    currency: item.party.currency
-                  });
-                }}
-              />
-            )}
+              return (
+                <CardItem
+                  isSecond={index % 2 == 1}
+                  raiting={item.rating}
+                  title={item.party.name}
+                  url={item.media.avatar}
+                  addFav={() => this.addItemToFavorite(item.id)}
+                  like={this.state.like}
+                  isNew={item.party.show_on_main_page}
+                  price={item.party.price}
+                  press={() => {
+                    this.props.navigation.navigate("CardGameScreen", {
+                      item: item,
+                      title: item.party.name,
+                      image: item.media.avatar,
+                      description: item.description,
+                      age_rating: item.party.age_rating,
+                      price: item.party.price,
+                      rating: item.rating,
+                      id: item.id,
+                      size: item.size,
+                      isTop: item.popular_rank != null,
+                      isNew: item.party.show_on_main_page,
+                      currency: item.party.currency
+                    });
+                  }}
+                />
+              );
+            }}
             keyExtractor={item => item.id}
             contentContainerStyle={{ margin: 1 }}
           />
