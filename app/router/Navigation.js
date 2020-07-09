@@ -66,6 +66,12 @@ const ShopStack = createStackNavigator({
       headerShown: false
     }
   },
+  PdfScreenn: {
+    screen: PdfScreen,
+    navigationOptions: {
+      headerShown: false
+    }
+  },
   RecoverScreeen: {
     screen: RecoverScreeen,
     navigationOptions: {
@@ -295,6 +301,12 @@ const AuthRoute = createStackNavigator(
     },
     RegistrationScreeen: {
       screen: RegistrationScreeen,
+      navigationOptions: {
+        headerShown: false
+      }
+    },
+    PdfScreenn: {
+      screen: PdfScreen,
       navigationOptions: {
         headerShown: false
       }

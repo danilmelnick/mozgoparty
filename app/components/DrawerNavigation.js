@@ -96,7 +96,15 @@ class drawerContentComponents extends Component {
               }
             }}
           >
-            <Icon src={require("../src/purchases.png")} h={24} w={24} />
+            <Icon
+              src={
+                this.props.activeItemKey == "MyGames"
+                  ? require("../src/purchasesActive.png")
+                  : require("../src/purchases.png")
+              }
+              h={24}
+              w={24}
+            />
             <Text
               style={[
                 styles.screenTextStyle,
@@ -122,7 +130,15 @@ class drawerContentComponents extends Component {
               this.props.navigation.goBack();
             }}
           >
-            <Icon src={require("../src/joystick.png")} h={24} w={24} />
+            <Icon
+              src={
+                this.props.activeItemKey == "Shop"
+                  ? require("../src/joystickActive.png")
+                  : require("../src/joystick.png")
+              }
+              h={24}
+              w={24}
+            />
             <Text
               style={[
                 styles.screenTextStyle,
@@ -153,7 +169,15 @@ class drawerContentComponents extends Component {
               }
             }}
           >
-            <Icon src={require("../src/help.png")} h={24} w={24} />
+            <Icon
+              src={
+                this.props.activeItemKey == "SupportGroup"
+                  ? require("../src/forumsActive.png")
+                  : require("../src/forums.png")
+              }
+              h={24}
+              w={24}
+            />
             <Text
               style={[
                 styles.screenTextStyle,
@@ -174,7 +198,15 @@ class drawerContentComponents extends Component {
             ]}
             onPress={() => this.props.navigation.navigate("Faq")}
           >
-            <Icon src={require("../src/faq.png")} h={24} w={24} />
+            <Icon
+              src={
+                this.props.activeItemKey == "Faq"
+                  ? require("../src/faqActive.png")
+                  : require("../src/faq.png")
+              }
+              h={24}
+              w={24}
+            />
             <Text
               style={[
                 styles.screenTextStyle,
@@ -199,7 +231,15 @@ class drawerContentComponents extends Component {
               this.props.navigation.goBack();
             }}
           >
-            <Icon src={require("../src/information.png")} h={24} w={24} />
+            <Icon
+              src={
+                this.props.activeItemKey == "GamesGuide"
+                  ? require("../src/informationActive.png")
+                  : require("../src/information.png")
+              }
+              h={24}
+              w={24}
+            />
             <Text
               style={[
                 styles.screenTextStyle,
@@ -226,7 +266,15 @@ class drawerContentComponents extends Component {
             this.props.navigation.goBack();
           }}
         >
-          <Icon src={require("../src/settings.png")} h={24} w={24} />
+          <Icon
+            src={
+              this.props.activeItemKey == "SettingsStack"
+                ? require("../src/settingsActive.png")
+                : require("../src/settings.png")
+            }
+            h={24}
+            w={24}
+          />
           <Text
             style={[
               styles.screenTextStyle,

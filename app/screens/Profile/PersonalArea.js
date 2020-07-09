@@ -137,7 +137,7 @@ class PersonalArea extends React.Component {
         if (buttonIndex === 1) {
           this.props.navigation.navigate("ChangePass");
         } else if (buttonIndex === 2) {
-          AsyncStorage.clear();
+          AsyncStorage.setItem("userToken", undefined);
           this.props.navigation.navigate("AuthScreen");
         }
       }

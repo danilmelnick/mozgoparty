@@ -173,6 +173,11 @@ class RegistrationScreeen extends Component {
                   fontWeight: "600",
                   fontFamily: "Montserrat-Bold"
                 }}
+                onPress={() =>
+                  this.props.navigation.navigate("PdfScreenn", {
+                    url: "https://party.mozgo.com/confidence.pdf"
+                  })
+                }
               >
                 обработку персональных данных
               </Text>
@@ -191,6 +196,11 @@ class RegistrationScreeen extends Component {
                   fontWeight: "600",
                   fontFamily: "Montserrat-Bold"
                 }}
+                onPress={() =>
+                  this.props.navigation.navigate("PdfScreenn", {
+                    url: "https://party.mozgo.com/userAgr.pdf"
+                  })
+                }
               >
                 {" "}
                 пользовательское соглашение

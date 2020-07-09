@@ -53,29 +53,35 @@ export default class RecoverScreeen extends Component {
       console.log("Resp >>>>>>>>>>>" + JSON.stringify(json));
 
       if (data.status == 200) {
-        Alert.alert(
-          "Письмо для восстановления пароля отправлено на почту",
-          "",
-          [
-            {
-              text: "OK",
-              style: "default"
-            }
-          ]
-        );
+        this.setState({ visible: false }, () => {
+          setTimeout(() => {
+            Alert.alert(
+              "Письмо для восстановления пароля отправлено на почту",
+              "",
+              [
+                {
+                  text: "OK",
+                  style: "default"
+                }
+              ]
+            );
+          }, 300);
+        });
       } else if (data.status == 422) {
-        Alert.alert(json.errors.email[0], "", [
-          {
-            text: "OK",
-            style: "default"
-          }
-        ]);
+        this.setState({ visible: false }, () => {
+          setTimeout(() => {
+            Alert.alert(json.errors.email[0], "", [
+              {
+                text: "OK",
+                style: "default"
+              }
+            ]);
+          }, 300);
+        });
       }
     } catch (error) {
       console.log(error);
     }
-
-    this.setState({ visible: false });
   };
 
   render() {
