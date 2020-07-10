@@ -4,6 +4,8 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 
 export default class StartedScreen extends Component {
   render() {
+    console.log("asd");
+
     return (
       <View style={styles.container}>
         <ImageBackground
