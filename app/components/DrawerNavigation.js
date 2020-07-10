@@ -24,6 +24,11 @@ class drawerContentComponents extends Component {
 
   getToken = async () => {
     const res = await AsyncStorage.getItem("userToken");
+    console.log("TOKEN,", res);
+    if (!res) {
+      this.setState({ token: undefined });
+      return;
+    }
     const token = res.slice(1, -1);
     this.setState({ token });
   };
@@ -33,6 +38,8 @@ class drawerContentComponents extends Component {
     const wasDrawerOpen = prevProps.navigation.state.isDrawerOpen;
 
     if (!wasDrawerOpen && isDrawerOpen) {
+      console.log("componentDidUpdate");
+
       await this.getToken();
       await this.props.userDataAction(this.state.token);
     }

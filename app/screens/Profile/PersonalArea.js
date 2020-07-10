@@ -16,6 +16,7 @@ import {
 import ImagePicker from "react-native-image-picker";
 import AsyncStorage from "@react-native-community/async-storage";
 import userDataAction from "../../actions/userDataAction";
+import logoutAction from "../../actions/logoutAction";
 import { connect } from "react-redux";
 import Loader from "../../components/Loader";
 import { Header } from "react-native-elements";
@@ -137,7 +138,8 @@ class PersonalArea extends React.Component {
         if (buttonIndex === 1) {
           this.props.navigation.navigate("ChangePass");
         } else if (buttonIndex === 2) {
-          AsyncStorage.setItem("userToken", undefined);
+          AsyncStorage.setItem("userToken", "");
+          this.props.logoutAction();
           this.props.navigation.navigate("AuthScreen");
         }
       }
@@ -442,7 +444,8 @@ const mapStateToProps = state => {
 };
 const mapDispatchToProps = dispatch => {
   return {
-    userDataAction: token => dispatch(userDataAction(token))
+    userDataAction: token => dispatch(userDataAction(token)),
+    logoutAction: () => dispatch(logoutAction())
   };
 };
 
