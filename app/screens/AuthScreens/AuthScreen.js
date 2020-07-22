@@ -52,6 +52,40 @@ class AuthScreen extends Component {
           "userToken",
           JSON.stringify(json.access_token)
         );
+
+        const dataMe = await fetch(`https://api.party.mozgo.com/api/users/me`, {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            Authorization:
+              "Bearer " + JSON.stringify(json.access_token).slice(1, -1)
+          }
+        });
+        const jsonMe = await dataMe.json();
+        const ids = jsonMe.purchases.map(item => item.game_id);
+        console.log(ids);
+
+        const itemsCardGames = JSON.parse(
+          await AsyncStorage.getItem("cardGames")
+        );
+        const itemPartyIDs = itemsCardGames;
+        console.log(itemPartyIDs);
+        const setItems = [];
+        itemPartyIDs.forEach(element1 => {
+          let b = true;
+          ids.forEach(element2 => {
+            if (element1.party.id == element2) {
+              b = false;
+            }
+          });
+
+          if (b) {
+            setItems.push(element1);
+          }
+        });
+        console.log("setItems", setItems);
+        await AsyncStorage.setItem("cardGames", JSON.stringify(setItems));
+
         await this.props.navigation.goBack();
       } else {
         Alert.alert(`${json.errors.email}`, "", [

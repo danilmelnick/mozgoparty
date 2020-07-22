@@ -8,6 +8,7 @@ import {
   Image,
   FlatList
 } from "react-native";
+import Orientation from "react-native-orientation";
 import { Header } from "react-native-elements";
 import GameListItem from "../../components/GameListItem";
 import GameCard from "../Card/GameCard";
@@ -66,6 +67,12 @@ class MyGamesScreen extends React.Component {
   };
 
   async componentDidMount() {
+    this.props.navigation.addListener("didFocus", async () => {
+      Orientation.lockToPortrait();
+    });
+
+    Orientation.lockToPortrait();
+
     await this.getToken();
     this.getGamesData();
   }

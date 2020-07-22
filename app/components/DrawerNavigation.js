@@ -168,12 +168,8 @@ class drawerContentComponents extends Component {
                 : null
             ]}
             onPress={() => {
-              if (token) {
-                this.props.navigation.navigate("SupportGroup");
-                this.props.navigation.goBack();
-              } else {
-                this.props.navigation.navigate("AuthScreen");
-              }
+              this.props.navigation.navigate("SupportGroup");
+              this.props.navigation.goBack();
             }}
           >
             <Icon

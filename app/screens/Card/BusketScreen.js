@@ -171,6 +171,10 @@ class BusketScreen extends Component {
   };
 
   async componentDidMount() {
+    this.props.navigation.addListener("didFocus", async () => {
+      await this.getToken();
+    });
+
     await this.getToken();
     let items = JSON.parse(await AsyncStorage.getItem("cardGames"));
     console.log(items);

@@ -75,13 +75,6 @@ class Game {
   getScreenData(screenData) {
     const screenType = this.getScreenType(screenData);
 
-    console.log(screenTypesArray);
-
-    // Think about proper error handling on UI
-    if (!screenType || !screenTypesArray.some(_type => _type === screenType)) {
-      throw new TypeError("Unknown screen type data");
-    }
-
     // For future usage can create func for every type.
     // Inside this func transform data or drop redundant fields
     // switch (screenData) {

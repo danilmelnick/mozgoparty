@@ -7,20 +7,28 @@ import {
   TouchableOpacity,
   Image
 } from "react-native";
+import Orientation from "react-native-orientation";
 import AsyncStorage from "@react-native-community/async-storage";
 import { Header } from "react-native-elements";
 import userDataAction from "../../actions/userDataAction";
 import { connect } from "react-redux";
+var RNFS = require("react-native-fs");
+
+let filesCount = 100;
 
 class CardGameScreen extends Component {
   constructor() {
     super();
 
     this.state = {
+      game: undefined,
       addGames: false,
+      loading: false,
       count: 0,
+      loadedFilesCount: 0,
       cardGames: [],
-      token: ""
+      token: "",
+      runCount: 3
     };
   }
 
@@ -33,7 +41,7 @@ class CardGameScreen extends Component {
   getItems = async () => {
     let id = this.props.navigation.state.params.id;
     let items = JSON.parse(await AsyncStorage.getItem("cardGames"));
-    this.setState({ count: items ? items.length : 0 });
+    this.setState({ count: items ? items.length : 0, addGames: false });
     items &&
       items.forEach(item => {
         if (item.id == id) {
@@ -43,16 +51,57 @@ class CardGameScreen extends Component {
   };
 
   async componentDidMount() {
+    Orientation.lockToPortrait();
+
+    await this.getGame();
     await this.getItems();
-    this.getToken();
+    await this.getToken();
+    this.countGame();
 
     this.props.navigation.addListener("didFocus", () => {
       this.getItems();
     });
   }
 
-  playGame = async item => {
-    console.log("playGame", item.hash);
+  countGame = async () => {
+    const item = this.props.navigation.state.params.item;
+    console.log(item);
+
+    try {
+      const response = await fetch(
+        "https://api.party.mozgo.com/count/" + item.hash,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: "Bearer " + this.state.token
+          }
+        }
+      );
+      const json = await response.json();
+      this.setState({ runCount: json.total - json.runs });
+    } catch (error) {
+      console.error("Ошибка:", error);
+    }
+  };
+
+  getGame = async () => {
+    const item = this.props.navigation.state.params;
+    const data = await AsyncStorage.getItem(item.id.toString());
+    this.setState({ game: JSON.parse(data) });
+  };
+
+  loadGame = async () => {
+    if (this.state.loading) {
+      this.setState({ loading: false, loadedFilesCount: 0 });
+      return;
+    }
+
+    this.setState({ loading: true, loadedFilesCount: 0 });
+
+    const item = this.props.navigation.state.params.item;
+    let notSavedFile = true;
 
     try {
       const response = await fetch(
@@ -68,10 +117,57 @@ class CardGameScreen extends Component {
       );
       const json = await response.json();
 
-      this.props.navigation.navigate("GameScreen", { data: json });
+      let jsonString = JSON.stringify(json);
+
+      filesCount = jsonString.split("https://").length;
+      console.log("filesCount", filesCount);
+
+      while (jsonString.indexOf("https://") != -1 && this.state.loading) {
+        const firstIndexOfHttps = jsonString.indexOf("https://");
+        const lastLinkIndex = jsonString.indexOf('"', firstIndexOfHttps);
+        const url = jsonString.slice(firstIndexOfHttps, lastLinkIndex);
+        const splitUrl = url.split("/");
+        const fileName = splitUrl[splitUrl.length - 1];
+        console.log(firstIndexOfHttps, lastLinkIndex, url, fileName);
+
+        const download = RNFS.downloadFile({
+          fromUrl: url,
+          toFile: RNFS.DocumentDirectoryPath + "/" + fileName
+        });
+        const result = await download.promise;
+
+        jsonString = jsonString.replace(
+          url,
+          "file://" + RNFS.DocumentDirectoryPath + "/" + fileName
+        );
+
+        if (
+          this.state.loadedFilesCount > filesCount / 2 ||
+          this.state.loadedFilesCount > filesCount / 2 + filesCount / 4
+        ) {
+          notSavedFile = true;
+        }
+
+        if (this.state.loadedFilesCount > filesCount / 4 && notSavedFile) {
+          this.setState({ game: JSON.parse(jsonString) });
+          notSavedFile = false;
+        }
+
+        this.setState({ loadedFilesCount: this.state.loadedFilesCount + 1 });
+      }
+
+      if (this.state.loading) {
+        await AsyncStorage.setItem(item.id.toString(), jsonString);
+        this.setState({ game: JSON.parse(jsonString), loading: false });
+        console.log("SAVE");
+      }
     } catch (error) {
       console.error("Ошибка:", error);
     }
+  };
+
+  playGame = async item => {
+    this.props.navigation.replace("GameScreen", { data: this.state.game });
   };
 
   addItemToCard = async element => {
@@ -177,8 +273,32 @@ class CardGameScreen extends Component {
       </TouchableOpacity>
     );
   }
+
   render() {
     const navigationProps = this.props.navigation.state.params;
+
+    const rating5 = navigationProps.item.review_details
+      ? navigationProps.item.review_details.filter(item => item.rating == 5)
+      : [];
+    const rating4 = navigationProps.item.review_details
+      ? navigationProps.item.review_details.filter(item => item.rating == 4)
+      : [];
+    const rating3 = navigationProps.item.review_details
+      ? navigationProps.item.review_details.filter(item => item.rating == 3)
+      : [];
+    const rating2 = navigationProps.item.review_details
+      ? navigationProps.item.review_details.filter(item => item.rating == 2)
+      : [];
+    const rating1 = navigationProps.item.review_details
+      ? navigationProps.item.review_details.filter(item => item.rating == 1)
+      : [];
+    const review_details = [
+      { rating: 5, count: rating5.length > 0 && rating5[0].count },
+      { rating: 4, count: rating4.length > 0 && rating4[0].count },
+      { rating: 3, count: rating3.length > 0 && rating3[0].count },
+      { rating: 2, count: rating2.length > 0 && rating2[0].count },
+      { rating: 1, count: rating1.length > 0 && rating1[0].count }
+    ];
 
     return (
       <SafeAreaView style={{ backgroundColor: "white" }}>
@@ -229,72 +349,318 @@ class CardGameScreen extends Component {
               </Text>
             )}
 
+            {!navigationProps.isMyGame && (
+              <View
+                style={{
+                  width: 1,
+                  height: 24,
+                  backgroundColor: "#DADADA",
+                  marginRight: 8
+                }}
+              />
+            )}
+
             <Text
               style={{
                 color: "#333",
                 fontFamily: "Montserrat-Regular",
                 fontSize: 12,
                 fontWeight: "600",
-                marginRight: 24
+                marginRight: 16
               }}
             >
               {Math.floor(navigationProps.size / 1000000)} Мб
             </Text>
 
+            <View
+              style={{
+                width: 1,
+                height: 24,
+                backgroundColor: "#DADADA",
+                marginRight: 8
+              }}
+            />
+
             <Text
               style={{
                 color: "#333",
                 fontFamily: "Montserrat-Regular",
                 fontSize: 12,
                 fontWeight: "600",
-                marginRight: 24
+                marginRight: 16
               }}
             >
               {navigationProps.age_rating + "+"}
             </Text>
+
+            {navigationProps.isMyGame && (
+              <View
+                style={{
+                  width: 1,
+                  height: 24,
+                  backgroundColor: "#DADADA",
+                  marginRight: 8
+                }}
+              />
+            )}
+
+            {navigationProps.isMyGame && (
+              <Text
+                style={{
+                  color: "#333",
+                  fontFamily: "Montserrat-Regular",
+                  fontSize: 12,
+                  fontWeight: "600",
+                  marginRight: 24
+                }}
+              >
+                {"Осталось запусков: " + this.state.runCount}
+              </Text>
+            )}
           </View>
 
-          <TouchableOpacity
-            style={[
-              styles.btnAuth,
-              {
-                borderWidth: 1,
-                borderColor: "#DADADA",
-                backgroundColor: !this.state.addGames
+          {this.state.loading && (
+            <View style={{ marginBottom: 44, marginTop: -10 }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  marginBottom: 8
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: "Montserrat-Regular",
+                    fontSize: 10,
+                    color: "#979797"
+                  }}
+                >
+                  В процессе
+                </Text>
+                <Text
+                  style={{
+                    fontFamily: "Montserrat-Regular",
+                    fontSize: 10,
+                    color: "#979797"
+                  }}
+                >
+                  {Math.floor(
+                    (this.state.loadedFilesCount / filesCount) * 100
+                  ) + "%"}
+                </Text>
+              </View>
+              <View
+                style={{
+                  height: 4,
+                  backgroundColor: "#DADADA",
+                  borderRadius: 10,
+                  width: "100%"
+                }}
+              >
+                <View
+                  style={{
+                    height: 4,
+                    backgroundColor:
+                      this.state.loadedFilesCount > filesCount / 4
+                        ? this.state.loadedFilesCount > filesCount / 2
+                          ? this.state.loadedFilesCount >
+                            filesCount / 2 + filesCount / 4
+                            ? "#6FCF97"
+                            : "#FFCE42"
+                          : "#F2994A"
+                        : "#EB5757",
+                    borderRadius: 10,
+                    width:
+                      (this.state.loadedFilesCount / filesCount) * 100 + "%"
+                  }}
+                />
+                {this.state.loadedFilesCount > filesCount / 4 && (
+                  <View
+                    style={{
+                      position: "absolute",
+                      left: "22%",
+                      top: -4
+                    }}
+                  >
+                    <View
+                      style={{
+                        backgroundColor:
+                          this.state.loadedFilesCount > filesCount / 4
+                            ? this.state.loadedFilesCount > filesCount / 2
+                              ? this.state.loadedFilesCount >
+                                filesCount / 2 + filesCount / 4
+                                ? "#6FCF97"
+                                : "#FFCE42"
+                              : "#F2994A"
+                            : "#EB5757",
+                        width: 12,
+                        height: 12,
+                        borderRadius: 6
+                      }}
+                    />
+                    <Text
+                      style={{
+                        color: "#979797",
+                        fontFamily: "Montserrat-Regular",
+                        fontSize: 10,
+                        left: -7,
+                        top: 8
+                      }}
+                    >
+                      1 тур
+                    </Text>
+                  </View>
+                )}
+
+                {this.state.loadedFilesCount > filesCount / 2 && (
+                  <View
+                    style={{
+                      position: "absolute",
+                      left: "47%",
+                      top: -4
+                    }}
+                  >
+                    <View
+                      style={{
+                        backgroundColor:
+                          this.state.loadedFilesCount > filesCount / 2
+                            ? this.state.loadedFilesCount >
+                              filesCount / 2 + filesCount / 4
+                              ? "#6FCF97"
+                              : "#FFCE42"
+                            : "#F2994A",
+                        width: 12,
+                        height: 12,
+                        borderRadius: 6
+                      }}
+                    />
+                    <Text
+                      style={{
+                        color: "#979797",
+                        fontFamily: "Montserrat-Regular",
+                        fontSize: 10,
+                        left: -7,
+                        top: 8
+                      }}
+                    >
+                      2 тур
+                    </Text>
+                  </View>
+                )}
+
+                {this.state.loadedFilesCount >
+                  filesCount / 2 + filesCount / 4 && (
+                  <View
+                    style={{
+                      position: "absolute",
+                      left: "72%",
+                      top: -4
+                    }}
+                  >
+                    <View
+                      style={{
+                        backgroundColor:
+                          this.state.loadedFilesCount >
+                          filesCount / 2 + filesCount / 4
+                            ? "#6FCF97"
+                            : "#FFCE42",
+                        width: 12,
+                        height: 12,
+                        borderRadius: 6
+                      }}
+                    />
+                    <Text
+                      style={{
+                        color: "#979797",
+                        fontFamily: "Montserrat-Regular",
+                        fontSize: 10,
+                        left: -7,
+                        top: 8
+                      }}
+                    >
+                      3 тур
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </View>
+          )}
+
+          {((navigationProps.isMyGame && this.state.game) ||
+            (navigationProps.isMyGame && this.state.runCount == 0) ||
+            !navigationProps.isMyGame) && (
+            <TouchableOpacity
+              disabled={this.state.addGames && !navigationProps.isMyGame}
+              style={[
+                styles.btnAuth,
+                {
+                  borderWidth: 1,
+                  borderColor: "#DADADA",
+                  backgroundColor: !this.state.addGames
+                    ? navigationProps.isMyGame && this.state.runCount != 0
+                      ? "#0B2A5B"
+                      : "#0B2A5B"
+                    : "white"
+                }
+              ]}
+              onPress={() =>
+                !this.state.addGames
                   ? navigationProps.isMyGame
-                    ? "#0B2A5B"
-                    : "#0B2A5B"
-                  : "white"
-              }
-            ]}
-            onPress={() =>
-              !this.state.addGames
-                ? navigationProps.isMyGame
-                  ? this.playGame(navigationProps.item)
+                    ? this.playGame(navigationProps.item)
+                    : this.addItemToCard(navigationProps.item)
                   : this.addItemToCard(navigationProps.item)
-                : this.addItemToCard(navigationProps.item)
-            }
-          >
-            <Text
-              style={{
-                textAlign: "center",
-                textTransform: "none",
-                color: !this.state.addGames
-                  ? navigationProps.isMyGame
-                    ? "#fff"
-                    : "#fff"
-                  : "#333333",
-                fontFamily: "Montserrat-Regular",
-                fontSize: 17
-              }}
+              }
             >
-              {!this.state.addGames
-                ? navigationProps.isMyGame
-                  ? "Играть"
-                  : "Добавить в корзину"
-                : "В корзине"}
-            </Text>
-          </TouchableOpacity>
+              <Text
+                style={{
+                  textAlign: "center",
+                  textTransform: "none",
+                  color: !this.state.addGames
+                    ? navigationProps.isMyGame && this.state.runCount != 0
+                      ? "#fff"
+                      : "#fff"
+                    : "#333333",
+                  fontFamily: "Montserrat-Regular",
+                  fontSize: 17
+                }}
+              >
+                {!this.state.addGames
+                  ? navigationProps.isMyGame && this.state.runCount != 0
+                    ? "Играть"
+                    : "Добавить в корзину"
+                  : "В корзине"}
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          {navigationProps.isMyGame &&
+            (!this.state.game || (this.state.game && this.state.loading)) &&
+            this.state.runCount != 0 && (
+              <TouchableOpacity
+                style={[
+                  styles.btnAuth,
+                  {
+                    marginTop: 8,
+                    borderWidth: 1,
+                    borderColor: "#DADADA",
+                    backgroundColor: "white"
+                  }
+                ]}
+                onPress={() => this.loadGame()}
+              >
+                <Text
+                  style={{
+                    textAlign: "center",
+                    textTransform: "none",
+                    color: "#333333",
+                    fontFamily: "Montserrat-Regular",
+                    fontSize: 17
+                  }}
+                >
+                  {this.state.loading ? "Отменить загрузку" : "Загрузить игру"}
+                </Text>
+              </TouchableOpacity>
+            )}
 
           <View style={styles.description}>
             <Text
@@ -346,6 +712,103 @@ class CardGameScreen extends Component {
               )}
             </View>
           </View>
+
+          {navigationProps.item.rating && (
+            <View style={styles.description}>
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: "600",
+                  marginBottom: 10,
+                  fontFamily: "Montserrat-Regular"
+                }}
+              >
+                Отзывы
+              </Text>
+
+              <View style={{ flexDirection: "row" }}>
+                <View style={{ flex: 1 }}>
+                  <Text
+                    style={{
+                      fontSize: 70,
+                      fontFamily: "Montserrat-Medium",
+                      fontWeight: "600",
+                      color: "#333333"
+                    }}
+                  >
+                    {navigationProps.item.rating.toString().replace(".", ",")}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      fontFamily: "Montserrat-Medium",
+                      fontWeight: "600",
+                      color: "#979797",
+                      marginLeft: 20
+                    }}
+                  >
+                    {navigationProps.item.review_count + " отзыва"}
+                  </Text>
+                </View>
+                <View style={{ flex: 1, marginTop: 13 }}>
+                  {review_details
+                    .sort(function(a, b) {
+                      if (a.rating < b.rating) {
+                        return 1;
+                      }
+                      if (a.rating > b.rating) {
+                        return -1;
+                      }
+                      return 0;
+                    })
+                    .map(item => {
+                      return (
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            alignItems: "center",
+                            marginBottom: 3
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color: "#333333",
+                              fontSize: 12,
+                              width: 7,
+                              fontFamily: "Montserrat-Regular"
+                            }}
+                          >
+                            {item.rating}
+                          </Text>
+                          <View
+                            style={{
+                              flex: 1,
+                              height: 5,
+                              backgroundColor: "#DADADA",
+                              borderRadius: 10,
+                              marginLeft: 10
+                            }}
+                          >
+                            <View
+                              style={{
+                                backgroundColor: "#0B2A5B",
+                                height: 5,
+                                borderRadius: 10,
+                                width:
+                                  (item.count /
+                                    navigationProps.item.review_count) *
+                                    100 +
+                                  "%"
+                              }}
+                            />
+                          </View>
+                        </View>
+                      );
+                    })}
+                </View>
+              </View>
+            </View>
+          )}
         </SafeAreaView>
         {this.renderFootBtn()}
       </SafeAreaView>

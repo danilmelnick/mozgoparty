@@ -207,6 +207,12 @@ const MyGames = createStackNavigator({
       headerShown: false
     }
   },
+  GameScreen: {
+    screen: GameScreen,
+    navigationOptions: {
+      headerShown: false
+    }
+  },
   LikeScreen: {
     screen: LikeScreen,
     navigationOptions: {

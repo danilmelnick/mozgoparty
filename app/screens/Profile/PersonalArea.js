@@ -105,26 +105,32 @@ class PersonalArea extends React.Component {
           error = json.errors.email[0];
         }
 
-        Alert.alert(error, "", [
-          {
-            text: "OK",
-            style: "default"
-          }
-        ]);
+        this.setState({ visible: false }, () => {
+          setTimeout(() => {
+            Alert.alert(error, "", [
+              {
+                text: "OK",
+                style: "default"
+              }
+            ]);
+          }, 200);
+        });
       } else {
-        Alert.alert("Данные успешно изменены", undefined, [
-          {
-            text: "OK"
-          }
-        ]);
+        this.setState({ visible: false }, () => {
+          setTimeout(() => {
+            Alert.alert("Данные успешно изменены", undefined, [
+              {
+                text: "OK"
+              }
+            ]);
+          }, 200);
+        });
 
         await this.props.userDataAction(this.state.token);
       }
     } catch (error) {
       alert(error);
     }
-
-    this.setState({ visible: false });
   };
 
   showActionMenu = () => {
@@ -140,7 +146,7 @@ class PersonalArea extends React.Component {
         } else if (buttonIndex === 2) {
           AsyncStorage.setItem("userToken", "");
           this.props.logoutAction();
-          this.props.navigation.navigate("AuthScreen");
+          this.props.navigation.navigate("ShopScreen");
         }
       }
     );
@@ -174,15 +180,14 @@ class PersonalArea extends React.Component {
       );
       const json = await data.json();
 
-      console.log(data);
-      console.log(json);
-
       await this.props.userDataAction(this.state.token);
+      setTimeout(() => {
+        this.setState({ visible: false });
+      }, 1000);
     } catch (error) {
       alert(error);
+      this.setState({ visible: false });
     }
-
-    this.setState({ visible: false });
   };
 
   deleteAvatar = async () => {

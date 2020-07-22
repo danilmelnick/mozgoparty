@@ -63,7 +63,20 @@ class RegistrationScreeen extends Component {
       console.log(data);
 
       if (data.status == 200) {
-        await this.props.navigation.goBack();
+        this.setState({ visible: false }, () => {
+          setTimeout(() => {
+            Alert.alert(
+              "Письмо для подтверждения аккаунта направлено на указанную почту",
+              "",
+              [
+                {
+                  text: "OK",
+                  style: "default"
+                }
+              ]
+            );
+          }, 300);
+        });
       } else {
         let error = "";
         if (json.errors.email) {

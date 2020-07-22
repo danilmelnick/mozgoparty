@@ -24,7 +24,9 @@ class SupportScreen extends React.Component {
     reasonRequest: "",
     y: 0,
     comment: "",
-    visible: false
+    visible: false,
+    name: "",
+    email: ""
   };
 
   send = async () => {
@@ -51,11 +53,11 @@ class SupportScreen extends React.Component {
     try {
       const data = await fetch(
         "https://api.party.mozgo.com/support?email=" +
-          this.props.user.userInfo.email +
+          (this.props.user.userInfo.email || this.state.email) +
           "&comment=" +
           this.state.comment +
           "&name=" +
-          this.props.user.userInfo.name +
+          (this.props.user.userInfo.name || this.state.name) +
           "&site=egames&reason=" +
           this.state.reasonRequest,
         settings
@@ -67,26 +69,50 @@ class SupportScreen extends React.Component {
       console.log("Resp >>>>>>>>>>>" + JSON.stringify(json));
 
       if (data.status == 200) {
-        this.setState({ reason: "", reasonRequest: "", comment: "" });
-        Alert.alert("Спасибо, ваша заявка будет обработана!", "", [
+        this.setState(
           {
-            text: "OK",
-            style: "default"
+            reason: "",
+            reasonRequest: "",
+            comment: "",
+            email: "",
+            name: "",
+            visible: false
+          },
+          () => {
+            setTimeout(() => {
+              Alert.alert("Спасибо, ваша заявка будет обработана!", "", [
+                {
+                  text: "OK",
+                  style: "default"
+                }
+              ]);
+            }, 200);
           }
-        ]);
+        );
       } else if (data.status == 422) {
-        Alert.alert(json.errors.comment[0], "", [
-          {
-            text: "OK",
-            style: "default"
-          }
-        ]);
+        this.setState({ visible: false }, () => {
+          setTimeout(() => {
+            let error = "";
+            if (json.errors.comment) {
+              error = json.errors.comment[0];
+            } else if (json.errors.name) {
+              error = json.errors.name[0];
+            } else if (json.errors.email) {
+              error = json.errors.email[0];
+            }
+
+            Alert.alert(error, "", [
+              {
+                text: "OK",
+                style: "default"
+              }
+            ]);
+          }, 200);
+        });
       }
     } catch (error) {
       console.log(error);
     }
-
-    this.setState({ visible: false });
   };
 
   renderDropDown = () => {
@@ -181,6 +207,8 @@ class SupportScreen extends React.Component {
   };
 
   render() {
+    console.log("this.props.user.userInfo", this.props.user.userInfo);
+
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <SafeAreaView style={styles.container}>
@@ -232,11 +260,68 @@ class SupportScreen extends React.Component {
             Запрос в тех. поддержку
           </Text>
 
+          {!this.props.user.userInfo.email && (
+            <View style={{ marginHorizontal: 16 }}>
+              {this.state.name.length > 0 && (
+                <Text
+                  style={{
+                    fontSize: 12,
+                    color: "#979797",
+                    fontFamily: "Montserrat-Regular",
+                    marginLeft: 10,
+                    marginBottom: -8
+                  }}
+                >
+                  Имя и фамилия
+                </Text>
+              )}
+              <TextInput
+                placeholder={"Имя и фамилия"}
+                style={[styles.inputForm, { marginTop: 10 }]}
+                value={this.state.name}
+                onChangeText={name => this.setState({ name })}
+              />
+            </View>
+          )}
+
+          {!this.props.user.userInfo.email && (
+            <View
+              style={{ marginHorizontal: 16 }}
+              onLayout={evt => {
+                this.setState({ y: evt.nativeEvent.layout.y });
+              }}
+            >
+              {this.state.email.length > 0 && (
+                <Text
+                  style={{
+                    fontSize: 12,
+                    color: "#979797",
+                    fontFamily: "Montserrat-Regular",
+                    marginLeft: 10,
+                    marginBottom: -8
+                  }}
+                >
+                  E-mail
+                </Text>
+              )}
+              <TextInput
+                placeholder={"E-mail"}
+                style={[styles.inputForm, { marginTop: 10 }]}
+                value={this.state.email}
+                onChangeText={email => this.setState({ email })}
+              />
+            </View>
+          )}
+
           <View
             style={{
               marginHorizontal: 16,
               marginVertical: 30,
+              marginTop: 10,
               marginBottom: -10
+            }}
+            onLayout={evt => {
+              this.setState({ y: evt.nativeEvent.layout.y });
             }}
           >
             {this.state.reason != "" && (

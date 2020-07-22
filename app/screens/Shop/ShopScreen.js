@@ -51,8 +51,8 @@ export default class ShopScreen extends Component {
       favGames: [],
       showSearch: false,
       searchText: "",
-      showenTab: 0,
-      selectedTab: 0,
+      showenTab: 1,
+      selectedTab: 1,
       categories: []
     };
   }
@@ -268,16 +268,27 @@ export default class ShopScreen extends Component {
       const json = await response.json();
       this.setState({ data: json });
 
-      const categories = Object.entries(
-        json
-          .map(item => item.category.toUpperCase())
-          .reduce((acc, el) => {
-            acc[el] = (acc[el] || 0) + 1;
-            return acc;
-          }, {})
-      );
+      const categories = [];
 
-      categories.unshift(["ВСЕ", json.length]);
+      categories.push(["ВСЕ", json.length]);
+      categories.push([
+        "КЛАССИЧЕСКИЕ",
+        json.filter(item => item.category.toUpperCase() == "КЛАССИЧЕСКАЯ ИГРА")
+          .length
+      ]);
+      categories.push([
+        "ТЕМАТИЧЕСКИЕ",
+        json.filter(item => item.category.toUpperCase() == "ТЕМАТИЧЕСКАЯ")
+          .length
+      ]);
+      categories.push([
+        "ДЕТСКИЕ",
+        json.filter(item => item.category.toUpperCase() == "ДЕТСКАЯ").length
+      ]);
+      categories.push([
+        "СПЕЦИАЛЬНЫЕ",
+        json.filter(item => item.category.toUpperCase() == "СПЕЦИАЛЬНАЯ").length
+      ]);
 
       this.setState({ categories });
     } catch (error) {
@@ -565,12 +576,6 @@ export default class ShopScreen extends Component {
             data={data}
             numColumns={2}
             renderItem={({ item, index }) => {
-              console.log(
-                "isNew",
-                item.party.show_on_main_page,
-                item.party.name
-              );
-
               return (
                 <CardItem
                   isSecond={index % 2 == 1}
