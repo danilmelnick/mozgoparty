@@ -423,8 +423,10 @@ export default class ShopScreen extends Component {
 
   render() {
     let data = this.state.filteredBy
-      ? this.state.data.filter(
-          item => item.category.toUpperCase() == this.state.filteredBy
+      ? this.state.data.filter(item =>
+          item.category
+            .toUpperCase()
+            .includes(this.state.filteredBy.substring(0, 4))
         )
       : this.state.data;
 
@@ -631,7 +633,8 @@ export default class ShopScreen extends Component {
           marginHorizontal: 16,
           borderRadius: 5,
           textAlign: "left",
-          marginTop: 16
+          marginTop: 16,
+          marginBottom: 20
         }}
         onPress={() => this.props.navigation.navigate("BusketScreen")}
       >
@@ -720,7 +723,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     width: Dimensions.get("window").width,
     marginLeft: -20,
-    marginBottom: -60
+    marginBottom: -60,
+    paddingBottom: 20
   },
   roundedDialog: {
     backgroundColor: Colors.white,
@@ -744,7 +748,8 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start"
   },
   modalWrapper: {
-    padding: 16
+    padding: 16,
+    marginBottom: 20
   },
   buttonTitle: {
     marginLeft: 10,
