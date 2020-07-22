@@ -138,12 +138,7 @@ class GameScreen extends Component {
     return (
       <TouchableOpacity
         onPress={() => {
-          this.showNextGame(
-            !(
-              this.state.data.properties.type == "repeat" ||
-              this.state.data.type == "slide-timer"
-            )
-          );
+          this.showNextGame(true);
         }}
         style={{
           position: "absolute",
@@ -200,41 +195,46 @@ class GameScreen extends Component {
 
     const tour = this.state.data.tour;
     const slide = this.state.data.slide;
+
     if (tour > 0 && slide > 0 && !!skip) {
-      while (nextScreen.tour == tour || nextScreen.tour == 0) {
+      while (nextScreen.slide > 0) {
+        if (!this.game.hasNextScreen()) {
+          this.props.navigation.goBack();
+        }
+
         nextScreen = this.game.nextScreen();
       }
     }
 
-    this.setState(
-      {
-        data: nextScreen,
-        timer: nextScreen.type == "slide-timer" ? -74 : 0,
-        buttons: false,
-        showAnswer: false
-      },
-      () => {
-        if (nextScreen.type == "slide-timer") {
-          this.setTimer();
-        }
+    if (nextScreen) {
+      this.setState(
+        {
+          data: nextScreen,
+          timer: nextScreen.type == "slide-timer" ? -75 : 0,
+          buttons: false,
+          showAnswer: false
+        },
+        () => {
+          if (nextScreen.type == "slide-timer") {
+            this.setTimer();
+          }
 
-        if (
-          nextScreen.properties.type == "repeat" ||
-          nextScreen.properties.type == "question" ||
-          nextScreen.properties.type == "answer"
-        ) {
-          Animated.timing(this.state.textScale, {
-            toValue: 1,
-            duration: 1000
-          }).start();
+          if (
+            nextScreen.properties.type == "repeat" ||
+            nextScreen.properties.type == "question" ||
+            nextScreen.properties.type == "answer"
+          ) {
+            Animated.timing(this.state.textScale, {
+              toValue: 1,
+              duration: 1000
+            }).start();
+          }
         }
-      }
-    );
+      );
+    }
   };
 
   componentDidUpdate() {
-    console.log(this.state.data.leading);
-
     if (this.state.data.properties.videoStart === false) {
       this.showNextGame();
     } else if (
@@ -259,7 +259,7 @@ class GameScreen extends Component {
         if (this.state.data.type == "slide-timer") {
           setTimeout(() => {
             this.showNextGame();
-          }, 101000);
+          }, 102000);
         }
 
         this.whoosh = new Sound(
@@ -274,7 +274,7 @@ class GameScreen extends Component {
             this.audioPlayed = true;
             this.whoosh.play(success => {
               if (success) {
-                this.audioPlayed = false;
+                // this.audioPlayed = false;
                 if (
                   this.state.data.properties.type == "repeat" ||
                   (this.state.data.tour == 4 &&
@@ -290,24 +290,29 @@ class GameScreen extends Component {
                   this.setState({ showAnswer: true });
                 }
 
-                this.circularProgress &&
-                  this.circularProgress.animate(0, 26000, Easing.linear);
-                this.setTimer();
+                if (this.state.data.type != "slide-timer") {
+                  this.circularProgress &&
+                    this.circularProgress.animate(0, 26000, Easing.linear);
+                  this.setTimer();
+                }
 
                 if (
-                  (!this.state.data.properties.sound &&
+                  (!this.state.data.properties.sounds &&
                     this.state.data.leading.length > 2 &&
                     this.state.data.leading[2].action == "audio") ||
                   this.state.data.type == "text-and-sounds"
                 ) {
                   if (this.whoosh) {
                     this.whoosh.stop();
-                    this.audioPlayed = false;
+                    // this.audioPlayed = false;
                   }
 
                   this.whoosh = new Sound(
-                    this.state.data.properties.sounds ||
-                      this.state.data.leading[2].params[0],
+                    this.state.data.type == "slide-timer"
+                      ? this.props.navigation.state.params.data.meta
+                          .blitzTimerMedia
+                      : this.state.data.properties.sounds ||
+                        this.state.data.leading[2].params[0],
                     null,
                     error => {
                       if (error) {
@@ -479,11 +484,11 @@ class GameScreen extends Component {
             <Text
               style={{
                 color: "white",
-                fontSize: 65,
+                fontSize: 70,
                 fontFamily: "Montserrat-Bold"
               }}
             >
-              {25 - this.state.timer}
+              {25 - this.state.timer < 0 ? 0 : 25 - this.state.timer}
             </Text>
           </Animated.View>
           <AnimatedCircularProgress
@@ -504,6 +509,7 @@ class GameScreen extends Component {
             width={15}
             rotation={0}
             fill={100}
+            prefill={100}
             tintColor={"white"}
             backgroundColor={"transparent"}
           />
@@ -534,7 +540,10 @@ class GameScreen extends Component {
         >
           <TouchableWithoutFeedback onPress={() => this.showButtons()}>
             <Animated.View
-              style={{ flex: 1, transform: [{ scale: this.state.textScale }] }}
+              style={{
+                flex: 1,
+                transform: [{ scale: this.state.textScale }]
+              }}
             >
               <View
                 style={{
@@ -575,32 +584,32 @@ class GameScreen extends Component {
                     </Text>
                   ))}
                 </Text>
-                {this.state.data.properties.image && (
-                  <ImageBackground
-                    resizeMode={"contain"}
-                    style={{
-                      flex: 1,
-                      marginTop: 40,
-                      maxHeight: Dimensions.get("window").height - 120
-                    }}
-                    source={{
-                      uri:
-                        this.state.data.properties.type == "answer" &&
-                        !this.state.showAnswer
-                          ? undefined
-                          : this.state.data.properties.image
-                    }}
-                  />
-                )}
+                {this.state.data.properties.image &&
+                  !(
+                    this.state.data.properties.type == "answer" &&
+                    !this.state.showAnswer
+                  ) && (
+                    <ImageBackground
+                      resizeMode={"contain"}
+                      style={{
+                        flex: 1,
+                        marginTop: 40,
+                        maxHeight: Dimensions.get("window").height - 120
+                      }}
+                      source={{
+                        uri: this.state.data.properties.image
+                      }}
+                    />
+                  )}
               </View>
               {this.state.data.properties.textAnswer && this.state.showAnswer && (
                 <Text
                   style={{
                     color: "white",
-                    paddingTop: 25,
+                    paddingTop: 20,
+                    paddingBottom: 65,
                     paddingHorizontal: 50,
                     fontSize: 30,
-                    flex: 1,
                     textAlign: "center",
                     fontFamily: "Montserrat-Bold"
                   }}
@@ -912,6 +921,6 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(GameScreen);
+export default GameScreen;
 
 const styles = StyleSheet.create({});

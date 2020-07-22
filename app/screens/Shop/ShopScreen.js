@@ -306,7 +306,6 @@ export default class ShopScreen extends Component {
     const data = this.state.data.filter(item => {
       return item.party.name.includes(this.state.searchText);
     });
-    console.log(data);
 
     return (
       <Modal visible={this.state.showSearch}>

@@ -8,6 +8,11 @@ let userState = {
 
 export function userData(state = userState, action) {
   switch (action.type) {
+    case "SET_DOWNLOAD_SUCCESS":
+      return {
+        ...state,
+        download: action.payload
+      };
     case "USER_INFO_SUCCESS":
       return {
         ...state,
