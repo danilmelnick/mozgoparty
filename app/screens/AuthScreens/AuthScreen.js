@@ -68,7 +68,7 @@ class AuthScreen extends Component {
         const itemsCardGames = JSON.parse(
           await AsyncStorage.getItem("cardGames")
         );
-        const itemPartyIDs = itemsCardGames;
+        const itemPartyIDs = itemsCardGames || [];
         console.log(itemPartyIDs);
         const setItems = [];
         itemPartyIDs.forEach(element1 => {
