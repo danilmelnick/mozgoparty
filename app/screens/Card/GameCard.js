@@ -12,17 +12,20 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Header } from "react-native-elements";
 import AsyncStorage from "@react-native-community/async-storage";
 import userDataAction from "../../actions/userDataAction";
-import setDownload from "../../actions/setDownload";
+import setDownload, {
+  setCancelDownloadVariable
+} from "../../actions/setDownload";
 import { connect } from "react-redux";
 var RNFS = require("react-native-fs");
 
-let filesCount = 100;
+let filesCount = 99;
 
 class GameCard extends Component {
   state = {
     game: undefined,
     runCount: 3,
-    startLoading: false
+    startLoading: false,
+    currentTour: 1
   };
 
   async componentDidMount() {
@@ -35,8 +38,28 @@ class GameCard extends Component {
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    if (nextProps.download.gameId == this.props.item.id) {
-      this.setState({ startLoading: true });
+    if (
+      nextProps.game.cancel &&
+      nextProps.download.gameId == this.props.item.id
+    ) {
+      this.setState({
+        game: undefined,
+        startLoading: false,
+        currentTour: 1
+      });
+    } else if (
+      nextProps.game.json &&
+      nextProps.download.gameId == this.props.item.id
+    ) {
+      this.setState({
+        game: nextProps.game.json,
+        startLoading: nextProps.download.persent < filesCount
+      });
+    } else if (nextProps.download.gameId == this.props.item.id) {
+      this.setState({
+        startLoading: true,
+        currentTour: nextProps.download.tour
+      });
     }
   }
 
@@ -63,68 +86,14 @@ class GameCard extends Component {
   };
 
   loadGame = async () => {
-    if (this.state.startLoading) {
-      this.setState({ startLoading: false });
-      return;
-    }
-
-    this.setState({ startLoading: true });
+    setCancelDownloadVariable(false);
 
     const item = this.props.item;
-    let notSavedFile = true;
-
-    try {
-      const response = await fetch(
-        "https://api.party.mozgo.com/game-content/" + item.hash,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: "Bearer " + this.state.token
-          }
-        }
-      );
-      const json = await response.json();
-
-      let jsonString = JSON.stringify(json);
-
-      filesCount = jsonString.split("https://").length;
-      console.log("filesCount", filesCount);
-
-      while (jsonString.indexOf("https://") != -1 && this.state.startLoading) {
-        const firstIndexOfHttps = jsonString.indexOf("https://");
-        const lastLinkIndex = jsonString.indexOf('"', firstIndexOfHttps);
-        const url = jsonString.slice(firstIndexOfHttps, lastLinkIndex);
-        const splitUrl = url.split("/");
-        const fileName = splitUrl[splitUrl.length - 1];
-        console.log(firstIndexOfHttps, lastLinkIndex, url, fileName);
-
-        const download = RNFS.downloadFile({
-          fromUrl: url,
-          toFile: RNFS.DocumentDirectoryPath + "/" + fileName
-        });
-        const result = await download.promise;
-
-        jsonString = jsonString.replace(
-          url,
-          "file://" + RNFS.DocumentDirectoryPath + "/" + fileName
-        );
-
-        this.props.setDownload({
-          persent: this.props.download.persent + 1,
-          gameId: item.id.toString()
-        });
-      }
-
-      if (this.state.startLoading) {
-        await AsyncStorage.setItem(item.id.toString(), jsonString);
-        this.setState({ game: JSON.parse(jsonString), startLoading: false });
-        console.log("SAVE");
-      }
-    } catch (error) {
-      console.error("Ошибка:", error);
-    }
+    this.props.setDownload({
+      gameId: item.id.toString(),
+      item,
+      token: this.state.token
+    });
   };
 
   renderDownloadView = () => {
@@ -170,10 +139,9 @@ class GameCard extends Component {
               style={{
                 height: 4,
                 backgroundColor:
-                  this.props.download.persent > filesCount / 4
-                    ? this.props.download.persent > filesCount / 2
-                      ? this.props.download.persent >
-                        filesCount / 2 + filesCount / 4
+                  this.state.currentTour - 1 >= 1
+                    ? this.state.currentTour - 1 >= 2
+                      ? this.state.currentTour - 1 >= 3
                         ? "#6FCF97"
                         : "#FFCE42"
                       : "#F2994A"
@@ -309,7 +277,8 @@ const mapStateToProps = state => {
   // console.log(JSON.stringify(state));
   return {
     user: state.userData,
-    download: state.userData.download || { persent: 0 }
+    download: state.userData.download || { persent: 0 },
+    game: state.userData.game || {}
   };
 };
 const mapDispatchToProps = dispatch => {

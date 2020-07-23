@@ -13,6 +13,11 @@ export function userData(state = userState, action) {
         ...state,
         download: action.payload
       };
+    case "SET_GAME_TO_LOCAL_STORE":
+      return {
+        ...state,
+        game: action.payload
+      };
     case "USER_INFO_SUCCESS":
       return {
         ...state,

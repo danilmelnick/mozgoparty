@@ -11,12 +11,13 @@ import Orientation from "react-native-orientation";
 import AsyncStorage from "@react-native-community/async-storage";
 import { Header } from "react-native-elements";
 import userDataAction from "../../actions/userDataAction";
-import setDownload from "../../actions/setDownload";
+import setDownload, {
+  setCancelDownloadVariable
+} from "../../actions/setDownload";
 import { connect } from "react-redux";
 import { throwStatement } from "@babel/types";
-var RNFS = require("react-native-fs");
 
-let filesCount = 100;
+let filesCount = 99;
 
 class CardGameScreen extends Component {
   constructor() {
@@ -29,13 +30,51 @@ class CardGameScreen extends Component {
       count: 0,
       cardGames: [],
       token: "",
-      runCount: 3
+      runCount: 3,
+      currentTour: 1,
+      persent1: 0,
+      persent2: 0,
+      persent3: 0
     };
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    if (nextProps.download.gameId == this.props.navigation.state.params.id) {
-      this.setState({ loading: true });
+    if (
+      nextProps.game.cancel &&
+      nextProps.download.gameId == this.props.navigation.state.params.id
+    ) {
+      this.setState({
+        game: undefined,
+        loading: false,
+        currentTour: 1,
+        persent1: 0,
+        persent2: 0,
+        persent3: 0
+      });
+    } else if (
+      nextProps.game.json &&
+      nextProps.download.gameId == this.props.navigation.state.params.id
+    ) {
+      this.setState({
+        game: nextProps.game.json,
+        loading: nextProps.download.persent < filesCount
+      });
+    } else if (
+      nextProps.download.gameId == this.props.navigation.state.params.id
+    ) {
+      this.setState({ loading: true, currentTour: nextProps.download.tour });
+
+      if (nextProps.download.persent1) {
+        this.setState({ persent1: nextProps.download.persent1 });
+      }
+
+      if (nextProps.download.persent2) {
+        this.setState({ persent2: nextProps.download.persent2 });
+      }
+
+      if (nextProps.download.persent3) {
+        this.setState({ persent3: nextProps.download.persent3 });
+      }
     }
   }
 
@@ -58,6 +97,13 @@ class CardGameScreen extends Component {
   };
 
   async componentDidMount() {
+    if (
+      this.props.download.gameId == this.props.navigation.state.params.id &&
+      this.props.download.persent > 0
+    ) {
+      this.setState({ loading: true });
+    }
+
     Orientation.lockToPortrait();
 
     // await AsyncStorage.setItem(item.id.toString(), undefined);
@@ -102,67 +148,19 @@ class CardGameScreen extends Component {
   };
 
   loadGame = async () => {
+    setCancelDownloadVariable(false);
+
     if (this.state.loading) {
-      this.setState({ loading: false });
+      setCancelDownloadVariable(true);
       return;
     }
 
-    this.setState({ loading: true });
-
     const item = this.props.navigation.state.params.item;
-
-    try {
-      const response = await fetch(
-        "https://api.party.mozgo.com/game-content/" + item.hash,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: "Bearer " + this.state.token
-          }
-        }
-      );
-      const json = await response.json();
-
-      let jsonString = JSON.stringify(json);
-
-      filesCount = jsonString.split("https://").length;
-      console.log("filesCount", filesCount);
-
-      while (jsonString.indexOf("https://") != -1 && this.state.loading) {
-        const firstIndexOfHttps = jsonString.indexOf("https://");
-        const lastLinkIndex = jsonString.indexOf('"', firstIndexOfHttps);
-        const url = jsonString.slice(firstIndexOfHttps, lastLinkIndex);
-        const splitUrl = url.split("/");
-        const fileName = splitUrl[splitUrl.length - 1];
-        console.log(firstIndexOfHttps, lastLinkIndex, url, fileName);
-
-        const download = RNFS.downloadFile({
-          fromUrl: url,
-          toFile: RNFS.DocumentDirectoryPath + "/" + fileName
-        });
-        const result = await download.promise;
-
-        jsonString = jsonString.replace(
-          url,
-          "file://" + RNFS.DocumentDirectoryPath + "/" + fileName
-        );
-
-        this.props.setDownload({
-          persent: this.props.download.persent + 1,
-          gameId: item.id.toString()
-        });
-      }
-
-      if (this.state.loading) {
-        await AsyncStorage.setItem(item.id.toString(), jsonString);
-        this.setState({ game: JSON.parse(jsonString), loading: false });
-        console.log("SAVE");
-      }
-    } catch (error) {
-      console.error("Ошибка:", error);
-    }
+    this.props.setDownload({
+      gameId: item.id.toString(),
+      item,
+      token: this.state.token
+    });
   };
 
   playGame = async item => {
@@ -462,10 +460,9 @@ class CardGameScreen extends Component {
                   style={{
                     height: 4,
                     backgroundColor:
-                      this.props.download.persent > filesCount / 4
-                        ? this.props.download.persent > filesCount / 2
-                          ? this.props.download.persent >
-                            filesCount / 2 + filesCount / 4
+                      this.state.currentTour - 1 >= 1
+                        ? this.state.currentTour - 1 >= 2
+                          ? this.state.currentTour - 1 >= 3
                             ? "#6FCF97"
                             : "#FFCE42"
                           : "#F2994A"
@@ -475,21 +472,20 @@ class CardGameScreen extends Component {
                       (this.props.download.persent / filesCount) * 100 + "%"
                   }}
                 />
-                {this.props.download.persent > filesCount / 4 && (
+                {this.state.currentTour - 1 >= 1 && (
                   <View
                     style={{
                       position: "absolute",
-                      left: "22%",
+                      left: this.state.persent1 - 2 + "%",
                       top: -4
                     }}
                   >
                     <View
                       style={{
                         backgroundColor:
-                          this.props.download.persent > filesCount / 4
-                            ? this.props.download.persent > filesCount / 2
-                              ? this.props.download.persent >
-                                filesCount / 2 + filesCount / 4
+                          this.state.currentTour - 1 >= 1
+                            ? this.state.currentTour - 1 >= 2
+                              ? this.state.currentTour - 1 >= 3
                                 ? "#6FCF97"
                                 : "#FFCE42"
                               : "#F2994A"
@@ -513,20 +509,19 @@ class CardGameScreen extends Component {
                   </View>
                 )}
 
-                {this.props.download.persent > filesCount / 2 && (
+                {this.state.currentTour - 1 >= 2 && (
                   <View
                     style={{
                       position: "absolute",
-                      left: "47%",
+                      left: this.state.persent2 - 2 + "%",
                       top: -4
                     }}
                   >
                     <View
                       style={{
                         backgroundColor:
-                          this.props.download.persent > filesCount / 2
-                            ? this.props.download.persent >
-                              filesCount / 2 + filesCount / 4
+                          this.state.currentTour - 1 >= 2
+                            ? this.state.currentTour - 1 >= 3
                               ? "#6FCF97"
                               : "#FFCE42"
                             : "#F2994A",
@@ -549,20 +544,18 @@ class CardGameScreen extends Component {
                   </View>
                 )}
 
-                {this.props.download.persent >
-                  filesCount / 2 + filesCount / 4 && (
+                {this.state.currentTour - 1 >= 3 && (
                   <View
                     style={{
                       position: "absolute",
-                      left: "72%",
+                      left: this.state.persent3 - 2 + "%",
                       top: -4
                     }}
                   >
                     <View
                       style={{
                         backgroundColor:
-                          this.props.download.persent >
-                          filesCount / 2 + filesCount / 4
+                          this.state.currentTour - 1 >= 3
                             ? "#6FCF97"
                             : "#FFCE42",
                         width: 12,
@@ -819,10 +812,11 @@ class CardGameScreen extends Component {
 
 const mapStateToProps = state => {
   // console.log("mapStateToProps >>>>>>>>", state);
-  // console.log(JSON.stringify(state));
+  console.log(JSON.stringify(state));
   return {
     user: state.userData,
-    download: state.userData.download || { persent: 0 }
+    download: state.userData.download || { persent: 0 },
+    game: state.userData.game || {}
   };
 };
 const mapDispatchToProps = dispatch => {
