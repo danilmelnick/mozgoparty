@@ -338,7 +338,8 @@ const MyDrawerNavigator = createDrawerNavigator(
   },
   {
     contentComponent: drawerContentComponents,
-    initialRouteName: "Shop"
+    initialRouteName: "Shop",
+    unmountInactiveRoutes: true
   }
 );
 
