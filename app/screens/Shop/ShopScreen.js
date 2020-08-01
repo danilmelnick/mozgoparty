@@ -28,6 +28,8 @@ import AsyncStorage from "@react-native-community/async-storage";
 import CardItem from "../../components/CardItem";
 
 export default class ShopScreen extends Component {
+  flatListRef = undefined;
+
   constructor(props) {
     super(props);
 
@@ -336,6 +338,7 @@ export default class ShopScreen extends Component {
               placeholderTextColor={"#979797"}
             />
             <TouchableOpacity
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               onPress={() => {
                 this.setState({ showSearch: false, searchText: "" });
               }}
@@ -468,6 +471,7 @@ export default class ShopScreen extends Component {
           leftComponent={
             <TouchableOpacity
               style={{ marginLeft: 8 }}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               onPress={() => this.props.navigation.openDrawer()}
             >
               <Image
@@ -479,6 +483,7 @@ export default class ShopScreen extends Component {
           rightComponent={
             <TouchableOpacity
               style={{ marginRight: 12 }}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               onPress={() => this.showSearch()}
             >
               <Image source={require("../../src/search.png")} />
@@ -512,12 +517,16 @@ export default class ShopScreen extends Component {
               renderItem={itemProps => {
                 return (
                   <TouchableOpacity
-                    onPress={() =>
+                    onPress={() => {
+                      this.flatListRef.scrollToOffset({
+                        animated: false,
+                        offset: 0
+                      });
                       this.setState({
                         filteredBy:
                           itemProps.index == 0 ? undefined : itemProps.item[0]
-                      })
-                    }
+                      });
+                    }}
                     style={{
                       paddingHorizontal: 20,
                       flex: 1,
@@ -574,6 +583,7 @@ export default class ShopScreen extends Component {
 
         <View style={styles.shopContainer}>
           <FlatList
+            ref={ref => (this.flatListRef = ref)}
             data={data}
             numColumns={2}
             renderItem={({ item, index }) => {

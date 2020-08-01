@@ -86,9 +86,10 @@ class GameCard extends Component {
   };
 
   loadGame = async () => {
-    setCancelDownloadVariable(false);
-
     const item = this.props.item;
+
+    this.props.setCancelDownloadVariable(false, item.id.toString());
+
     this.props.setDownload({
       gameId: item.id.toString(),
       item,
@@ -284,7 +285,9 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     userDataAction: token => dispatch(userDataAction(token)),
-    setDownload: token => dispatch(setDownload(token))
+    setDownload: token => dispatch(setDownload(token)),
+    setCancelDownloadVariable: (cancel, gameId) =>
+      dispatch(setCancelDownloadVariable(cancel, gameId))
   };
 };
 

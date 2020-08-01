@@ -85,6 +85,7 @@ class MyGamesScreen extends React.Component {
           leftComponent={
             <TouchableOpacity
               style={{ marginLeft: 8 }}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               onPress={() => this.props.navigation.openDrawer()}
             >
               <Image

@@ -20,6 +20,7 @@ import logoutAction from "../../actions/logoutAction";
 import { connect } from "react-redux";
 import Loader from "../../components/Loader";
 import { Header } from "react-native-elements";
+import ImageResizer from "react-native-image-resizer";
 import Icon from "../../components/Icon";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -155,9 +156,11 @@ class PersonalArea extends React.Component {
   loadAvatar = async url => {
     this.setState({ visible: true });
 
+    const res = await ImageResizer.createResizedImage(url, 200, 200, "PNG", 50);
+
     let body = new FormData();
     body.append("avatar", {
-      uri: url,
+      uri: res.uri,
       name: "photo.png",
       filename: "imageName.png",
       type: "image/png"
@@ -267,6 +270,7 @@ class PersonalArea extends React.Component {
             leftComponent={
               <TouchableOpacity
                 style={{ marginLeft: 8 }}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 onPress={() => this.props.navigation.openDrawer()}
               >
                 <Image
@@ -305,7 +309,7 @@ class PersonalArea extends React.Component {
                   height: 80
                 }}
               >
-                <ImageBackground
+                <Image
                   source={
                     this.props.user.userInfo.avatar_url
                       ? { uri: this.props.user.userInfo.avatar_url }

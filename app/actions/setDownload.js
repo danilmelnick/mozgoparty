@@ -5,8 +5,31 @@ var RNFS = require("react-native-fs");
 
 let cancelDownloadVariable = false;
 
-export const setCancelDownloadVariable = cancel => {
+export const setCancelDownloadVariable = (cancel, gameId) => {
   cancelDownloadVariable = cancel;
+
+  return dispatch => {
+    cancel &&
+      dispatch(
+        setGameToLocalStore({
+          gameId,
+          json: undefined,
+          cancel: true
+        })
+      );
+
+    cancel &&
+      dispatch(
+        setDownloadSuccess({
+          persent: 0,
+          gameId,
+          tour: 1,
+          persent1: 0,
+          persent2: 0,
+          persent3: 0
+        })
+      );
+  };
 };
 
 export function setDownloadSuccess(data) {
@@ -17,8 +40,6 @@ export function setDownloadSuccess(data) {
 }
 
 export function setGameToLocalStore(data) {
-  console.log("setGameToLocalStore");
-
   return {
     type: "SET_GAME_TO_LOCAL_STORE",
     payload: data
@@ -27,8 +48,15 @@ export function setGameToLocalStore(data) {
 
 export default function setDownload(data) {
   return dispatch => {
-    console.log("data data data", data);
     let tour = 1;
+
+    dispatch(
+      setDownloadSuccess({
+        persent: 0.1,
+        gameId: data.gameId,
+        tour
+      })
+    );
 
     fetch("https://api.party.mozgo.com/game-content/" + data.item.hash, {
       method: "GET",
@@ -134,8 +162,6 @@ export default function setDownload(data) {
         let persent3 = 0;
 
         while (dataScreen) {
-          console.log("dataScreen.tour", dataScreen.tour);
-
           let jsnStr = JSON.stringify(dataScreen);
           if (dataScreen.tour > tour) {
             tour = dataScreen.tour;
@@ -143,25 +169,25 @@ export default function setDownload(data) {
 
           while (jsnStr.indexOf("https://") != -1) {
             if (cancelDownloadVariable) {
-              dispatch(
-                setGameToLocalStore({
-                  gameId: data.gameId,
-                  json: undefined,
-                  tour,
-                  cancel: true
-                })
-              );
+              // dispatch(
+              //   setGameToLocalStore({
+              //     gameId: data.gameId,
+              //     json: undefined,
+              //     tour,
+              //     cancel: true
+              //   })
+              // );
 
-              dispatch(
-                setDownloadSuccess({
-                  persent: 0,
-                  gameId: data.gameId,
-                  tour: 1,
-                  persent1: 0,
-                  persent2: 0,
-                  persent3: 0
-                })
-              );
+              // dispatch(
+              //   setDownloadSuccess({
+              //     persent: 0,
+              //     gameId: data.gameId,
+              //     tour: 1,
+              //     persent1: 0,
+              //     persent2: 0,
+              //     persent3: 0
+              //   })
+              // );
               return;
             }
 

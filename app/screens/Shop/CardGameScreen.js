@@ -85,6 +85,8 @@ class CardGameScreen extends Component {
   };
 
   getItems = async () => {
+    console.log("getItems");
+
     let id = this.props.navigation.state.params.id;
     let items = JSON.parse(await AsyncStorage.getItem("cardGames"));
     this.setState({ count: items ? items.length : 0, addGames: false });
@@ -97,6 +99,10 @@ class CardGameScreen extends Component {
   };
 
   async componentDidMount() {
+    this.props.navigation.addListener("didFocus", () => {
+      this.getItems();
+    });
+
     if (
       this.props.download.gameId == this.props.navigation.state.params.id &&
       this.props.download.persent > 0
@@ -112,10 +118,6 @@ class CardGameScreen extends Component {
     await this.getItems();
     await this.getToken();
     this.countGame();
-
-    this.props.navigation.addListener("didFocus", () => {
-      this.getItems();
-    });
   }
 
   countGame = async () => {
@@ -148,14 +150,15 @@ class CardGameScreen extends Component {
   };
 
   loadGame = async () => {
-    setCancelDownloadVariable(false);
+    const item = this.props.navigation.state.params.item;
+
+    this.props.setCancelDownloadVariable(false, item.id.toString());
 
     if (this.state.loading) {
-      setCancelDownloadVariable(true);
+      this.props.setCancelDownloadVariable(true, item.id.toString());
       return;
     }
 
-    const item = this.props.navigation.state.params.item;
     this.props.setDownload({
       gameId: item.id.toString(),
       item,
@@ -819,8 +822,11 @@ const mapStateToProps = state => {
     game: state.userData.game || {}
   };
 };
+
 const mapDispatchToProps = dispatch => {
   return {
+    setCancelDownloadVariable: (cancel, gameId) =>
+      dispatch(setCancelDownloadVariable(cancel, gameId)),
     userDataAction: token => dispatch(userDataAction(token)),
     setDownload: token => dispatch(setDownload(token))
   };

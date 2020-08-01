@@ -45,6 +45,14 @@ class drawerContentComponents extends Component {
     }
   }
 
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    const { avatar_url } = nextProps.user.userInfo;
+    console.log("prefetch", avatar_url);
+
+    avatar_url && Image.prefetch(avatar_url);
+    avatar_url && Image.queryCache([avatar_url]);
+  }
+
   async componentDidMount() {
     await this.getToken();
     await this.props.userDataAction(this.state.token);
