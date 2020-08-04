@@ -32,6 +32,8 @@ class GameScreen extends Component {
   audioPlayed = false;
 
   state = {
+    scaleYForAnswer: new Animated.Value(0),
+    scaleXImageAnswer: new Animated.Value(1),
     textScale: new Animated.Value(0.1),
     pause: false,
     showAnswer: false,
@@ -163,7 +165,17 @@ class GameScreen extends Component {
     Orientation.lockToLandscape();
 
     this.game = new Game(this.props.navigation.state.params.data);
-    this.setState({ data: this.game.initialScreen() });
+    let nextScreen = this.game.initialScreen();
+
+    // while (nextScreen.tour != 2) {
+    //   if (!this.game.hasNextScreen()) {
+    //     this.props.navigation.goBack();
+    //   }
+
+    //   nextScreen = this.game.nextScreen();
+    // }
+
+    this.setState({ data: nextScreen });
   }
 
   showButtons = () => {
@@ -216,6 +228,9 @@ class GameScreen extends Component {
         nextScreen = this.game.nextScreen();
       }
     }
+
+    this.state.scaleYForAnswer.setValue(0);
+    this.state.scaleXImageAnswer.setValue(1);
 
     if (nextScreen) {
       this.setState(
@@ -320,7 +335,36 @@ class GameScreen extends Component {
                 }
 
                 if (this.state.data.properties.type == "answer") {
-                  this.setState({ showAnswer: true });
+                  if (this.state.data.tour == 2) {
+                    this.setState({ showAnswer: true }, () => {
+                      Animated.timing(this.state.scaleXImageAnswer, {
+                        toValue: 1,
+                        duration: 300
+                      }).start(() => {
+                        Animated.timing(this.state.scaleYForAnswer, {
+                          toValue: 1,
+                          duration: 500
+                        }).start();
+                      });
+                    });
+                  } else {
+                    Animated.timing(this.state.scaleXImageAnswer, {
+                      toValue: 0,
+                      duration: 300
+                    }).start(() => {
+                      this.setState({ showAnswer: true }, () => {
+                        Animated.timing(this.state.scaleXImageAnswer, {
+                          toValue: 1,
+                          duration: 300
+                        }).start(() => {
+                          Animated.timing(this.state.scaleYForAnswer, {
+                            toValue: 1,
+                            duration: 500
+                          }).start();
+                        });
+                      });
+                    });
+                  }
                 }
 
                 if (this.state.data.type != "slide-timer") {
@@ -584,7 +628,7 @@ class GameScreen extends Component {
               <View
                 style={{
                   flex: 1,
-                  // alignItems: "center",
+                  // justifyContent: "center",
                   flexDirection: "row",
                   paddingHorizontal: 50
                 }}
@@ -620,55 +664,91 @@ class GameScreen extends Component {
                     </Text>
                   ))}
                 </Text>
+                {this.state.data.tour == 2 && (
+                  <ImageBackground
+                    resizeMode={"contain"}
+                    style={{
+                      flex: 1,
+                      marginTop: 40,
+                      maxHeight: Dimensions.get("window").height - 120
+                    }}
+                    source={{
+                      uri: this.state.data.properties.image
+                    }}
+                  />
+                )}
                 {this.state.data.properties.image &&
-                  !(
-                    this.state.data.properties.type == "answer" &&
-                    !this.state.showAnswer
-                  ) && (
-                    <ImageBackground
-                      resizeMode={"contain"}
+                  this.state.data.tour != 2 &&
+                  this.state.data.properties.type == "answer" && (
+                    <Animated.View
                       style={{
                         flex: 1,
                         marginTop: 40,
-                        maxHeight: Dimensions.get("window").height - 120
+                        maxHeight: Dimensions.get("window").height - 120,
+                        transform: [
+                          {
+                            scaleX: this.state.scaleXImageAnswer
+                          }
+                        ]
                       }}
-                      source={{
-                        uri: this.state.data.properties.image
-                      }}
-                    />
+                    >
+                      <ImageBackground
+                        resizeMode={"contain"}
+                        style={{
+                          flex: 1
+                        }}
+                        source={
+                          !this.state.showAnswer
+                            ? require("../../src/questionmark.png")
+                            : {
+                                uri: this.state.data.properties.image
+                              }
+                        }
+                      />
+                    </Animated.View>
                   )}
               </View>
-              {this.state.data.properties.textAnswer && this.state.showAnswer && (
-                <Text
+              {this.state.data.properties.textAnswer && (
+                <Animated.View
                   style={{
-                    color: "white",
-                    paddingTop: 20,
-                    paddingHorizontal: 50,
-                    fontSize: 30,
-                    textAlign: "center",
-                    fontFamily: "Montserrat-Bold"
+                    transform: [
+                      {
+                        scaleY: this.state.scaleYForAnswer
+                      }
+                    ]
                   }}
                 >
-                  {this.prepareText(
-                    this.state.data.properties.textAnswer.text,
-                    "&nbsp;"
-                  ).map((item, index) => (
-                    <Text
-                      style={
-                        index % 2 == 1
-                          ? {
-                              color: this.props.navigation.state.params.data.meta.gameStrongFont.slice(
-                                0,
-                                7
-                              )
-                            }
-                          : {}
-                      }
-                    >
-                      {item}
-                    </Text>
-                  ))}
-                </Text>
+                  <Text
+                    style={{
+                      color: "white",
+                      paddingTop: 20,
+                      paddingHorizontal: 50,
+                      fontSize: 40,
+                      textAlign: "center",
+                      fontFamily: "Montserrat-Bold"
+                    }}
+                  >
+                    {this.prepareText(
+                      this.state.data.properties.textAnswer.text,
+                      "&nbsp;"
+                    ).map((item, index) => (
+                      <Text
+                        style={
+                          index % 2 == 1
+                            ? {
+                                color: this.props.navigation.state.params.data.meta.gameStrongFont.slice(
+                                  0,
+                                  7
+                                )
+                              }
+                            : {}
+                        }
+                      >
+                        {item}
+                      </Text>
+                    ))}
+                  </Text>
+                </Animated.View>
               )}
               <View
                 style={{
@@ -832,134 +912,11 @@ class GameScreen extends Component {
             </Animated.View>
           </TouchableWithoutFeedback>
           {this.state.buttons && this.renderPauseButton()}
-          {this.state.data.properties.type != "question" &&
-            (this.state.buttons ||
-              this.state.data.properties.type == "repeat" ||
-              this.state.data.type == "slide-timer") &&
+          {//this.state.data.properties.type != "question" &&
+          (this.state.buttons ||
+            this.state.data.properties.type == "repeat" ||
+            this.state.data.type == "slide-timer") &&
             this.renderNextStepButton()}
-        </ImageBackground>
-      );
-    } else if (this.state.data.properties.text) {
-      const backgroundImage = this.props.navigation.state.params.data.meta
-        .gameBackground;
-
-      return (
-        <ImageBackground
-          source={{ uri: backgroundImage }}
-          resizeMode={"cover"}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            bottom: 0,
-            right: 0
-          }}
-        >
-          <TouchableWithoutFeedback onPress={() => this.showButtons()}>
-            <Animated.View
-              style={{ flex: 1, transform: [{ scale: this.state.textScale }] }}
-            >
-              <Text
-                style={{
-                  color: "white",
-                  paddingTop: 25,
-                  paddingHorizontal: 50,
-                  fontSize: 30,
-                  width: "100%",
-                  height: "100%",
-                  textAlign: "center"
-                }}
-              >
-                {this.prepareText(
-                  this.state.data.properties.text.text,
-                  "&nbsp;"
-                ).map((item, index) => (
-                  <Text
-                    style={
-                      index % 2 == 1
-                        ? {
-                            color: this.props.navigation.state.params.data.meta.gameStrongFont.slice(
-                              0,
-                              7
-                            )
-                          }
-                        : {}
-                    }
-                  >
-                    {item}
-                  </Text>
-                ))}
-              </Text>
-              {this.state.buttons && this.renderPauseButton()}
-              {(this.state.buttons ||
-                this.state.data.properties.type == "repeat" ||
-                this.state.data.type == "slide-timer") &&
-                this.renderNextStepButton()}
-              <View
-                style={{
-                  position: "absolute",
-                  height: 100,
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  flexDirection: "row",
-                  justifyContent: "space-evenly",
-                  alignItems: "center"
-                }}
-              >
-                <Text
-                  style={{
-                    color: "white",
-                    fontFamily: "Montserrat-Bold",
-                    fontWeight: "700",
-                    fontSize: 28
-                  }}
-                >
-                  {this.state.data.tour} ТУР
-                </Text>
-                {this.returnNumberView(1)}
-                {this.returnNumberView(2)}
-                {this.returnNumberView(3)}
-                {this.returnNumberView(4)}
-                {this.returnNumberView(5)}
-                {this.returnNumberView(6)}
-                {this.returnNumberView(7)}
-                {this.state.data.properties.type != "repeat" && (
-                  <View
-                    style={{
-                      width: 50,
-                      height: 50,
-                      borderRadius: 25,
-                      borderWidth: 2,
-                      borderColor:
-                        this.state.timer == 0 ? "white" : "transparent",
-                      justifyContent: "center",
-                      alignItems: "center"
-                    }}
-                  >
-                    <Animated.View
-                      style={{
-                        transform: [{ scale: this.state.scale }],
-                        opacity: this.state.opacity
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color: "white",
-                          fontFamily: "Montserrat-Bold",
-                          fontWeight: "600",
-                          fontSize: 18
-                        }}
-                      >
-                        {25 - this.state.timer}
-                      </Text>
-                    </Animated.View>
-                  </View>
-                )}
-              </View>
-              {this.renderPause()}
-            </Animated.View>
-          </TouchableWithoutFeedback>
         </ImageBackground>
       );
     }
