@@ -33,6 +33,7 @@ class GameScreen extends Component {
 
   state = {
     scaleYForAnswer: new Animated.Value(0),
+    showAnswerText: false,
     scaleXImageAnswer: new Animated.Value(1),
     textScale: new Animated.Value(0.1),
     pause: false,
@@ -249,7 +250,8 @@ class GameScreen extends Component {
               }),
           data: nextScreen,
           buttons: false,
-          showAnswer: false
+          showAnswer: false,
+          showAnswerText: false
         },
         () => {
           if (
@@ -279,6 +281,8 @@ class GameScreen extends Component {
     if (this.state.data.properties.videoStart === false) {
       this.showNextGame();
     } else if (
+      (this.state.data.tour == 2 &&
+        this.state.data.properties.type == "repeat") ||
       this.state.data.hasTimer === true ||
       (this.state.data.properties.type == "repeat" &&
         this.state.data.type == "question") ||
@@ -286,6 +290,37 @@ class GameScreen extends Component {
       this.state.data.type == "slide-timer" ||
       this.state.data.type == "text-and-sounds"
     ) {
+      if (
+        !this.audioPlayed &&
+        this.state.data.leading[0].action != "audio" &&
+        this.state.data.properties.sounds &&
+        this.state.data.tour == 3 &&
+        this.state.data.properties.type == "repeat"
+      ) {
+        console.log("FIRST");
+
+        this.whoosh = new Sound(
+          this.state.data.properties.sounds,
+          null,
+          error => {
+            if (error) {
+              this.audioPlayed = false;
+              return;
+            }
+
+            this.audioPlayed = true;
+            setTimeout(() => {
+              this.whoosh.play(success => {
+                console.log("TIMEOUT");
+
+                this.audioPlayed = false;
+                this.showNextGame();
+              });
+            }, 800);
+          }
+        );
+      }
+
       if (!this.audioPlayed && this.state.data.leading[0].action == "audio") {
         if (this.state.data.type == "slide-timer") {
           this.circularProgress &&
@@ -294,6 +329,15 @@ class GameScreen extends Component {
               this.state.data.tour == 4 ? 51000 : 102000,
               Easing.linear
             );
+        }
+
+        if (
+          this.state.data.tour == 4 &&
+          this.state.data.properties.type == "question"
+        ) {
+          setTimeout(() => {
+            this.showNextGame();
+          }, 15150);
         }
 
         if (this.whoosh) {
@@ -310,6 +354,7 @@ class GameScreen extends Component {
           );
         }
 
+        console.log("PLAY FIRST TRACK");
         this.whoosh = new Sound(
           this.state.data.leading[0].params[0],
           null,
@@ -322,7 +367,15 @@ class GameScreen extends Component {
             this.audioPlayed = true;
             this.whoosh.play(success => {
               if (success) {
-                // this.audioPlayed = false;
+                console.log("FINISHED PLAYING FIRST TRACK");
+
+                if (
+                  this.state.data.tour == 4 &&
+                  this.state.data.properties.type == "question"
+                ) {
+                  return;
+                }
+
                 if (
                   this.state.data.properties.type == "repeat" ||
                   (this.state.data.tour == 4 &&
@@ -341,10 +394,12 @@ class GameScreen extends Component {
                         toValue: 1,
                         duration: 300
                       }).start(() => {
-                        Animated.timing(this.state.scaleYForAnswer, {
-                          toValue: 1,
-                          duration: 500
-                        }).start();
+                        this.setState({ showAnswerText: true }, () => {
+                          Animated.timing(this.state.scaleYForAnswer, {
+                            toValue: 1,
+                            duration: 500
+                          }).start();
+                        });
                       });
                     });
                   } else {
@@ -357,10 +412,12 @@ class GameScreen extends Component {
                           toValue: 1,
                           duration: 300
                         }).start(() => {
-                          Animated.timing(this.state.scaleYForAnswer, {
-                            toValue: 1,
-                            duration: 500
-                          }).start();
+                          this.setState({ showAnswerText: true }, () => {
+                            Animated.timing(this.state.scaleYForAnswer, {
+                              toValue: 1,
+                              duration: 500
+                            }).start();
+                          });
                         });
                       });
                     });
@@ -372,6 +429,8 @@ class GameScreen extends Component {
                     this.circularProgress.animate(0, 26000, Easing.linear);
                   this.setTimer();
                 }
+
+                console.log("PLAY SECOND TRACK");
 
                 if (
                   (!this.state.data.properties.sounds &&
@@ -392,6 +451,8 @@ class GameScreen extends Component {
                         this.state.data.leading[2].params[0],
                     null,
                     error => {
+                      console.log("STARTED PLAYING SECOND TRACK");
+
                       if (error) {
                         console.log("failed to load the sound", error);
                         return;
@@ -400,6 +461,8 @@ class GameScreen extends Component {
                       this.audioPlayed = true;
                       this.whoosh.play(success => {
                         if (success) {
+                          console.log("FINISHED PLAYING SECOND TRACK");
+
                           setTimeout(() => {
                             this.audioPlayed = false;
                             this.showNextGame();
@@ -628,7 +691,6 @@ class GameScreen extends Component {
               <View
                 style={{
                   flex: 1,
-                  // justifyContent: "center",
                   flexDirection: "row",
                   paddingHorizontal: 50
                 }}
@@ -679,6 +741,7 @@ class GameScreen extends Component {
                 )}
                 {this.state.data.properties.image &&
                   this.state.data.tour != 2 &&
+                  this.state.data.tour != 3 &&
                   this.state.data.properties.type == "answer" && (
                     <Animated.View
                       style={{
@@ -708,48 +771,75 @@ class GameScreen extends Component {
                     </Animated.View>
                   )}
               </View>
-              {this.state.data.properties.textAnswer && (
-                <Animated.View
-                  style={{
-                    transform: [
-                      {
-                        scaleY: this.state.scaleYForAnswer
-                      }
-                    ]
-                  }}
-                >
-                  <Text
+              {this.state.data.tour == 3 &&
+                this.state.showAnswer &&
+                this.state.data.properties.type == "answer" && (
+                  <Animated.View
                     style={{
-                      color: "white",
-                      paddingTop: 20,
-                      paddingHorizontal: 50,
-                      fontSize: 40,
-                      textAlign: "center",
-                      fontFamily: "Montserrat-Bold"
+                      height: Dimensions.get("window").height - 200,
+                      width: "100%",
+                      transform: [
+                        {
+                          scaleY: this.state.scaleXImageAnswer
+                        }
+                      ]
                     }}
                   >
-                    {this.prepareText(
-                      this.state.data.properties.textAnswer.text,
-                      "&nbsp;"
-                    ).map((item, index) => (
-                      <Text
-                        style={
-                          index % 2 == 1
-                            ? {
-                                color: this.props.navigation.state.params.data.meta.gameStrongFont.slice(
-                                  0,
-                                  7
-                                )
-                              }
-                            : {}
+                    <ImageBackground
+                      resizeMode={"contain"}
+                      style={{
+                        flex: 1
+                      }}
+                      source={{
+                        uri: this.state.data.properties.image
+                      }}
+                    />
+                  </Animated.View>
+                )}
+              {this.state.data.properties.textAnswer &&
+                this.state.showAnswerText && (
+                  <Animated.View
+                    style={{
+                      marginBottom: 10,
+                      transform: [
+                        {
+                          scaleY: this.state.scaleYForAnswer
                         }
-                      >
-                        {item}
-                      </Text>
-                    ))}
-                  </Text>
-                </Animated.View>
-              )}
+                      ]
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "white",
+                        paddingTop: 20,
+                        paddingHorizontal: 50,
+                        fontSize: 40,
+                        textAlign: "center",
+                        fontFamily: "Montserrat-Bold"
+                      }}
+                    >
+                      {this.prepareText(
+                        this.state.data.properties.textAnswer.text,
+                        "&nbsp;"
+                      ).map((item, index) => (
+                        <Text
+                          style={
+                            index % 2 == 1
+                              ? {
+                                  color: this.props.navigation.state.params.data.meta.gameStrongFont.slice(
+                                    0,
+                                    7
+                                  )
+                                }
+                              : {}
+                          }
+                        >
+                          {item}
+                        </Text>
+                      ))}
+                    </Text>
+                  </Animated.View>
+                )}
               <View
                 style={{
                   position: "absolute",
@@ -786,15 +876,14 @@ class GameScreen extends Component {
                   <View
                     onLayout={() => {
                       this.circularProgress &&
-                        this.circularProgress.animate(0, 100000, Easing.linear);
+                        this.circularProgress.animate(0, 106000, Easing.linear);
                     }}
                     style={{
                       width: 50,
                       height: 50,
                       borderRadius: 25,
                       borderWidth: 3,
-                      borderColor:
-                        this.state.timer == 0 ? "white" : "transparent",
+                      borderColor: "transparent",
                       justifyContent: "center",
                       alignItems: "center"
                     }}
@@ -912,7 +1001,7 @@ class GameScreen extends Component {
             </Animated.View>
           </TouchableWithoutFeedback>
           {this.state.buttons && this.renderPauseButton()}
-          {//this.state.data.properties.type != "question" &&
+          {this.state.data.properties.type != "question" &&
           (this.state.buttons ||
             this.state.data.properties.type == "repeat" ||
             this.state.data.type == "slide-timer") &&
