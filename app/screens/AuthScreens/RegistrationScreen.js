@@ -71,7 +71,10 @@ class RegistrationScreeen extends Component {
               [
                 {
                   text: "OK",
-                  style: "default"
+                  style: "default",
+                  onPress: () => {
+                    this.props.navigation.goBack();
+                  }
                 }
               ]
             );

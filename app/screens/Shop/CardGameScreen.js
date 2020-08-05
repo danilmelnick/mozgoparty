@@ -221,7 +221,7 @@ class CardGameScreen extends Component {
             }
           );
           const json = await response.json();
-          console.log(response);
+          console.log(json);
         } catch (error) {
           console.error("Ошибка:", error);
         }
