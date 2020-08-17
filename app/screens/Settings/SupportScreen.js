@@ -424,6 +424,7 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   inputField: {
+    color: "#333333",
     height: 40,
     fontFamily: "Montserrat-Regular",
     borderBottomWidth: 1,
@@ -440,6 +441,7 @@ const styles = StyleSheet.create({
     fontSize: 16
   },
   inputForm: {
+    color: "#333333",
     marginTop: 45,
     height: 40,
     fontFamily: "Montserrat-Regular",

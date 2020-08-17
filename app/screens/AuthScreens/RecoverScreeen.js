@@ -160,6 +160,7 @@ const styeles = StyleSheet.create({
     marginVertical: 30
   },
   inputForm: {
+    color: "#333333",
     height: 40,
     fontFamily: "Montserrat-Regular",
     borderBottomWidth: 1,

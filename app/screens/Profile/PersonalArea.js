@@ -238,11 +238,15 @@ class PersonalArea extends React.Component {
       buttonIndex => {
         if (buttonIndex === 2) {
           ImagePicker.launchCamera(options, response => {
-            this.loadAvatar(response.uri);
+            if (response.uri) {
+              this.loadAvatar(response.uri);
+            }
           });
         } else if (buttonIndex === 1) {
           ImagePicker.launchImageLibrary(options, response => {
-            this.loadAvatar(response.uri);
+            if (response.uri) {
+              this.loadAvatar(response.uri);
+            }
           });
         } else if (buttonIndex === 3) {
           this.deleteAvatar();
@@ -473,6 +477,7 @@ const styles = StyleSheet.create({
     marginBottom: 32
   },
   inputForm: {
+    color: "#333333",
     height: 40,
     fontFamily: "Montserrat-Regular",
     borderBottomWidth: 1,

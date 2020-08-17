@@ -325,6 +325,7 @@ export default class ShopScreen extends Component {
             <Image source={require("../../src/search.png")} />
             <TextInput
               style={{
+                color: "#333333",
                 flex: 1,
                 color: "#979797",
                 marginLeft: 20,

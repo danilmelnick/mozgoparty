@@ -286,6 +286,7 @@ const styeles = StyleSheet.create({
   },
   form: { marginTop: 38 },
   inputForm: {
+    color: "#333333",
     fontFamily: "Montserrat-Regular",
     height: 40,
     borderBottomWidth: 1,

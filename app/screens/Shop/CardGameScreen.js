@@ -733,7 +733,11 @@ class CardGameScreen extends Component {
                       color: "#333333"
                     }}
                   >
-                    {navigationProps.item.rating.toString().replace(".", ",")}
+                    {navigationProps.item.rating.toString().length == 1
+                      ? navigationProps.item.rating.toString() + ",0"
+                      : navigationProps.item.rating
+                          .toString()
+                          .replace(".", ",")}
                   </Text>
                   <Text
                     style={{

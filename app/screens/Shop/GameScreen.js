@@ -11,7 +11,8 @@ import {
   ImageBackground,
   TouchableWithoutFeedback,
   Modal,
-  Animated
+  Animated,
+  AppState
 } from "react-native";
 import AsyncStorage from "@react-native-community/async-storage";
 import { Header } from "react-native-elements";
@@ -62,12 +63,20 @@ class GameScreen extends Component {
   };
 
   componentDidMount() {
+    AppState.addEventListener("change", this._handleAppStateChange);
     Orientation.addOrientationListener(this._orientationDidChange);
     Image.prefetch(this.props.navigation.state.params.data.meta.gameBackground);
     Image.queryCache([
       this.props.navigation.state.params.data.meta.gameBackground
     ]);
   }
+
+  _handleAppStateChange = nextAppState => {
+    if (nextAppState.match(/inactive|background/)) {
+      console.log("App has come to the background!");
+      this.showPause();
+    }
+  };
 
   _orientationDidChange = orientation => {
     this.forceUpdate();
@@ -1001,7 +1010,7 @@ class GameScreen extends Component {
             </Animated.View>
           </TouchableWithoutFeedback>
           {this.state.buttons && this.renderPauseButton()}
-          {this.state.data.properties.type != "question" &&
+          {//this.state.data.properties.type != "question" &&
           (this.state.buttons ||
             this.state.data.properties.type == "repeat" ||
             this.state.data.type == "slide-timer") &&
