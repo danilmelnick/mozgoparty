@@ -138,6 +138,7 @@ class AuthScreen extends Component {
               E-mail
             </Text>
             <TextInput
+              placeholderTextColor={"#979797"}
               style={styeles.inputForm}
               onChangeText={email => this.setState({ email })}
             />
@@ -152,6 +153,7 @@ class AuthScreen extends Component {
               Пароль
             </Text>
             <TextInput
+              placeholderTextColor={"#979797"}
               style={styeles.inputForm}
               onChangeText={password => this.setState({ password })}
               secureTextEntry={true}

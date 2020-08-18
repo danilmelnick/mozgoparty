@@ -277,6 +277,7 @@ class SupportScreen extends React.Component {
                 </Text>
               )}
               <TextInput
+                placeholderTextColor={"#979797"}
                 placeholder={"Имя и фамилия"}
                 style={[styles.inputForm, { marginTop: 10 }]}
                 value={this.state.name}
@@ -306,6 +307,7 @@ class SupportScreen extends React.Component {
                 </Text>
               )}
               <TextInput
+                placeholderTextColor={"#979797"}
                 placeholder={"E-mail"}
                 style={[styles.inputForm, { marginTop: 10 }]}
                 value={this.state.email}
@@ -338,6 +340,7 @@ class SupportScreen extends React.Component {
               </Text>
             )}
             <TextInput
+              placeholderTextColor={"#979797"}
               placeholder={"Выберите причину"}
               value={this.state.reason}
               style={styles.inputField}
@@ -366,6 +369,7 @@ class SupportScreen extends React.Component {
             }}
           >
             <TextInput
+              placeholderTextColor={"#979797"}
               placeholder={"Описать подробнее"}
               style={styles.inputForm}
               value={this.state.comment}

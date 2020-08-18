@@ -123,6 +123,7 @@ class ChangePass extends React.Component {
               </Text>
             )}
             <TextInput
+              placeholderTextColor={"#979797"}
               secureTextEntry={true}
               placeholder={"Текущий пароль"}
               placeholderTextColor={"#979797"}
@@ -142,6 +143,7 @@ class ChangePass extends React.Component {
               </Text>
             )}
             <TextInput
+              placeholderTextColor={"#979797"}
               style={styles.inputForm}
               placeholder={"Новый пароль"}
               placeholderTextColor={"#979797"}
@@ -161,6 +163,7 @@ class ChangePass extends React.Component {
               </Text>
             )}
             <TextInput
+              placeholderTextColor={"#979797"}
               style={styles.inputForm}
               placeholder={"Повторите пароль"}
               placeholderTextColor={"#979797"}

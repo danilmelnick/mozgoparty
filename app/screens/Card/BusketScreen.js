@@ -142,6 +142,7 @@ class BusketScreen extends Component {
                   Промокод
                 </Text>
                 <TextInput
+                  placeholderTextColor={"#979797"}
                   style={styles.inputForm}
                   onChangeText={promoCodeEnter =>
                     this.setState({ promoCodeEnter })

@@ -345,6 +345,7 @@ class PersonalArea extends React.Component {
               Имя и фамилия
             </Text>
             <TextInput
+              placeholderTextColor={"#979797"}
               style={[
                 styles.inputForm,
                 {
@@ -370,6 +371,7 @@ class PersonalArea extends React.Component {
               Номер телефона
             </Text>
             <TextInput
+              placeholderTextColor={"#979797"}
               style={[
                 styles.inputForm,
                 {
@@ -395,6 +397,7 @@ class PersonalArea extends React.Component {
               E-mail
             </Text>
             <TextInput
+              placeholderTextColor={"#979797"}
               style={[
                 styles.inputForm,
                 {

@@ -170,6 +170,7 @@ export class EditPersonalArea extends React.Component {
         <View style={styles.PersonInfoWrapper}>
           <Text style={styles.PersonInfoTitle}>Имя и фамилия</Text>
           <TextInput
+            placeholderTextColor={"#979797"}
             style={styles.PersonInfoDesc}
             placeholder={"Василий Петечкин"}
             defaultValue={"Василий Петечкин"}
@@ -178,6 +179,7 @@ export class EditPersonalArea extends React.Component {
         <View style={styles.PersonInfoWrapper}>
           <Text style={styles.PersonInfoTitle}>Номер телефона</Text>
           <TextInput
+            placeholderTextColor={"#979797"}
             style={styles.PersonInfoDesc}
             keyboardType={"number-pad"}
             placeholder={"+7 (992) 020-02-20"}
@@ -187,6 +189,7 @@ export class EditPersonalArea extends React.Component {
         <View style={styles.PersonInfoWrapper}>
           <Text style={styles.PersonInfoTitle}>E-mail</Text>
           <TextInput
+            placeholderTextColor={"#979797"}
             style={styles.PersonInfoDesc}
             placeholder={"vasyapetechkin@gmail.com"}
             defaultValue={"vasyapetechkin@gmail.com"}

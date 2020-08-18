@@ -126,24 +126,28 @@ class RegistrationScreeen extends Component {
 
           <View style={styeles.form}>
             <TextInput
+              placeholderTextColor={"#979797"}
               style={styeles.inputForm}
               onChangeText={name => this.setState({ name })}
               placeholder="Имя и фамилия"
               value={this.state.name}
             />
             <TextInput
+              placeholderTextColor={"#979797"}
               style={styeles.inputForm}
               onChangeText={email => this.setState({ email })}
               placeholder="E-mail"
               value={this.state.email}
             />
             <TextInput
+              placeholderTextColor={"#979797"}
               style={styeles.inputForm}
               onChangeText={phone => this.setState({ phone })}
               placeholder="Номер телефона"
               value={this.state.phone}
             />
             <TextInput
+              placeholderTextColor={"#979797"}
               style={styeles.inputForm}
               onChangeText={password => this.setState({ password })}
               secureTextEntry={true}
@@ -151,6 +155,7 @@ class RegistrationScreeen extends Component {
               value={this.state.password}
             />
             <TextInput
+              placeholderTextColor={"#979797"}
               style={styeles.inputForm}
               onChangeText={pass =>
                 this.setState({ password_confirmation: pass })
