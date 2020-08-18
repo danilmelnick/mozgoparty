@@ -32,6 +32,8 @@ class GameScreen extends Component {
   interval = 0;
   audioPlayed = false;
 
+  showenFirst = false;
+
   state = {
     scaleYForAnswer: new Animated.Value(0),
     showAnswerText: false,
@@ -117,7 +119,7 @@ class GameScreen extends Component {
 
   hidePause = () => {
     if (this.whoosh) {
-      this.whoosh.play();
+      this.whoosh.play(this.showenFirst ? this.onPlaySecond : this.onPlayFirst);
     }
 
     this.setState({ pause: false });
@@ -225,6 +227,7 @@ class GameScreen extends Component {
     this.state.textScale.setValue(0.1);
     this.audioPlayed = false;
     let nextScreen = this.game.nextScreen();
+    this.showenFirst = false;
 
     const tour = this.state.data.tour;
     const slide = this.state.data.slide;
@@ -374,126 +377,128 @@ class GameScreen extends Component {
             }
 
             this.audioPlayed = true;
-            this.whoosh.play(success => {
-              if (success) {
-                console.log("FINISHED PLAYING FIRST TRACK");
-
-                if (
-                  this.state.data.tour == 4 &&
-                  this.state.data.properties.type == "question"
-                ) {
-                  return;
-                }
-
-                if (
-                  this.state.data.properties.type == "repeat" ||
-                  (this.state.data.tour == 4 &&
-                    this.state.data.properties.type == "question")
-                ) {
-                  setTimeout(() => {
-                    this.showNextGame();
-                  }, 2000);
-                  return;
-                }
-
-                if (this.state.data.properties.type == "answer") {
-                  if (this.state.data.tour == 2) {
-                    this.setState({ showAnswer: true }, () => {
-                      Animated.timing(this.state.scaleXImageAnswer, {
-                        toValue: 1,
-                        duration: 300
-                      }).start(() => {
-                        this.setState({ showAnswerText: true }, () => {
-                          Animated.timing(this.state.scaleYForAnswer, {
-                            toValue: 1,
-                            duration: 500
-                          }).start();
-                        });
-                      });
-                    });
-                  } else {
-                    Animated.timing(this.state.scaleXImageAnswer, {
-                      toValue: 0,
-                      duration: 300
-                    }).start(() => {
-                      this.setState({ showAnswer: true }, () => {
-                        Animated.timing(this.state.scaleXImageAnswer, {
-                          toValue: 1,
-                          duration: 300
-                        }).start(() => {
-                          this.setState({ showAnswerText: true }, () => {
-                            Animated.timing(this.state.scaleYForAnswer, {
-                              toValue: 1,
-                              duration: 500
-                            }).start();
-                          });
-                        });
-                      });
-                    });
-                  }
-                }
-
-                if (this.state.data.type != "slide-timer") {
-                  this.circularProgress &&
-                    this.circularProgress.animate(0, 26000, Easing.linear);
-                  this.setTimer();
-                }
-
-                console.log("PLAY SECOND TRACK");
-
-                if (
-                  (!this.state.data.properties.sounds &&
-                    this.state.data.leading.length > 2 &&
-                    this.state.data.leading[2].action == "audio") ||
-                  this.state.data.type == "text-and-sounds"
-                ) {
-                  if (this.whoosh) {
-                    this.whoosh.stop();
-                    // this.audioPlayed = false;
-                  }
-
-                  this.whoosh = new Sound(
-                    this.state.data.type == "slide-timer"
-                      ? this.props.navigation.state.params.data.meta
-                          .blitzTimerMedia
-                      : this.state.data.properties.sounds ||
-                        this.state.data.leading[2].params[0],
-                    null,
-                    error => {
-                      console.log("STARTED PLAYING SECOND TRACK");
-
-                      if (error) {
-                        console.log("failed to load the sound", error);
-                        return;
-                      }
-
-                      this.audioPlayed = true;
-                      this.whoosh.play(success => {
-                        if (success) {
-                          console.log("FINISHED PLAYING SECOND TRACK");
-
-                          setTimeout(() => {
-                            this.audioPlayed = false;
-                            this.showNextGame();
-                          }, 1500);
-                        } else {
-                          console.log(
-                            "playback failed due to audio decoding errors"
-                          );
-                        }
-                      });
-                    }
-                  );
-                }
-              } else {
-                console.log("playback failed due to audio decoding errors");
-              }
-            });
+            this.whoosh.play(this.onPlayFirst);
           }
         );
       }
     }
   }
+
+  onPlayFirst = success => {
+    if (success) {
+      this.showenFirst = true;
+      console.log("FINISHED PLAYING FIRST TRACK");
+
+      if (
+        this.state.data.tour == 4 &&
+        this.state.data.properties.type == "question"
+      ) {
+        return;
+      }
+
+      if (
+        this.state.data.properties.type == "repeat" ||
+        (this.state.data.tour == 4 &&
+          this.state.data.properties.type == "question")
+      ) {
+        setTimeout(() => {
+          this.showNextGame();
+        }, 2000);
+        return;
+      }
+
+      if (this.state.data.properties.type == "answer") {
+        if (this.state.data.tour == 2) {
+          this.setState({ showAnswer: true }, () => {
+            Animated.timing(this.state.scaleXImageAnswer, {
+              toValue: 1,
+              duration: 300
+            }).start(() => {
+              this.setState({ showAnswerText: true }, () => {
+                Animated.timing(this.state.scaleYForAnswer, {
+                  toValue: 1,
+                  duration: 500
+                }).start();
+              });
+            });
+          });
+        } else {
+          Animated.timing(this.state.scaleXImageAnswer, {
+            toValue: 0,
+            duration: 300
+          }).start(() => {
+            this.setState({ showAnswer: true }, () => {
+              Animated.timing(this.state.scaleXImageAnswer, {
+                toValue: 1,
+                duration: 300
+              }).start(() => {
+                this.setState({ showAnswerText: true }, () => {
+                  Animated.timing(this.state.scaleYForAnswer, {
+                    toValue: 1,
+                    duration: 500
+                  }).start();
+                });
+              });
+            });
+          });
+        }
+      }
+
+      if (this.state.data.type != "slide-timer") {
+        this.circularProgress &&
+          this.circularProgress.animate(0, 26000, Easing.linear);
+        this.setTimer();
+      }
+
+      console.log("PLAY SECOND TRACK");
+
+      if (
+        (!this.state.data.properties.sounds &&
+          this.state.data.leading.length > 2 &&
+          this.state.data.leading[2].action == "audio") ||
+        this.state.data.type == "text-and-sounds"
+      ) {
+        if (this.whoosh) {
+          this.whoosh.stop();
+          // this.audioPlayed = false;
+        }
+
+        this.whoosh = new Sound(
+          this.state.data.type == "slide-timer"
+            ? this.props.navigation.state.params.data.meta.blitzTimerMedia
+            : this.state.data.properties.sounds ||
+              this.state.data.leading[2].params[0],
+          null,
+          error => {
+            console.log("STARTED PLAYING SECOND TRACK");
+
+            if (error) {
+              console.log("failed to load the sound", error);
+              return;
+            }
+
+            this.audioPlayed = true;
+            this.whoosh.play(this.onPlaySecond);
+          }
+        );
+      }
+    } else {
+      console.log("playback failed due to audio decoding errors");
+    }
+  };
+
+  onPlaySecond = success => {
+    if (success) {
+      console.log("FINISHED PLAYING SECOND TRACK");
+
+      setTimeout(() => {
+        this.audioPlayed = false;
+        this.showNextGame();
+      }, 1500);
+    } else {
+      console.log("playback failed due to audio decoding errors");
+    }
+  };
 
   prepareText(text, removedText) {
     while (text.indexOf(removedText) != -1) {
