@@ -15,7 +15,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Header } from "react-native-elements";
 import GameCard from "./GameCard";
 import AsyncStorage from "@react-native-community/async-storage";
-import { Linking } from "expo";
 import userDataAction from "../../actions/userDataAction";
 import { connect } from "react-redux";
 import Loader from "../../components/Loader";
@@ -76,6 +75,7 @@ class BusketScreen extends Component {
               games[index].party.price -= discount;
 
               games[index].party.discount = discount / 100;
+              games[index].party.promoCode = this.state.promoCodeEnter;
 
               this.setState({ games });
 
@@ -194,10 +194,12 @@ class BusketScreen extends Component {
     AsyncStorage.setItem("cardGames", JSON.stringify(items));
     this.setState({ games: items });
 
+    console.log(element);
+
     if (this.state.token != "") {
       try {
         const response = await fetch(
-          "https://api.party.mozgo.com/api/cart/" + element.id,
+          "https://api.party.mozgo.com/api/cart/" + element.party.id,
           {
             method: "DELETE",
             headers: {
@@ -217,11 +219,91 @@ class BusketScreen extends Component {
     this.setState({ visible: false });
   };
 
-  pay = () => {
+  pay = async () => {
     if (!this.state.token) {
       this.props.navigation.navigate("AuthScreen");
     } else {
-      Linking.openURL("https://party.mozgo.com/cart");
+      this.setState({ visible: true });
+
+      console.log(
+        JSON.stringify(
+          this.state.games.map(item => ({
+            model_id: item.party.id,
+            model_type: "game",
+            promocode: item.party.promoCode
+          }))
+        )
+      );
+
+      try {
+        const response = await fetch(
+          "https://api.party.mozgo.com/api/games/buy/bulk",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              gift_certificates: null,
+              purchases: this.state.games.map(item => ({
+                model_id: item.party.id,
+                model_type: "game",
+                promocode: item.party.promoCode,
+                roistat: null
+              }))
+            }),
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              Authorization: "Bearer " + this.state.token
+            }
+          }
+        );
+        const json = await response.json();
+        console.log(response);
+        console.log(json);
+
+        const url = json.additionalData.redirectUrl;
+        if (url.includes("/free/")) {
+          const splitedUrl = url.split("/");
+          const id = splitedUrl[splitedUrl.length - 1];
+
+          await this.sendCheckRequest(id);
+        } else {
+          this.props.navigation.navigate("Payment", {
+            url: url,
+            id: json.additionalData.id
+          });
+        }
+      } catch (err) {
+        console.log(err);
+      }
+
+      this.setState({ visible: false });
+      // this.props.navigation.navigate("Payment");
+    }
+  };
+
+  sendCheckRequest = async id => {
+    try {
+      const response = await fetch(
+        "https://api.party.mozgo.com/check-payment/" + id,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: "Bearer " + this.state.token
+          }
+        }
+      );
+      const json = await response.json();
+      console.log(response);
+      console.log(json, json.status);
+      if (json.status == "success") {
+        this.props.userDataAction(this.state.token);
+        await AsyncStorage.setItem("cardGames", JSON.stringify([]));
+        this.props.navigation.navigate("MyGamesScreen");
+      }
+    } catch (err) {
+      console.log(err);
     }
   };
 

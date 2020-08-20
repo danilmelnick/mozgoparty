@@ -210,7 +210,8 @@ class CardGameScreen extends Component {
       if (this.state.token != "") {
         try {
           const response = await fetch(
-            "https://api.party.mozgo.com/api/cart/" + element.id,
+            "https://api.party.mozgo.com/api/cart/" +
+              this.props.navigation.state.params.item.party.id,
             {
               method: "POST",
               headers: {
@@ -221,6 +222,7 @@ class CardGameScreen extends Component {
             }
           );
           const json = await response.json();
+          console.log(response);
           console.log(json);
         } catch (error) {
           console.error("Ошибка:", error);

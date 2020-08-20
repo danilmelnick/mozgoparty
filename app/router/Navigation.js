@@ -18,6 +18,7 @@ import CardGameScreen from "../screens/Shop/CardGameScreen";
 import GameScreen from "../screens/Shop/GameScreen";
 
 import BusketScreen from "../screens/Card/BusketScreen";
+import Payment from "../screens/Card/Payment";
 
 import MyGamesScreen from "../screens/MyGames/MyGamesScreen";
 import LikeScreen from "../screens/Liked/LikeScreen";
@@ -44,6 +45,12 @@ const ShopStack = createStackNavigator({
   },
   BusketScreen: {
     screen: BusketScreen,
+    navigationOptions: {
+      headerShown: false
+    }
+  },
+  Payment: {
+    screen: Payment,
     navigationOptions: {
       headerShown: false
     }
@@ -232,6 +239,12 @@ const Favorites = createStackNavigator({
 const ShopCardStack = createStackNavigator({
   BusketScreen: {
     screen: BusketScreen,
+    navigationOptions: {
+      headerShown: false
+    }
+  },
+  Payment: {
+    screen: Payment,
     navigationOptions: {
       headerShown: false
     }
