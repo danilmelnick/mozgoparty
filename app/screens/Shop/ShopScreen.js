@@ -414,12 +414,50 @@ export default class ShopScreen extends Component {
     await this.getToken();
     await this.getGamesData();
     this.getItems();
+    this.checkCard();
 
-    this.props.navigation.addListener("didFocus", () => {
+    this.props.navigation.addListener("didFocus", async () => {
+      await this.getToken();
       this.getItems();
+      this.checkCard();
     });
     // await AsyncStorage.setItem("cardGames", [1]);
   }
+
+  checkCard = async () => {
+    if (!this.state.data) {
+      return;
+    }
+
+    try {
+      const response = await fetch("https://api.party.mozgo.com/api/cart", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: "Bearer " + this.state.token
+        }
+      });
+      const json = await response.json();
+      console.log(json);
+
+      const idsAndHash = json.map(item => ({
+        id: item.model_id
+      }));
+
+      let games = [];
+      this.state.data.forEach(element => {
+        idsAndHash.forEach(({ id }) => {
+          if (element.party.id == id) {
+            games.push(element);
+          }
+        });
+      });
+
+      AsyncStorage.setItem("cardGames", JSON.stringify(games));
+      this.setState({ count: games.length });
+    } catch (err) {}
+  };
 
   render() {
     let data = this.state.filteredBy
