@@ -15,7 +15,6 @@ import setDownload, {
   setCancelDownloadVariable
 } from "../../actions/setDownload";
 import { connect } from "react-redux";
-import { throwStatement } from "@babel/types";
 
 let filesCount = 99;
 
@@ -24,6 +23,7 @@ class CardGameScreen extends Component {
     super();
 
     this.state = {
+      isMyGame: false,
       game: undefined,
       addGames: false,
       loading: false,
@@ -34,7 +34,8 @@ class CardGameScreen extends Component {
       currentTour: 1,
       persent1: 0,
       persent2: 0,
-      persent3: 0
+      persent3: 0,
+      hash: undefined
     };
   }
 
@@ -114,7 +115,25 @@ class CardGameScreen extends Component {
     await this.getGame();
     await this.getItems();
     await this.getToken();
-    this.countGame();
+    // this.countGame();
+
+    if (this.props.navigation.state.params.isMyGame) {
+      this.setState({ isMyGame: this.props.navigation.state.params.isMyGame });
+    }
+
+    if (this.props.user.userInfo.purchases) {
+      const itemParams = this.props.navigation.state.params.item;
+      const purchases = this.props.user.userInfo.purchases;
+
+      purchases.forEach(item => {
+        if (item.game_id == itemParams.party.id) {
+          this.setState({ isMyGame: true, hash: item.hash }, () => {
+            this.countGame();
+          });
+          return;
+        }
+      });
+    }
   }
 
   countGame = async () => {
@@ -122,7 +141,7 @@ class CardGameScreen extends Component {
 
     try {
       const response = await fetch(
-        "https://api.party.mozgo.com/count/" + item.hash,
+        "https://api.party.mozgo.com/count/" + (item.hash || this.state.hash),
         {
           method: "GET",
           headers: {
@@ -328,7 +347,7 @@ class CardGameScreen extends Component {
           </View>
 
           <View style={styles.aboutGame}>
-            {!navigationProps.isMyGame && (
+            {!this.state.isMyGame && (
               <Text
                 style={{
                   color: "#BD006C",
@@ -342,7 +361,7 @@ class CardGameScreen extends Component {
               </Text>
             )}
 
-            {!navigationProps.isMyGame && (
+            {!this.state.isMyGame && (
               <View
                 style={{
                   width: 1,
@@ -386,7 +405,7 @@ class CardGameScreen extends Component {
               {navigationProps.age_rating + "+"}
             </Text>
 
-            {navigationProps.isMyGame && (
+            {this.state.isMyGame && (
               <View
                 style={{
                   width: 1,
@@ -397,7 +416,7 @@ class CardGameScreen extends Component {
               />
             )}
 
-            {navigationProps.isMyGame && (
+            {this.state.isMyGame && (
               <Text
                 style={{
                   color: "#333",
@@ -574,18 +593,18 @@ class CardGameScreen extends Component {
             </View>
           )}
 
-          {((navigationProps.isMyGame && this.state.game) ||
-            (navigationProps.isMyGame && this.state.runCount == 0) ||
-            !navigationProps.isMyGame) && (
+          {((this.state.isMyGame && this.state.game) ||
+            (this.state.isMyGame && this.state.runCount == 0) ||
+            !this.state.isMyGame) && (
             <TouchableOpacity
-              disabled={this.state.addGames && !navigationProps.isMyGame}
+              disabled={this.state.addGames && !this.state.isMyGame}
               style={[
                 styles.btnAuth,
                 {
                   borderWidth: 1,
                   borderColor: "#DADADA",
                   backgroundColor: !this.state.addGames
-                    ? navigationProps.isMyGame && this.state.runCount != 0
+                    ? this.state.isMyGame && this.state.runCount != 0
                       ? "#0B2A5B"
                       : "#0B2A5B"
                     : "white"
@@ -593,7 +612,7 @@ class CardGameScreen extends Component {
               ]}
               onPress={() =>
                 !this.state.addGames
-                  ? navigationProps.isMyGame
+                  ? this.state.isMyGame
                     ? this.playGame(navigationProps.item)
                     : this.addItemToCard(navigationProps.item)
                   : this.addItemToCard(navigationProps.item)
@@ -604,7 +623,7 @@ class CardGameScreen extends Component {
                   textAlign: "center",
                   textTransform: "none",
                   color: !this.state.addGames
-                    ? navigationProps.isMyGame && this.state.runCount != 0
+                    ? this.state.isMyGame && this.state.runCount != 0
                       ? "#fff"
                       : "#fff"
                     : "#333333",
@@ -613,7 +632,7 @@ class CardGameScreen extends Component {
                 }}
               >
                 {!this.state.addGames
-                  ? navigationProps.isMyGame && this.state.runCount != 0
+                  ? this.state.isMyGame && this.state.runCount != 0
                     ? "Играть"
                     : "Добавить в корзину"
                   : "В корзине"}
@@ -621,7 +640,7 @@ class CardGameScreen extends Component {
             </TouchableOpacity>
           )}
 
-          {navigationProps.isMyGame &&
+          {this.state.isMyGame &&
             (!this.state.game || (this.state.game && this.state.loading)) &&
             this.state.runCount != 0 && (
               <TouchableOpacity

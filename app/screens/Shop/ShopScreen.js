@@ -86,7 +86,7 @@ export default class ShopScreen extends Component {
   };
 
   hideDialog = () => {
-    this.setState({ showDialog: false, showenTab: this.state.selectedTab });
+    this.setState({ showDialog: false });
   };
 
   renderContent = () => {
