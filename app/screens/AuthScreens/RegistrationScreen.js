@@ -24,6 +24,7 @@ class RegistrationScreeen extends Component {
     super(props);
 
     this.state = {
+      disabled: true,
       checked: false,
       name: "",
       visible: false,
@@ -41,6 +42,20 @@ class RegistrationScreeen extends Component {
     password_confirmation,
     phone
   ) => {
+    if (!this.state.checked) {
+      Alert.alert(
+        "Письмо для подтверждения аккаунта направлено на указанную почту",
+        "",
+        [
+          {
+            text: "OK",
+            style: "default"
+          }
+        ]
+      );
+      return;
+    }
+
     this.setState({ visible: true });
 
     try {
@@ -107,6 +122,21 @@ class RegistrationScreeen extends Component {
     }
   };
 
+  checkButton = () => {
+    if (
+      this.state.checked &&
+      this.state.email.length > 0 &&
+      this.state.name.length > 0 &&
+      this.state.password.length > 0 &&
+      this.state.password_confirmation.length > 0 &&
+      this.state.phone.length > 0
+    ) {
+      this.setState({ disabled: false });
+    } else {
+      this.setState({ disabled: true });
+    }
+  };
+
   render() {
     const { registrationUser } = this.props;
     const { name, email, password, password_confirmation, phone } = this.state;
@@ -126,28 +156,38 @@ class RegistrationScreeen extends Component {
             <TextInput
               placeholderTextColor={"#979797"}
               style={styeles.inputForm}
-              onChangeText={name => this.setState({ name })}
+              onChangeText={name =>
+                this.setState({ name }, () => this.checkButton())
+              }
               placeholder="Имя и фамилия"
               value={this.state.name}
             />
             <TextInput
               placeholderTextColor={"#979797"}
               style={styeles.inputForm}
-              onChangeText={email => this.setState({ email })}
+              onChangeText={email =>
+                this.setState({ email: email.trim() }, () => this.checkButton())
+              }
               placeholder="E-mail"
               value={this.state.email}
             />
             <TextInput
               placeholderTextColor={"#979797"}
               style={styeles.inputForm}
-              onChangeText={phone => this.setState({ phone })}
+              onChangeText={phone =>
+                this.setState({ phone: phone.trim() }, () => this.checkButton())
+              }
               placeholder="Номер телефона"
               value={this.state.phone}
             />
             <TextInput
               placeholderTextColor={"#979797"}
               style={styeles.inputForm}
-              onChangeText={password => this.setState({ password })}
+              onChangeText={password =>
+                this.setState({ password: password.trim() }, () =>
+                  this.checkButton()
+                )
+              }
               secureTextEntry={true}
               placeholder="Пароль"
               value={this.state.password}
@@ -156,7 +196,9 @@ class RegistrationScreeen extends Component {
               placeholderTextColor={"#979797"}
               style={styeles.inputForm}
               onChangeText={pass =>
-                this.setState({ password_confirmation: pass })
+                this.setState({ password_confirmation: pass.trim() }, () =>
+                  this.checkButton()
+                )
               }
               secureTextEntry={true}
               placeholder="Подтвердить пароль"
@@ -166,7 +208,11 @@ class RegistrationScreeen extends Component {
 
           <View style={{ marginVertical: 20, flexDirection: "row" }}>
             <TouchableOpacity
-              onPress={() => this.setState({ checked: !this.state.checked })}
+              onPress={() => {
+                this.setState({ checked: !this.state.checked }, () => {
+                  this.checkButton();
+                });
+              }}
               style={{ marginRight: 8 }}
             >
               <Image source={require("../../src/Rectangle.png")} />
@@ -228,7 +274,10 @@ class RegistrationScreeen extends Component {
           </View>
 
           <TouchableOpacity
-            style={styeles.btnAuth}
+            disabled={this.state.disabled}
+            style={
+              this.state.disabled ? styeles.btnAuthDisabled : styeles.btnAuth
+            }
             onPress={() =>
               this.registration(
                 name,
@@ -299,6 +348,12 @@ const styeles = StyleSheet.create({
   btnAuth: {
     marginTop: 30,
     backgroundColor: "#0B2A5B",
+    padding: 16,
+    borderRadius: 5
+  },
+  btnAuthDisabled: {
+    marginTop: 30,
+    backgroundColor: "#DADADA",
     padding: 16,
     borderRadius: 5
   }

@@ -37,7 +37,8 @@ class PersonalArea extends React.Component {
       phoneChanged: undefined,
       name: undefined,
       email: undefined,
-      phone: undefined
+      phone: undefined,
+      uri: undefined
     };
   }
 
@@ -63,6 +64,12 @@ class PersonalArea extends React.Component {
   }
 
   componentWillReceiveProps(nextprops) {
+    if (
+      nextprops.user.userInfo.avatar_url != this.props.user.userInfo.avatar_url
+    ) {
+      this.setState({ uri: undefined });
+    }
+
     if (nextprops.user.userInfo) {
       const { name, email, phone } = nextprops.user.userInfo;
       this.setState({ name, email, phone });
@@ -70,6 +77,26 @@ class PersonalArea extends React.Component {
   }
 
   change = async () => {
+    if (this.state.uri) {
+      this.loadAvatar(this.state.uri);
+      this.setState({
+        hasChanges:
+          this.state.nameChanged ||
+          this.state.emailChanged ||
+          this.state.phoneChanged
+      });
+    }
+
+    if (
+      !(
+        this.state.nameChanged ||
+        this.state.emailChanged ||
+        this.state.phoneChanged
+      )
+    ) {
+      return;
+    }
+
     this.setState({ visible: true });
 
     const { email, phone, name } = this.state;
@@ -116,14 +143,12 @@ class PersonalArea extends React.Component {
           }, 200);
         });
       } else {
-        this.setState({ visible: false }, () => {
-          setTimeout(() => {
-            Alert.alert("Данные успешно изменены", undefined, [
-              {
-                text: "OK"
-              }
-            ]);
-          }, 200);
+        this.setState({
+          visible: false,
+          hasChanges: false,
+          nameChanged: undefined,
+          emailChanged: undefined,
+          phoneChanged: undefined
         });
 
         await this.props.userDataAction(this.state.token);
@@ -236,13 +261,15 @@ class PersonalArea extends React.Component {
         if (buttonIndex === 2) {
           ImagePicker.launchCamera(options, response => {
             if (response.uri) {
-              this.loadAvatar(response.uri);
+              this.setState({ hasChanges: true, uri: response.uri });
+              // this.loadAvatar(response.uri);
             }
           });
         } else if (buttonIndex === 1) {
           ImagePicker.launchImageLibrary(options, response => {
             if (response.uri) {
-              this.loadAvatar(response.uri);
+              this.setState({ hasChanges: true, uri: response.uri });
+              // this.loadAvatar(response.uri);
             }
           });
         } else if (buttonIndex === 3) {
@@ -312,7 +339,9 @@ class PersonalArea extends React.Component {
               >
                 <Image
                   source={
-                    this.props.user.userInfo.avatar_url
+                    this.state.uri
+                      ? { uri: this.state.uri }
+                      : this.props.user.userInfo.avatar_url
                       ? { uri: this.props.user.userInfo.avatar_url }
                       : require("../../src/avatarDefault.png")
                   }

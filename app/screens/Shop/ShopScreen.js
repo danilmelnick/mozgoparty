@@ -275,8 +275,9 @@ export default class ShopScreen extends Component {
       ]);
       categories.push([
         "ТЕМАТИЧЕСКИЕ",
-        json.filter(item => item.category.toUpperCase() == "ТЕМАТИЧЕСКАЯ")
-          .length
+        json
+          .filter(item => item.category.toUpperCase() == "ТЕМАТИЧЕСКАЯ")
+          .filter(item => item.party.price > 0).length
       ]);
       categories.push([
         "ДЕТСКИЕ",
@@ -422,11 +423,17 @@ export default class ShopScreen extends Component {
 
   render() {
     let data = this.state.filteredBy
-      ? this.state.data.filter(item =>
-          item.category
-            .toUpperCase()
-            .includes(this.state.filteredBy.substring(0, 4))
-        )
+      ? this.state.data
+          .filter(item =>
+            item.category
+              .toUpperCase()
+              .includes(this.state.filteredBy.substring(0, 4))
+          )
+          .filter(item => {
+            return item.category.toUpperCase().includes("ТЕМАТИЧЕСКАЯ")
+              ? item.party.price > 0
+              : true;
+          })
       : this.state.data;
 
     if (this.state.selectedTab == 0) {
