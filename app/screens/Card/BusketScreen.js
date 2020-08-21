@@ -49,8 +49,6 @@ class BusketScreen extends Component {
         }
       );
       const json = await response.json();
-      console.log(response);
-      console.log(json);
 
       if (json.status == "error") {
         Alert.alert(json.text, undefined, [
@@ -69,7 +67,7 @@ class BusketScreen extends Component {
               const index = games.findIndex(
                 item => item.id == this.state.promoId
               );
-              console.log(index);
+
               const discount =
                 games[index].party.price * (json.discount.value / 100);
               games[index].party.price -= discount;
@@ -175,13 +173,11 @@ class BusketScreen extends Component {
     this.props.navigation.addListener("didFocus", async () => {
       await this.getToken();
       let items = JSON.parse(await AsyncStorage.getItem("cardGames"));
-      console.log(items);
       this.setState({ games: items });
     });
 
     await this.getToken();
     let items = JSON.parse(await AsyncStorage.getItem("cardGames"));
-    console.log(items);
     this.setState({ games: items });
   }
 
@@ -193,8 +189,6 @@ class BusketScreen extends Component {
     items = items.filter(item => item.id != element.id);
     AsyncStorage.setItem("cardGames", JSON.stringify(items));
     this.setState({ games: items });
-
-    console.log(element);
 
     if (this.state.token != "") {
       try {
@@ -210,7 +204,6 @@ class BusketScreen extends Component {
           }
         );
         const json = await response.json();
-        console.log(response);
       } catch (error) {
         console.error("Ошибка:", error);
       }
@@ -224,16 +217,6 @@ class BusketScreen extends Component {
       this.props.navigation.navigate("AuthScreen");
     } else {
       this.setState({ visible: true });
-
-      console.log(
-        JSON.stringify(
-          this.state.games.map(item => ({
-            model_id: item.party.id,
-            model_type: "game",
-            promocode: item.party.promoCode
-          }))
-        )
-      );
 
       try {
         const response = await fetch(
@@ -257,8 +240,6 @@ class BusketScreen extends Component {
           }
         );
         const json = await response.json();
-        console.log(response);
-        console.log(json);
 
         const url = json.additionalData.redirectUrl;
         if (url.includes("/free/")) {
@@ -272,9 +253,7 @@ class BusketScreen extends Component {
             id: json.additionalData.id
           });
         }
-      } catch (err) {
-        console.log(err);
-      }
+      } catch (err) {}
 
       this.setState({ visible: false });
       // this.props.navigation.navigate("Payment");
@@ -295,16 +274,13 @@ class BusketScreen extends Component {
         }
       );
       const json = await response.json();
-      console.log(response);
-      console.log(json, json.status);
+
       if (json.status == "success") {
         this.props.userDataAction(this.state.token);
         await AsyncStorage.setItem("cardGames", JSON.stringify([]));
         this.props.navigation.navigate("MyGamesScreen");
       }
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   };
 
   render() {
@@ -498,8 +474,6 @@ class BusketScreen extends Component {
 }
 
 const mapStateToProps = state => {
-  console.log("mapStateToProps >>>>>>>>");
-  console.log(JSON.stringify(state));
   return {
     user: state.userData
   };

@@ -223,7 +223,8 @@ class GameCard extends Component {
               )}
             {this.state.runCount > 0 && this.renderDownloadView()}
             {this.props.isMyGame &&
-              (this.state.game || this.state.runCount === 0) && (
+              ((this.state.game && !this.state.startLoading) ||
+                this.state.runCount === 0) && (
                 <Text
                   style={{
                     color: "#979797",
@@ -274,8 +275,6 @@ class GameCard extends Component {
 }
 
 const mapStateToProps = state => {
-  // console.log("mapStateToProps >>>>>>>>", state);
-  // console.log(JSON.stringify(state));
   return {
     user: state.userData,
     download: state.userData.download || { persent: 0 },

@@ -92,7 +92,6 @@ class PersonalArea extends React.Component {
         settings
       );
       const json = await data.json();
-      console.log("Update >>>>>>>>>>>" + JSON.stringify(json), data);
 
       if (data.status == 422) {
         let error = "";
@@ -210,8 +209,6 @@ class PersonalArea extends React.Component {
         settings
       );
       const json = await data.json();
-
-      console.log(json);
 
       await this.props.userDataAction(this.state.token);
     } catch (error) {
@@ -452,8 +449,6 @@ class PersonalArea extends React.Component {
 }
 
 const mapStateToProps = state => {
-  console.log("mapStateToProps >>>>>>>>");
-  console.log(JSON.stringify(state));
   return {
     user: state.userData
   };

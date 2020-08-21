@@ -64,9 +64,6 @@ class SupportScreen extends React.Component {
       );
 
       const json = await data.json();
-      console.log(data);
-
-      console.log("Resp >>>>>>>>>>>" + JSON.stringify(json));
 
       if (data.status == 200) {
         this.setState(
@@ -110,9 +107,7 @@ class SupportScreen extends React.Component {
           }, 200);
         });
       }
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
   renderDropDown = () => {
@@ -207,8 +202,6 @@ class SupportScreen extends React.Component {
   };
 
   render() {
-    console.log("this.props.user.userInfo", this.props.user.userInfo);
-
     return (
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <SafeAreaView style={styles.container}>
@@ -397,8 +390,6 @@ class SupportScreen extends React.Component {
 }
 
 const mapStateToProps = state => {
-  console.log("mapStateToProps >>>>>>>>");
-  console.log(JSON.stringify(state));
   return {
     user: state.userData
   };

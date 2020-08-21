@@ -51,23 +51,19 @@ class Payment extends Component {
         }
       );
       const json = await response.json();
-      console.log(response);
-      console.log(json, json.status);
+
       if (json.status == "success") {
         clearInterval(interval);
         this.props.userDataAction(this.state.token);
         await AsyncStorage.setItem("cardGames", JSON.stringify([]));
         this.props.navigation.navigate("MyGamesScreen");
       }
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   };
 
   async componentDidMount() {
     await this.getToken();
 
-    console.log(this.props.navigation.state.params.url);
     this.setState({ visible: true });
 
     interval = setInterval(() => {
@@ -100,12 +96,8 @@ class Payment extends Component {
             this.setState({ visible: false });
           }}
           source={{ uri: this.props.navigation.state.params.url }}
-          goBack={() => {
-            console.log("goBack");
-          }}
-          onMessage={() => {
-            console.log("onMessage");
-          }}
+          goBack={() => {}}
+          onMessage={() => {}}
         />
       </SafeAreaView>
     );

@@ -45,7 +45,6 @@ class AuthScreen extends Component {
     try {
       const data = await fetch(`https://api.base.mozgo.com/login`, settings);
       const json = await data.json();
-      console.log("Resp >>>>>>>>>>>" + JSON.stringify(json));
 
       if (JSON.stringify(json.access_token)) {
         await AsyncStorage.setItem(
@@ -63,13 +62,11 @@ class AuthScreen extends Component {
         });
         const jsonMe = await dataMe.json();
         const ids = jsonMe.purchases.map(item => item.game_id);
-        console.log(ids);
 
         const itemsCardGames = JSON.parse(
           await AsyncStorage.getItem("cardGames")
         );
         const itemPartyIDs = itemsCardGames || [];
-        console.log(itemPartyIDs);
         const setItems = [];
         itemPartyIDs.forEach(element1 => {
           let b = true;
@@ -83,7 +80,6 @@ class AuthScreen extends Component {
             setItems.push(element1);
           }
         });
-        console.log("setItems", setItems);
         await AsyncStorage.setItem("cardGames", JSON.stringify(setItems));
 
         await this.props.navigation.goBack();
@@ -230,8 +226,6 @@ class AuthScreen extends Component {
 }
 
 const mapStateToProps = state => {
-  console.log("mapStateToProps >>>>>>>>");
-  console.log(JSON.stringify(state));
   return {};
 };
 const mapDispatchToProps = dispatch => {

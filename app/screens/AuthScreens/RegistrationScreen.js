@@ -59,8 +59,6 @@ class RegistrationScreeen extends Component {
         })
       });
       const json = await data.json();
-      console.log("Resp >>>>>>>>>>>" + JSON.stringify(json));
-      console.log(data);
 
       if (data.status == 200) {
         this.setState({ visible: false }, () => {
@@ -259,13 +257,10 @@ class RegistrationScreeen extends Component {
 }
 
 const mapStateToProps = state => {
-  console.log("mapStateToProps >>>>>>>>");
-  console.log(JSON.stringify(state));
   return {};
 };
 
 const mapDispatchToProps = dispatch => {
-  console.log("mapDispatchToProps >>>>>>>>");
   return {
     registrationUser: (name, email, password, password_confirmation, phone) => {
       dispatch(

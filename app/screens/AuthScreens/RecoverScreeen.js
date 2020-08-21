@@ -50,7 +50,6 @@ export default class RecoverScreeen extends Component {
       );
 
       const json = await data.json();
-      console.log("Resp >>>>>>>>>>>" + JSON.stringify(json));
 
       if (data.status == 200) {
         this.setState({ visible: false }, () => {
@@ -80,9 +79,7 @@ export default class RecoverScreeen extends Component {
           }, 300);
         });
       }
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
   render() {

@@ -41,7 +41,6 @@ class ChangePass extends React.Component {
     this.setState({ visible: true });
 
     const { oldPass, newPass, repeatPass } = this.state;
-    console.log(oldPass, newPass, repeatPass);
 
     const settings = {
       method: "POST",
@@ -63,8 +62,6 @@ class ChangePass extends React.Component {
         settings
       );
       const json = await data.json();
-      console.log("Resp >>>>>>>>>>>" + JSON.stringify(json));
-      console.log(data);
 
       if (data.status == 422) {
         let error = "";
@@ -228,8 +225,6 @@ class ChangePass extends React.Component {
 }
 
 const mapStateToProps = state => {
-  console.log("mapStateToProps >>>>>>>>");
-  console.log(JSON.stringify(state));
   return {
     user: state.userData
   };

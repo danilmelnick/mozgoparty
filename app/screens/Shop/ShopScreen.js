@@ -72,17 +72,12 @@ export default class ShopScreen extends Component {
     let arr = this.state.favGames;
     arr.push(id);
     this.setState({ favGames: arr });
-    console.log(this.state.favGames);
     if (this.state.like === false) {
       await AsyncStorage.setItem(
         "favArray",
         JSON.stringify(this.state.favGames)
       );
-      setTimeout(() => {
-        console.log(AsyncStorage.getItem("favArray"));
-      }, 1000);
     } else {
-      console.log("remove Array" + arr);
     }
   };
 
@@ -629,8 +624,6 @@ export default class ShopScreen extends Component {
   }
 
   renderFootBtn() {
-    console.log("(this.state.count ", this.state.count);
-
     if (this.state.count === 0) {
       return null;
     }

@@ -24,7 +24,6 @@ class drawerContentComponents extends Component {
 
   getToken = async () => {
     const res = await AsyncStorage.getItem("userToken");
-    console.log("TOKEN,", res);
     if (!res) {
       this.setState({ token: undefined });
       return;
@@ -38,8 +37,6 @@ class drawerContentComponents extends Component {
     const wasDrawerOpen = prevProps.navigation.state.isDrawerOpen;
 
     if (!wasDrawerOpen && isDrawerOpen) {
-      console.log("componentDidUpdate");
-
       await this.getToken();
       await this.props.userDataAction(this.state.token);
     }
@@ -47,8 +44,6 @@ class drawerContentComponents extends Component {
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     const { avatar_url } = nextProps.user.userInfo;
-    console.log("prefetch", avatar_url);
-
     avatar_url && Image.prefetch(avatar_url);
     avatar_url && Image.queryCache([avatar_url]);
   }
@@ -303,7 +298,6 @@ class drawerContentComponents extends Component {
 }
 
 const mapStateToProps = state => {
-  console.log("mapStateToProps >>>>>>>>");
   // alert(JSON.stringify(state));
   return {
     user: state.userData

@@ -111,8 +111,6 @@ class MyGamesScreen extends React.Component {
           style={{ flex: 1 }}
           data={this.state.games}
           renderItem={itemProps => {
-            console.log(itemProps.item);
-
             return (
               <GameCard
                 isMyGame={true}
@@ -156,8 +154,6 @@ class MyGamesScreen extends React.Component {
 }
 
 const mapStateToProps = state => {
-  console.log("mapStateToProps >>>>>>>>");
-  console.log(JSON.stringify(state));
   return {
     user: state.userData
   };

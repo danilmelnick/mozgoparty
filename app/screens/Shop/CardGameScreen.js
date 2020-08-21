@@ -39,30 +39,29 @@ class CardGameScreen extends Component {
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    if (
-      nextProps.game.cancel &&
-      nextProps.download.gameId == this.props.navigation.state.params.id
-    ) {
+    if (nextProps.download.gameId == this.props.navigation.state.params.id) {
       this.setState({
-        game: undefined,
-        loading: false,
-        currentTour: 1,
-        persent1: 0,
-        persent2: 0,
-        persent3: 0
+        loading: !nextProps.game.json,
+        currentTour: nextProps.download.tour
       });
-    } else if (
-      nextProps.game.json &&
-      nextProps.download.gameId == this.props.navigation.state.params.id
-    ) {
-      this.setState({
-        game: nextProps.game.json,
-        loading: nextProps.download.persent < filesCount
-      });
-    } else if (
-      nextProps.download.gameId == this.props.navigation.state.params.id
-    ) {
-      this.setState({ loading: true, currentTour: nextProps.download.tour });
+
+      if (nextProps.game.cancel) {
+        this.setState({
+          game: undefined,
+          loading: false,
+          currentTour: 1,
+          persent1: 0,
+          persent2: 0,
+          persent3: 0
+        });
+      }
+
+      if (nextProps.game.json) {
+        this.setState({
+          game: nextProps.game.json,
+          loading: nextProps.download.persent < filesCount
+        });
+      }
 
       if (nextProps.download.persent1) {
         this.setState({ persent1: nextProps.download.persent1 });
@@ -85,8 +84,6 @@ class CardGameScreen extends Component {
   };
 
   getItems = async () => {
-    console.log("getItems");
-
     let id = this.props.navigation.state.params.id;
     let items = JSON.parse(await AsyncStorage.getItem("cardGames"));
     this.setState({ count: items ? items.length : 0, addGames: false });
@@ -105,7 +102,7 @@ class CardGameScreen extends Component {
 
     if (
       this.props.download.gameId == this.props.navigation.state.params.id &&
-      this.props.download.persent > 0
+      this.props.download.persent < filesCount
     ) {
       this.setState({ loading: true });
     }
@@ -122,7 +119,6 @@ class CardGameScreen extends Component {
 
   countGame = async () => {
     const item = this.props.navigation.state.params.item;
-    console.log(item);
 
     try {
       const response = await fetch(
@@ -192,10 +188,7 @@ class CardGameScreen extends Component {
             }
           );
           const json = await response.json();
-          console.log(response);
-        } catch (error) {
-          console.error("Ошибка:", error);
-        }
+        } catch (error) {}
       }
     } else {
       this.setState({ addGames: true });
@@ -222,8 +215,6 @@ class CardGameScreen extends Component {
             }
           );
           const json = await response.json();
-          console.log(response);
-          console.log(json);
         } catch (error) {
           console.error("Ошибка:", error);
         }
@@ -277,8 +268,6 @@ class CardGameScreen extends Component {
   }
 
   render() {
-    console.log("download", this.props.download);
-
     const navigationProps = this.props.navigation.state.params;
 
     const rating5 = navigationProps.item.review_details
@@ -820,8 +809,6 @@ class CardGameScreen extends Component {
 }
 
 const mapStateToProps = state => {
-  // console.log("mapStateToProps >>>>>>>>", state);
-  console.log(JSON.stringify(state));
   return {
     user: state.userData,
     download: state.userData.download || { persent: 0 },

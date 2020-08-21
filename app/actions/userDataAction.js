@@ -7,7 +7,6 @@ export function userDataSuccess(data) {
 
 
 export default function userDataAction(token) {
-    console.log('TESssT  >>>>>>> ' + token)
     return ( dispatch ) => {
         fetch('https://api.party.mozgo.com/api/users/me', {
             method: 'GET',
