@@ -85,8 +85,6 @@ class GameScreen extends Component {
   };
 
   setTimer() {
-    console.log("setTimer");
-
     this.interval = setInterval(() => {
       if (!this.state.pause && this.state.timer < 25) {
         Animated.parallel([
@@ -323,8 +321,6 @@ class GameScreen extends Component {
             this.audioPlayed = true;
             setTimeout(() => {
               this.whoosh.play(success => {
-                console.log("TIMEOUT");
-
                 this.audioPlayed = false;
                 this.showNextGame();
               });
@@ -366,7 +362,7 @@ class GameScreen extends Component {
           );
         }
 
-        console.log("PLAY FIRST TRACK");
+        console.log("PLAY FIRST TRACK", this.state.data.leading[0].params[0]);
         this.whoosh = new Sound(
           this.state.data.leading[0].params[0],
           null,
@@ -383,6 +379,38 @@ class GameScreen extends Component {
       }
     }
   }
+
+  onPlay3TourAnswer = success => {
+    if (success) {
+      this.audioPlayed = true;
+
+      console.log(
+        "this.state.data.leading[0].after[0].params[0]",
+        this.state.data.leading[0].after[0].params[0]
+      );
+
+      this.whoosh = new Sound(
+        this.state.data.leading[0].after[0].params[0],
+        null,
+        error => {
+          if (error) {
+            console.log("failed to load the sound", error);
+            this.audioPlayed = false;
+            return;
+          }
+
+          this.audioPlayed = true;
+          this.whoosh.play(success => {
+            if (success) {
+              this.audioPlayed = false;
+
+              this.showNextGame();
+            }
+          });
+        }
+      );
+    }
+  };
 
   onPlayFirst = success => {
     if (success) {
@@ -478,7 +506,11 @@ class GameScreen extends Component {
             }
 
             this.audioPlayed = true;
-            this.whoosh.play(this.onPlaySecond);
+            this.whoosh.play(
+              this.state.data.properties.type == "answer"
+                ? this.onPlay3TourAnswer
+                : this.onPlaySecond
+            );
           }
         );
       }
@@ -578,8 +610,6 @@ class GameScreen extends Component {
         </TouchableOpacity>
       );
     } else if (this.state.data.properties.videoStart) {
-      console.log(this.state.data);
-
       return (
         <TouchableWithoutFeedback onPress={() => this.showButtons()}>
           <View style={{ flex: 1 }}>
@@ -677,8 +707,6 @@ class GameScreen extends Component {
         </ImageBackground>
       );
     } else if (this.state.data.properties.text) {
-      console.log(this.state.data);
-
       const backgroundImage = this.props.navigation.state.params.data.meta
         .gameBackground;
 
@@ -748,6 +776,7 @@ class GameScreen extends Component {
                       marginTop: 40,
                       maxHeight: Dimensions.get("window").height - 120
                     }}
+                    key={this.state.data.properties.image}
                     source={{
                       uri: this.state.data.properties.image
                     }}
@@ -772,8 +801,16 @@ class GameScreen extends Component {
                       <ImageBackground
                         resizeMode={"contain"}
                         style={{
-                          flex: 1
+                          flex: 1,
+                          margin: !this.state.showAnswer ? 30 : 0
                         }}
+                        key={
+                          !this.state.showAnswer
+                            ? require("../../src/questionmark.png")
+                            : {
+                                uri: this.state.data.properties.image
+                              }
+                        }
                         source={
                           !this.state.showAnswer
                             ? require("../../src/questionmark.png")
@@ -804,6 +841,7 @@ class GameScreen extends Component {
                       style={{
                         flex: 1
                       }}
+                      key={this.state.data.properties.image}
                       source={{
                         uri: this.state.data.properties.image
                       }}
@@ -1015,10 +1053,10 @@ class GameScreen extends Component {
             </Animated.View>
           </TouchableWithoutFeedback>
           {this.state.buttons && this.renderPauseButton()}
-          {//this.state.data.properties.type != "question" &&
-          (this.state.buttons ||
-            this.state.data.properties.type == "repeat" ||
-            this.state.data.type == "slide-timer") &&
+          {this.state.data.properties.type != "question" &&
+            (this.state.buttons ||
+              this.state.data.properties.type == "repeat" ||
+              this.state.data.type == "slide-timer") &&
             this.renderNextStepButton()}
         </ImageBackground>
       );
@@ -1068,8 +1106,6 @@ class GameScreen extends Component {
 }
 
 const mapStateToProps = state => {
-  console.log("mapStateToProps >>>>>>>>");
-  console.log(JSON.stringify(state));
   return {
     user: state.userData
   };
