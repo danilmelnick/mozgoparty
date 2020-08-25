@@ -40,7 +40,9 @@ export default class RecoverScreeen extends Component {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        email: email
+        email: email,
+        is_party: 1,
+        is_promo: false
       })
     };
     try {

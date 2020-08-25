@@ -23,6 +23,7 @@ class CardGameScreen extends Component {
     super();
 
     this.state = {
+      countJSON: undefined,
       isMyGame: false,
       game: undefined,
       addGames: false,
@@ -152,7 +153,33 @@ class CardGameScreen extends Component {
         }
       );
       const json = await response.json();
-      this.setState({ runCount: json.total - json.runs });
+      this.setState({ runCount: json.total - json.runs, countJSON: json });
+    } catch (error) {
+      console.error("Ошибка:", error);
+    }
+  };
+
+  postGame = async () => {
+    const item = this.props.navigation.state.params.item;
+
+    try {
+      const response = await fetch("https://api.party.mozgo.com/count/", {
+        method: "POST",
+        body: JSON.stringify({
+          game_id: item.hash || this.state.hash,
+          runs: this.state.countJSON.runs + 1
+        }),
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: "Bearer " + this.state.token
+        }
+      });
+      const json = await response.json();
+      this.setState({
+        runCount: json.total - json.runs,
+        countJSON: { ...this.state.countJSON, runs: json.runs }
+      });
     } catch (error) {
       console.error("Ошибка:", error);
     }
@@ -182,6 +209,7 @@ class CardGameScreen extends Component {
   };
 
   playGame = async item => {
+    this.postGame();
     this.props.navigation.replace("GameScreen", { data: this.state.game });
   };
 
