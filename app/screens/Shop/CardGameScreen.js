@@ -214,30 +214,7 @@ class CardGameScreen extends Component {
   };
 
   addItemToCard = async element => {
-    if (this.state.addGames) {
-      this.setState({ addGames: false });
-      let items = JSON.parse(await AsyncStorage.getItem("cardGames"));
-      items = items.filter(item => item.id != element.id);
-      AsyncStorage.setItem("cardGames", JSON.stringify(items));
-      this.getItems();
-
-      if (this.state.token != "") {
-        try {
-          const response = await fetch(
-            "https://api.party.mozgo.com/api/cart/" + element.id,
-            {
-              method: "DELETE",
-              headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-                Authorization: "Bearer " + this.state.token
-              }
-            }
-          );
-          const json = await response.json();
-        } catch (error) {}
-      }
-    } else {
+    if (!this.state.addGames) {
       this.setState({ addGames: true });
       let items = JSON.parse(await AsyncStorage.getItem("cardGames"));
       if (!items) {
@@ -454,7 +431,8 @@ class CardGameScreen extends Component {
                   marginRight: 24
                 }}
               >
-                {"Осталось запусков: " + this.state.runCount}
+                {"Осталось запусков: " +
+                  (this.state.runCount < 0 ? 0 : this.state.runCount)}
               </Text>
             )}
           </View>
@@ -625,7 +603,10 @@ class CardGameScreen extends Component {
             (this.state.isMyGame && this.state.runCount == 0) ||
             !this.state.isMyGame) && (
             <TouchableOpacity
-              disabled={this.state.addGames && !this.state.isMyGame}
+              disabled={
+                (this.state.addGames && !this.state.isMyGame) ||
+                this.state.addGames
+              }
               style={[
                 styles.btnAuth,
                 {
@@ -640,7 +621,7 @@ class CardGameScreen extends Component {
               ]}
               onPress={() =>
                 !this.state.addGames
-                  ? this.state.isMyGame
+                  ? this.state.isMyGame && this.state.runCount > 0
                     ? this.playGame(navigationProps.item)
                     : this.addItemToCard(navigationProps.item)
                   : this.addItemToCard(navigationProps.item)
@@ -660,7 +641,7 @@ class CardGameScreen extends Component {
                 }}
               >
                 {!this.state.addGames
-                  ? this.state.isMyGame && this.state.runCount != 0
+                  ? this.state.isMyGame && this.state.runCount > 0
                     ? "Играть"
                     : "Добавить в корзину"
                   : "В корзине"}
