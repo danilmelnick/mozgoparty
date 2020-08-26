@@ -300,85 +300,91 @@ class GameScreen extends Component {
       this.state.data.type == "slide-timer" ||
       this.state.data.type == "text-and-sounds"
     ) {
-      if (
-        !this.audioPlayed &&
-        this.state.data.leading[0].action != "audio" &&
-        this.state.data.properties.sounds &&
-        this.state.data.tour == 3 &&
-        this.state.data.properties.type == "repeat"
-      ) {
-        console.log("FIRST");
-
-        this.whoosh = new Sound(
-          this.state.data.properties.sounds,
-          null,
-          error => {
-            if (error) {
-              this.audioPlayed = false;
-              return;
-            }
-
-            this.audioPlayed = true;
-            setTimeout(() => {
-              this.whoosh.play(success => {
-                this.audioPlayed = false;
-                this.showNextGame();
-              });
-            }, 800);
-          }
-        );
-      }
-
-      if (!this.audioPlayed && this.state.data.leading[0].action == "audio") {
-        if (this.state.data.type == "slide-timer") {
-          this.circularProgress &&
-            this.circularProgress.animate(
-              0,
-              this.state.data.tour == 4 ? 51000 : 102000,
-              Easing.linear
-            );
-        }
-
-        if (
-          this.state.data.tour == 4 &&
-          this.state.data.properties.type == "question"
-        ) {
-          setTimeout(() => {
-            this.showNextGame();
-          }, 15150);
-        }
-
-        if (this.whoosh) {
-          this.whoosh.stop();
-          this.audioPlayed = false;
-        }
-
-        if (this.state.data.type == "slide-timer") {
-          setTimeout(
-            () => {
-              this.showNextGame();
-            },
-            this.state.data.tour == 4 ? 51000 : 102000
-          );
-        }
-
-        console.log("PLAY FIRST TRACK", this.state.data.leading[0].params[0]);
-        this.whoosh = new Sound(
-          this.state.data.leading[0].params[0],
-          null,
-          error => {
-            if (error) {
-              console.log("failed to load the sound", error);
-              return;
-            }
-
-            this.audioPlayed = true;
-            this.whoosh.play(this.onPlayFirst);
-          }
-        );
-      }
+      setTimeout(() => {
+        this.startPlayAudio();
+      }, 500);
     }
   }
+
+  startPlayAudio = () => {
+    if (
+      !this.audioPlayed &&
+      this.state.data.leading[0].action != "audio" &&
+      this.state.data.properties.sounds &&
+      this.state.data.tour == 3 &&
+      this.state.data.properties.type == "repeat"
+    ) {
+      console.log("FIRST");
+
+      this.whoosh = new Sound(
+        this.state.data.properties.sounds,
+        null,
+        error => {
+          if (error) {
+            this.audioPlayed = false;
+            return;
+          }
+
+          this.audioPlayed = true;
+          setTimeout(() => {
+            this.whoosh.play(success => {
+              this.audioPlayed = false;
+              this.showNextGame();
+            });
+          }, 800);
+        }
+      );
+    }
+
+    if (!this.audioPlayed && this.state.data.leading[0].action == "audio") {
+      if (this.state.data.type == "slide-timer") {
+        this.circularProgress &&
+          this.circularProgress.animate(
+            0,
+            this.state.data.tour == 4 ? 51000 : 102000,
+            Easing.linear
+          );
+      }
+
+      if (
+        this.state.data.tour == 4 &&
+        this.state.data.properties.type == "question"
+      ) {
+        setTimeout(() => {
+          this.showNextGame();
+        }, 15150);
+      }
+
+      if (this.whoosh) {
+        this.whoosh.stop();
+        this.audioPlayed = false;
+      }
+
+      if (this.state.data.type == "slide-timer") {
+        setTimeout(
+          () => {
+            this.showNextGame();
+          },
+          this.state.data.tour == 4 ? 51000 : 102000
+        );
+      }
+
+      console.log("PLAY FIRST TRACK", this.state.data.leading[0].params[0]);
+      this.whoosh = new Sound(
+        this.state.data.leading[0].params[0],
+        null,
+        error => {
+          if (error) {
+            console.log("failed to load the sound", error);
+            return;
+          }
+
+          this.audioPlayed = true;
+          this.whoosh.play(this.onPlayFirst);
+        }
+      );
+    }
+  };
 
   onPlay3TourAnswer = success => {
     if (success) {
