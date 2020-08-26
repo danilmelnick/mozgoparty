@@ -384,11 +384,6 @@ class GameScreen extends Component {
     if (success) {
       this.audioPlayed = true;
 
-      console.log(
-        "this.state.data.leading[0].after[0].params[0]",
-        this.state.data.leading[0].after[0].params[0]
-      );
-
       this.whoosh = new Sound(
         this.state.data.leading[0].after[0].params[0],
         null,
@@ -507,7 +502,8 @@ class GameScreen extends Component {
 
             this.audioPlayed = true;
             this.whoosh.play(
-              this.state.data.properties.type == "answer"
+              this.state.data.properties.type == "answer" &&
+                this.state.data.tour == 3
                 ? this.onPlay3TourAnswer
                 : this.onPlaySecond
             );
@@ -1053,10 +1049,10 @@ class GameScreen extends Component {
             </Animated.View>
           </TouchableWithoutFeedback>
           {this.state.buttons && this.renderPauseButton()}
-          {this.state.data.properties.type != "question" &&
-            (this.state.buttons ||
-              this.state.data.properties.type == "repeat" ||
-              this.state.data.type == "slide-timer") &&
+          {//this.state.data.properties.type != "question" &&
+          (this.state.buttons ||
+            this.state.data.properties.type == "repeat" ||
+            this.state.data.type == "slide-timer") &&
             this.renderNextStepButton()}
         </ImageBackground>
       );
