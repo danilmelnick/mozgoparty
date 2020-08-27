@@ -409,7 +409,7 @@ export default class ShopScreen extends Component {
       this.setState({ token });
     }
   };
-
+ 
   async componentDidMount() {
     await this.getToken();
     await this.getGamesData();
