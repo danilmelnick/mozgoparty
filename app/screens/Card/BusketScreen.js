@@ -9,7 +9,8 @@ import {
   FlatList,
   Modal,
   TouchableWithoutFeedback,
-  Alert
+  Alert,
+  Dimensions
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Header } from "react-native-elements";
@@ -327,8 +328,9 @@ class BusketScreen extends Component {
           </Text>
 
           <FlatList
+            style={{ maxHeight: Dimensions.get("screen").height - 380 }}
             data={this.state.games}
-            scrollEnabled={false}
+            scrollEnabled={true}
             renderItem={itemProps => {
               return (
                 <GameCard
