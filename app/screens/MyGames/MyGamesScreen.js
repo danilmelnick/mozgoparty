@@ -127,8 +127,9 @@ class MyGamesScreen extends React.Component {
                 isTop={itemProps.item.popular_rank != null}
                 isNew={itemProps.item.party.show_on_main_page}
                 currency={itemProps.item.party.currency}
-                onPress={() => {
+                onPress={loading => {
                   this.props.navigation.navigate("CardGameScreen", {
+                    loading,
                     isMyGame: true,
                     item: itemProps.item,
                     title: itemProps.item.party.name,

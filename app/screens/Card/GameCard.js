@@ -19,13 +19,17 @@ import { connect } from "react-redux";
 var RNFS = require("react-native-fs");
 
 let filesCount = 99;
+let persent1 = 0;
+let persent2 = 0;
+let persent3 = 0;
 
 class GameCard extends Component {
   state = {
     game: undefined,
     runCount: 3,
     startLoading: false,
-    currentTour: 1
+    currentTour: 1,
+    persent: 0
   };
 
   async componentDidMount() {
@@ -38,28 +42,35 @@ class GameCard extends Component {
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    if (
-      nextProps.game.cancel &&
-      nextProps.download.gameId == this.props.item.id
-    ) {
-      this.setState({
-        game: undefined,
-        startLoading: false,
-        currentTour: 1
-      });
-    } else if (
-      nextProps.game.json &&
-      nextProps.download.gameId == this.props.item.id
-    ) {
-      this.setState({
-        game: nextProps.game.json,
-        startLoading: nextProps.download.persent < filesCount
-      });
-    } else if (nextProps.download.gameId == this.props.item.id) {
-      this.setState({
-        startLoading: true,
-        currentTour: nextProps.download.tour
-      });
+    if (nextProps.download.gameId == this.props.item.id) {
+      persent1 = nextProps.download.persent1;
+      persent2 = nextProps.download.persent2;
+      persent3 = nextProps.download.persent3;
+
+      if (nextProps.game.cancel) {
+        this.setState({
+          game: undefined,
+          startLoading: false,
+          currentTour: 1
+        });
+
+        persent1 = 0;
+        persent2 = 0;
+        persent3 = 0;
+      } else if (nextProps.game.json) {
+        this.setState({
+          game: nextProps.game.json,
+          startLoading: nextProps.download.persent < filesCount,
+          currentTour: nextProps.download.tour
+        });
+      } else {
+        this.setState({
+          startLoading: true,
+          currentTour: nextProps.download.tour
+        });
+      }
+
+      this.setState({ persent: nextProps.download.persent });
     }
   }
 
@@ -124,8 +135,7 @@ class GameCard extends Component {
                 color: "#979797"
               }}
             >
-              {Math.floor((this.props.download.persent / filesCount) * 100) +
-                "%"}
+              {Math.floor((this.state.persent / filesCount) * 100) + "%"}
             </Text>
           </View>
           <View
@@ -148,7 +158,7 @@ class GameCard extends Component {
                       : "#F2994A"
                     : "#EB5757",
                 borderRadius: 10,
-                width: (this.props.download.persent / filesCount) * 100 + "%"
+                width: (this.state.persent / filesCount) * 100 + "%"
               }}
             />
           </View>
@@ -161,7 +171,17 @@ class GameCard extends Component {
     return (
       <TouchableOpacity
         disabled={this.props.onPress == undefined}
-        onPress={this.props.onPress}
+        onPress={() =>
+          this.props.onPress &&
+          this.props.onPress({
+            loading: this.state.startLoading,
+            persent: this.state.persent,
+            persent1,
+            persent2,
+            persent3,
+            tour: this.state.currentTour
+          })
+        }
       >
         <View
           style={{

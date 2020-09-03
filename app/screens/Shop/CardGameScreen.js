@@ -23,6 +23,7 @@ class CardGameScreen extends Component {
     super();
 
     this.state = {
+      persent: 0,
       countJSON: undefined,
       isMyGame: false,
       game: undefined,
@@ -43,6 +44,7 @@ class CardGameScreen extends Component {
   UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.download.gameId == this.props.navigation.state.params.id) {
       this.setState({
+        persent: nextProps.download.persent,
         loading: !nextProps.game.json,
         currentTour: nextProps.download.tour
       });
@@ -102,11 +104,16 @@ class CardGameScreen extends Component {
       this.getItems();
     });
 
-    if (
-      this.props.download.gameId == this.props.navigation.state.params.id &&
-      this.props.download.persent < filesCount
-    ) {
-      this.setState({ loading: true });
+    const params = this.props.navigation.state.params.loading;
+    if (params && params.loading) {
+      this.setState({
+        loading: true,
+        currentTour: params.tour,
+        persent1: params.persent1,
+        persent2: params.persent2,
+        persent3: params.persent3,
+        persent: params.persent
+      });
     }
 
     Orientation.lockToPortrait();
@@ -462,9 +469,7 @@ class CardGameScreen extends Component {
                     color: "#979797"
                   }}
                 >
-                  {Math.floor(
-                    (this.props.download.persent / filesCount) * 100
-                  ) + "%"}
+                  {Math.floor((this.state.persent / filesCount) * 100) + "%"}
                 </Text>
               </View>
               <View
@@ -487,8 +492,7 @@ class CardGameScreen extends Component {
                           : "#F2994A"
                         : "#EB5757",
                     borderRadius: 10,
-                    width:
-                      (this.props.download.persent / filesCount) * 100 + "%"
+                    width: (this.state.persent / filesCount) * 100 + "%"
                   }}
                 />
                 {this.state.currentTour - 1 >= 1 && (

@@ -5,22 +5,24 @@ var RNFS = require("react-native-fs");
 
 let jobIds = [];
 let cancelDownloadVariable = false;
-let number = 0;
-let persent1 = 0;
-let persent2 = 0;
-let persent3 = 0;
+let number = [];
+let persent1 = [];
+let persent2 = [];
+let persent3 = [];
 
 export const setCancelDownloadVariable = (cancel, gameId) => {
   cancelDownloadVariable = cancel;
-  number = 0;
-  persent1 = 0;
-  persent2 = 0;
-  persent3 = 0;
+  number[gameId] = 0;
+  persent1[gameId] = 0;
+  persent2[gameId] = 0;
+  persent3[gameId] = 0;
 
-  jobIds.forEach(item => {
-    RNFS.stopDownload(item);
-  });
-  jobIds = [];
+  if (jobIds[gameId]) {
+    jobIds[gameId].forEach(item => {
+      RNFS.stopDownload(item);
+    });
+  }
+  jobIds[gameId] = [];
 
   return dispatch => {
     AsyncStorage.removeItem(gameId.toString());
@@ -65,10 +67,11 @@ export function setGameToLocalStore(data) {
 export default function setDownload(data) {
   return dispatch => {
     let tour = 1;
-    number = 0;
-    persent1 = 0;
-    persent2 = 0;
-    persent3 = 0;
+    jobIds[data.gameId] = [];
+    number[data.gameId] = 0;
+    persent1[data.gameId] = 0;
+    persent2[data.gameId] = 0;
+    persent3[data.gameId] = 0;
 
     dispatch(
       setDownloadSuccess({
@@ -183,7 +186,7 @@ const blitzTimerMedia = async (
     fromUrl: blitzTimerMediaUrl,
     toFile: RNFS.DocumentDirectoryPath + "/" + blitzTimerMediaFileName,
     begin: res => {
-      jobIds.push(res.jobId);
+      jobIds[data.gameId].push(res.jobId);
       // console.log("begin1");
     },
     progress: res => {
@@ -200,11 +203,11 @@ const blitzTimerMedia = async (
     "file://" + RNFS.DocumentDirectoryPath + "/" + blitzTimerMediaFileName
   );
 
-  number++;
+  number[data.gameId]++;
 
   dispatch(
     setDownloadSuccess({
-      persent: (number / filesCount) * 100,
+      persent: (number[data.gameId] / filesCount) * 100,
       gameId: data.gameId,
       tour
     })
@@ -238,7 +241,7 @@ const downloadGameBackground = async (
     fromUrl: gameBackgroundUrl,
     toFile: RNFS.DocumentDirectoryPath + "/" + gameBackgroundFileName,
     begin: res => {
-      jobIds.push(res.jobId);
+      jobIds[data.gameId].push(res.jobId);
 
       // console.log("begin3");
     },
@@ -256,11 +259,11 @@ const downloadGameBackground = async (
     "file://" + RNFS.DocumentDirectoryPath + "/" + gameBackgroundFileName
   );
 
-  number++;
+  number[data.gameId]++;
 
   dispatch(
     setDownloadSuccess({
-      persent: (number / filesCount) * 100,
+      persent: (number[data.gameId] / filesCount) * 100,
       gameId: data.gameId,
       tour
     })
@@ -292,9 +295,9 @@ const download = async (
       fromUrl: url,
       toFile: RNFS.DocumentDirectoryPath + "/" + fileName,
       begin: res => {
-        jobIds.push(res.jobId);
+        jobIds[data.gameId].push(res.jobId);
 
-        console.log("begin2", res.contentLength);
+        // console.log("begin2", res.contentLength);
       },
       progress: res => {
         // console.log("progress2", res);
@@ -314,23 +317,10 @@ const download = async (
       "file://" + RNFS.DocumentDirectoryPath + "/" + fileName
     );
 
-    number++;
+    number[data.gameId]++;
 
-    if (persent1 == 0 && tour - 1 >= 1) {
-      persent1 = (number / filesCount) * 100;
-
-      dispatch(
-        setGameToLocalStore({
-          gameId: data.gameId,
-          json: JSON.parse(jsonString),
-          tour,
-          cancel: cancelDownloadVariable
-        })
-      );
-    }
-
-    if (persent2 == 0 && tour - 1 >= 2) {
-      persent2 = (number / filesCount) * 100;
+    if (persent1[data.gameId] == 0 && tour - 1 >= 1) {
+      persent1[data.gameId] = (number[data.gameId] / filesCount) * 100;
 
       dispatch(
         setGameToLocalStore({
@@ -342,8 +332,21 @@ const download = async (
       );
     }
 
-    if (persent3 == 0 && tour - 1 >= 3) {
-      persent3 = (number / filesCount) * 100;
+    if (persent2[data.gameId] == 0 && tour - 1 >= 2) {
+      persent2[data.gameId] = (number[data.gameId] / filesCount) * 100;
+
+      dispatch(
+        setGameToLocalStore({
+          gameId: data.gameId,
+          json: JSON.parse(jsonString),
+          tour,
+          cancel: cancelDownloadVariable
+        })
+      );
+    }
+
+    if (persent3[data.gameId] == 0 && tour - 1 >= 3) {
+      persent3[data.gameId] = (number[data.gameId] / filesCount) * 100;
 
       dispatch(
         setGameToLocalStore({
@@ -357,12 +360,12 @@ const download = async (
 
     dispatch(
       setDownloadSuccess({
-        persent: (number / filesCount) * 100,
+        persent: (number[data.gameId] / filesCount) * 100,
         gameId: data.gameId,
         tour,
-        persent1,
-        persent2,
-        persent3
+        persent1: persent1[data.gameId],
+        persent2: persent2[data.gameId],
+        persent3: persent3[data.gameId]
       })
     );
   }
