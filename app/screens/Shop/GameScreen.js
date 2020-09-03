@@ -309,6 +309,8 @@ class GameScreen extends Component {
   startPlayAudio = () => {
     if (
       !this.audioPlayed &&
+      this.state.data.leading &&
+      this.state.data.leading[0] &&
       this.state.data.leading[0].action != "audio" &&
       this.state.data.properties.sounds &&
       this.state.data.tour == 3 &&
@@ -336,7 +338,12 @@ class GameScreen extends Component {
       );
     }
 
-    if (!this.audioPlayed && this.state.data.leading[0].action == "audio") {
+    if (
+      !this.audioPlayed &&
+      this.state.data.leading &&
+      this.state.data.leading[0] &&
+      this.state.data.leading[0].action == "audio"
+    ) {
       if (this.state.data.type == "slide-timer") {
         this.circularProgress &&
           this.circularProgress.animate(
@@ -1055,10 +1062,10 @@ class GameScreen extends Component {
             </Animated.View>
           </TouchableWithoutFeedback>
           {this.state.buttons && this.renderPauseButton()}
-          {//this.state.data.properties.type != "question" &&
-          (this.state.buttons ||
-            this.state.data.properties.type == "repeat" ||
-            this.state.data.type == "slide-timer") &&
+          {this.state.data.properties.type != "question" &&
+            (this.state.buttons ||
+              this.state.data.properties.type == "repeat" ||
+              this.state.data.type == "slide-timer") &&
             this.renderNextStepButton()}
         </ImageBackground>
       );
