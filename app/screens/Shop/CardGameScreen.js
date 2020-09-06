@@ -5,14 +5,14 @@ import {
   View,
   SafeAreaView,
   TouchableOpacity,
-  Image
+  Image,
 } from "react-native";
 import Orientation from "react-native-orientation";
 import AsyncStorage from "@react-native-community/async-storage";
 import { Header } from "react-native-elements";
 import userDataAction from "../../actions/userDataAction";
 import setDownload, {
-  setCancelDownloadVariable
+  setCancelDownloadVariable,
 } from "../../actions/setDownload";
 import { connect } from "react-redux";
 
@@ -37,7 +37,7 @@ class CardGameScreen extends Component {
       persent1: 0,
       persent2: 0,
       persent3: 0,
-      hash: undefined
+      hash: undefined,
     };
   }
 
@@ -46,7 +46,7 @@ class CardGameScreen extends Component {
       this.setState({
         persent: nextProps.download.persent,
         loading: !nextProps.game.json,
-        currentTour: nextProps.download.tour
+        currentTour: nextProps.download.tour,
       });
 
       if (nextProps.game.cancel) {
@@ -56,14 +56,14 @@ class CardGameScreen extends Component {
           currentTour: 1,
           persent1: 0,
           persent2: 0,
-          persent3: 0
+          persent3: 0,
         });
       }
 
       if (nextProps.game.json) {
         this.setState({
           game: nextProps.game.json,
-          loading: nextProps.download.persent < filesCount
+          loading: nextProps.download.persent < filesCount,
         });
       }
 
@@ -92,7 +92,7 @@ class CardGameScreen extends Component {
     let items = JSON.parse(await AsyncStorage.getItem("cardGames"));
     this.setState({ count: items ? items.length : 0, addGames: false });
     items &&
-      items.forEach(item => {
+      items.forEach((item) => {
         if (item.id == id) {
           this.setState({ addGames: true });
         }
@@ -112,7 +112,7 @@ class CardGameScreen extends Component {
         persent1: params.persent1,
         persent2: params.persent2,
         persent3: params.persent3,
-        persent: params.persent
+        persent: params.persent,
       });
     }
 
@@ -133,7 +133,7 @@ class CardGameScreen extends Component {
       const itemParams = this.props.navigation.state.params.item;
       const purchases = this.props.user.userInfo.purchases;
 
-      purchases.forEach(item => {
+      purchases.forEach((item) => {
         if (item.game_id == itemParams.party.id) {
           this.setState({ isMyGame: true, hash: item.hash }, () => {
             this.countGame();
@@ -155,8 +155,8 @@ class CardGameScreen extends Component {
           headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
-            Authorization: "Bearer " + this.state.token
-          }
+            Authorization: "Bearer " + this.state.token,
+          },
         }
       );
       const json = await response.json();
@@ -174,18 +174,18 @@ class CardGameScreen extends Component {
         method: "POST",
         body: JSON.stringify({
           game_id: item.hash || this.state.hash,
-          runs: this.state.countJSON.runs + 1
+          runs: this.state.countJSON.runs + 1,
         }),
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          Authorization: "Bearer " + this.state.token
-        }
+          Authorization: "Bearer " + this.state.token,
+        },
       });
       const json = await response.json();
       this.setState({
         runCount: json.total - json.runs,
-        countJSON: { ...this.state.countJSON, runs: json.runs }
+        countJSON: { ...this.state.countJSON, runs: json.runs },
       });
     } catch (error) {
       console.error("Ошибка:", error);
@@ -211,16 +211,16 @@ class CardGameScreen extends Component {
     this.props.setDownload({
       gameId: item.id.toString(),
       item,
-      token: this.state.token
+      token: this.state.token,
     });
   };
 
-  playGame = async item => {
+  playGame = async (item) => {
     this.postGame();
     this.props.navigation.replace("GameScreen", { data: this.state.game });
   };
 
-  addItemToCard = async element => {
+  addItemToCard = async (element) => {
     if (!this.state.addGames) {
       this.setState({ addGames: true });
       let items = JSON.parse(await AsyncStorage.getItem("cardGames"));
@@ -241,8 +241,8 @@ class CardGameScreen extends Component {
               headers: {
                 "Content-Type": "application/json",
                 Accept: "application/json",
-                Authorization: "Bearer " + this.state.token
-              }
+                Authorization: "Bearer " + this.state.token,
+              },
             }
           );
           const json = await response.json();
@@ -267,7 +267,7 @@ class CardGameScreen extends Component {
             textAlign: "left",
             color: "#fff",
             fontSize: 17,
-            fontFamily: "Montserrat-Regular"
+            fontFamily: "Montserrat-Regular",
           }}
         >
           Корзина
@@ -280,7 +280,7 @@ class CardGameScreen extends Component {
             backgroundColor: "rgba(255, 255, 255, 0.3)",
             justifyContent: "center",
             alignItems: "center",
-            marginLeft: 8
+            marginLeft: 8,
           }}
         >
           <Text
@@ -288,7 +288,7 @@ class CardGameScreen extends Component {
               textAlign: "left",
               color: "#fff",
               fontSize: 12,
-              fontFamily: "Montserrat-Regular"
+              fontFamily: "Montserrat-Regular",
             }}
           >
             {this.state.count}
@@ -302,26 +302,26 @@ class CardGameScreen extends Component {
     const navigationProps = this.props.navigation.state.params;
 
     const rating5 = navigationProps.item.review_details
-      ? navigationProps.item.review_details.filter(item => item.rating == 5)
+      ? navigationProps.item.review_details.filter((item) => item.rating == 5)
       : [];
     const rating4 = navigationProps.item.review_details
-      ? navigationProps.item.review_details.filter(item => item.rating == 4)
+      ? navigationProps.item.review_details.filter((item) => item.rating == 4)
       : [];
     const rating3 = navigationProps.item.review_details
-      ? navigationProps.item.review_details.filter(item => item.rating == 3)
+      ? navigationProps.item.review_details.filter((item) => item.rating == 3)
       : [];
     const rating2 = navigationProps.item.review_details
-      ? navigationProps.item.review_details.filter(item => item.rating == 2)
+      ? navigationProps.item.review_details.filter((item) => item.rating == 2)
       : [];
     const rating1 = navigationProps.item.review_details
-      ? navigationProps.item.review_details.filter(item => item.rating == 1)
+      ? navigationProps.item.review_details.filter((item) => item.rating == 1)
       : [];
     const review_details = [
       { rating: 5, count: rating5.length > 0 && rating5[0].count },
       { rating: 4, count: rating4.length > 0 && rating4[0].count },
       { rating: 3, count: rating3.length > 0 && rating3[0].count },
       { rating: 2, count: rating2.length > 0 && rating2[0].count },
-      { rating: 1, count: rating1.length > 0 && rating1[0].count }
+      { rating: 1, count: rating1.length > 0 && rating1[0].count },
     ];
 
     return (
@@ -366,7 +366,7 @@ class CardGameScreen extends Component {
                   fontFamily: "Montserrat-Regular",
                   fontSize: 12,
                   fontWeight: "600",
-                  marginRight: 24
+                  marginRight: 24,
                 }}
               >
                 {navigationProps.price / 100 + " " + navigationProps.currency}
@@ -379,7 +379,7 @@ class CardGameScreen extends Component {
                   width: 1,
                   height: 24,
                   backgroundColor: "#DADADA",
-                  marginRight: 8
+                  marginRight: 8,
                 }}
               />
             )}
@@ -390,7 +390,7 @@ class CardGameScreen extends Component {
                 fontFamily: "Montserrat-Regular",
                 fontSize: 12,
                 fontWeight: "600",
-                marginRight: 16
+                marginRight: 16,
               }}
             >
               {Math.floor(navigationProps.size / 1000000)} Мб
@@ -401,7 +401,7 @@ class CardGameScreen extends Component {
                 width: 1,
                 height: 24,
                 backgroundColor: "#DADADA",
-                marginRight: 8
+                marginRight: 8,
               }}
             />
 
@@ -411,7 +411,7 @@ class CardGameScreen extends Component {
                 fontFamily: "Montserrat-Regular",
                 fontSize: 12,
                 fontWeight: "600",
-                marginRight: 16
+                marginRight: 16,
               }}
             >
               {navigationProps.age_rating + "+"}
@@ -423,7 +423,7 @@ class CardGameScreen extends Component {
                   width: 1,
                   height: 24,
                   backgroundColor: "#DADADA",
-                  marginRight: 8
+                  marginRight: 8,
                 }}
               />
             )}
@@ -435,7 +435,7 @@ class CardGameScreen extends Component {
                   fontFamily: "Montserrat-Regular",
                   fontSize: 12,
                   fontWeight: "600",
-                  marginRight: 24
+                  marginRight: 24,
                 }}
               >
                 {"Осталось запусков: " +
@@ -450,14 +450,14 @@ class CardGameScreen extends Component {
                 style={{
                   flexDirection: "row",
                   justifyContent: "space-between",
-                  marginBottom: 8
+                  marginBottom: 8,
                 }}
               >
                 <Text
                   style={{
                     fontFamily: "Montserrat-Regular",
                     fontSize: 10,
-                    color: "#979797"
+                    color: "#979797",
                   }}
                 >
                   В процессе
@@ -466,7 +466,7 @@ class CardGameScreen extends Component {
                   style={{
                     fontFamily: "Montserrat-Regular",
                     fontSize: 10,
-                    color: "#979797"
+                    color: "#979797",
                   }}
                 >
                   {Math.floor((this.state.persent / filesCount) * 100) + "%"}
@@ -477,7 +477,7 @@ class CardGameScreen extends Component {
                   height: 4,
                   backgroundColor: "#DADADA",
                   borderRadius: 10,
-                  width: "100%"
+                  width: "100%",
                 }}
               >
                 <View
@@ -492,7 +492,7 @@ class CardGameScreen extends Component {
                           : "#F2994A"
                         : "#EB5757",
                     borderRadius: 10,
-                    width: (this.state.persent / filesCount) * 100 + "%"
+                    width: (this.state.persent / filesCount) * 100 + "%",
                   }}
                 />
                 {this.state.currentTour - 1 >= 1 && (
@@ -500,7 +500,7 @@ class CardGameScreen extends Component {
                     style={{
                       position: "absolute",
                       left: this.state.persent1 - 2 + "%",
-                      top: -4
+                      top: -4,
                     }}
                   >
                     <View
@@ -515,7 +515,7 @@ class CardGameScreen extends Component {
                             : "#EB5757",
                         width: 12,
                         height: 12,
-                        borderRadius: 6
+                        borderRadius: 6,
                       }}
                     />
                     <Text
@@ -524,7 +524,7 @@ class CardGameScreen extends Component {
                         fontFamily: "Montserrat-Regular",
                         fontSize: 10,
                         left: -7,
-                        top: 8
+                        top: 8,
                       }}
                     >
                       1 тур
@@ -537,7 +537,7 @@ class CardGameScreen extends Component {
                     style={{
                       position: "absolute",
                       left: this.state.persent2 - 2 + "%",
-                      top: -4
+                      top: -4,
                     }}
                   >
                     <View
@@ -550,7 +550,7 @@ class CardGameScreen extends Component {
                             : "#F2994A",
                         width: 12,
                         height: 12,
-                        borderRadius: 6
+                        borderRadius: 6,
                       }}
                     />
                     <Text
@@ -559,7 +559,7 @@ class CardGameScreen extends Component {
                         fontFamily: "Montserrat-Regular",
                         fontSize: 10,
                         left: -7,
-                        top: 8
+                        top: 8,
                       }}
                     >
                       2 тур
@@ -572,7 +572,7 @@ class CardGameScreen extends Component {
                     style={{
                       position: "absolute",
                       left: this.state.persent3 - 2 + "%",
-                      top: -4
+                      top: -4,
                     }}
                   >
                     <View
@@ -583,7 +583,7 @@ class CardGameScreen extends Component {
                             : "#FFCE42",
                         width: 12,
                         height: 12,
-                        borderRadius: 6
+                        borderRadius: 6,
                       }}
                     />
                     <Text
@@ -592,7 +592,7 @@ class CardGameScreen extends Component {
                         fontFamily: "Montserrat-Regular",
                         fontSize: 10,
                         left: -7,
-                        top: 8
+                        top: 8,
                       }}
                     >
                       3 тур
@@ -620,8 +620,8 @@ class CardGameScreen extends Component {
                     ? this.state.isMyGame && this.state.runCount != 0
                       ? "#0B2A5B"
                       : "#0B2A5B"
-                    : "white"
-                }
+                    : "white",
+                },
               ]}
               onPress={() =>
                 !this.state.addGames
@@ -641,7 +641,7 @@ class CardGameScreen extends Component {
                       : "#fff"
                     : "#333333",
                   fontFamily: "Montserrat-Regular",
-                  fontSize: 17
+                  fontSize: 17,
                 }}
               >
                 {!this.state.addGames
@@ -663,8 +663,8 @@ class CardGameScreen extends Component {
                     marginTop: 8,
                     borderWidth: 1,
                     borderColor: "#DADADA",
-                    backgroundColor: "white"
-                  }
+                    backgroundColor: "white",
+                  },
                 ]}
                 onPress={() => this.loadGame()}
               >
@@ -674,7 +674,7 @@ class CardGameScreen extends Component {
                     textTransform: "none",
                     color: "#333333",
                     fontFamily: "Montserrat-Regular",
-                    fontSize: 17
+                    fontSize: 17,
                   }}
                 >
                   {this.state.loading ? "Отменить загрузку" : "Загрузить игру"}
@@ -688,7 +688,7 @@ class CardGameScreen extends Component {
                 fontSize: 14,
                 fontWeight: "600",
                 marginBottom: 10,
-                fontFamily: "Montserrat-Regular"
+                fontFamily: "Montserrat-Regular",
               }}
             >
               Описание
@@ -698,7 +698,7 @@ class CardGameScreen extends Component {
                 fontSize: 12,
                 fontWeight: "normal",
                 marginBottom: 10,
-                fontFamily: "Montserrat-Regular"
+                fontFamily: "Montserrat-Regular",
               }}
             >
               {navigationProps.description}
@@ -710,7 +710,7 @@ class CardGameScreen extends Component {
                     style={{
                       textAlign: "center",
                       color: "#333333",
-                      fontSize: 12
+                      fontSize: 12,
                     }}
                   >
                     Топ-5
@@ -723,7 +723,7 @@ class CardGameScreen extends Component {
                     style={{
                       textAlign: "center",
                       color: "#333333",
-                      fontSize: 12
+                      fontSize: 12,
                     }}
                   >
                     Новинка
@@ -740,7 +740,7 @@ class CardGameScreen extends Component {
                   fontSize: 14,
                   fontWeight: "600",
                   marginBottom: 10,
-                  fontFamily: "Montserrat-Regular"
+                  fontFamily: "Montserrat-Regular",
                 }}
               >
                 Отзывы
@@ -753,7 +753,7 @@ class CardGameScreen extends Component {
                       fontSize: 70,
                       fontFamily: "Montserrat-Medium",
                       fontWeight: "600",
-                      color: "#333333"
+                      color: "#333333",
                     }}
                   >
                     {navigationProps.item.rating.toString().length == 1
@@ -768,7 +768,7 @@ class CardGameScreen extends Component {
                       fontFamily: "Montserrat-Medium",
                       fontWeight: "600",
                       color: "#979797",
-                      marginLeft: 20
+                      marginLeft: 20,
                     }}
                   >
                     {navigationProps.item.review_count + " отзыва"}
@@ -776,7 +776,7 @@ class CardGameScreen extends Component {
                 </View>
                 <View style={{ flex: 1, marginTop: 13 }}>
                   {review_details
-                    .sort(function(a, b) {
+                    .sort(function (a, b) {
                       if (a.rating < b.rating) {
                         return 1;
                       }
@@ -785,13 +785,13 @@ class CardGameScreen extends Component {
                       }
                       return 0;
                     })
-                    .map(item => {
+                    .map((item) => {
                       return (
                         <View
                           style={{
                             flexDirection: "row",
                             alignItems: "center",
-                            marginBottom: 3
+                            marginBottom: 3,
                           }}
                         >
                           <Text
@@ -799,7 +799,7 @@ class CardGameScreen extends Component {
                               color: "#333333",
                               fontSize: 12,
                               width: 7,
-                              fontFamily: "Montserrat-Regular"
+                              fontFamily: "Montserrat-Regular",
                             }}
                           >
                             {item.rating}
@@ -810,7 +810,7 @@ class CardGameScreen extends Component {
                               height: 5,
                               backgroundColor: "#DADADA",
                               borderRadius: 10,
-                              marginLeft: 10
+                              marginLeft: 10,
                             }}
                           >
                             <View
@@ -822,7 +822,7 @@ class CardGameScreen extends Component {
                                   (item.count /
                                     navigationProps.item.review_count) *
                                     100 +
-                                  "%"
+                                  "%",
                               }}
                             />
                           </View>
@@ -840,20 +840,20 @@ class CardGameScreen extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     user: state.userData,
     download: state.userData.download || { persent: 0 },
-    game: state.userData.game || {}
+    game: state.userData.game || {},
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
     setCancelDownloadVariable: (cancel, gameId) =>
       dispatch(setCancelDownloadVariable(cancel, gameId)),
-    userDataAction: token => dispatch(userDataAction(token)),
-    setDownload: token => dispatch(setDownload(token))
+    userDataAction: (token) => dispatch(userDataAction(token)),
+    setDownload: (token) => dispatch(setDownload(token)),
   };
 };
 
@@ -864,36 +864,36 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 22,
     height: "95%",
-    backgroundColor: "#fff"
+    backgroundColor: "#fff",
   },
   title: {
     color: "#333333",
     fontSize: 18,
     fontWeight: "600",
     fontFamily: "Montserrat-Regular",
-    lineHeight: 18
+    lineHeight: 18,
   },
   logo: {
     width: 94,
     height: 94,
     borderRadius: 5,
-    marginRight: 10
+    marginRight: 10,
   },
   btnAuth: {
     backgroundColor: "#0B2A5B",
     padding: 16,
-    borderRadius: 5
+    borderRadius: 5,
   },
   headerGames: {
     flexDirection: "row",
     justifyContent: "flex-start",
-    alignItems: "flex-start"
+    alignItems: "flex-start",
   },
   aboutGame: {
     marginVertical: 30,
     flexDirection: "row",
     justifyContent: "flex-start",
-    alignItems: "center"
+    alignItems: "center",
   },
   categor: {
     backgroundColor: "rgba(255, 206, 66, 0.5)",
@@ -901,10 +901,10 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     borderRadius: 24,
     paddingHorizontal: 16,
-    marginRight: 8
+    marginRight: 8,
   },
   description: {
-    marginVertical: 30
+    marginVertical: 30,
   },
   btnAuth2: {
     flexDirection: "row",
@@ -915,7 +915,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 18,
     right: 18,
-    bottom: 20
+    bottom: 20,
   },
   header: {
     backgroundColor: "#fff",
@@ -923,13 +923,13 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
     borderBottomColor: "white",
     paddingTop: 0,
-    height: 44
+    height: 44,
   },
   rating: {
     color: "#979797",
     fontSize: 12,
     fontWeight: "600",
     fontFamily: "Montserrat-Regular",
-    alignItems: "center"
-  }
+    alignItems: "center",
+  },
 });
