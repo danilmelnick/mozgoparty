@@ -18,13 +18,13 @@ export const setCancelDownloadVariable = (cancel, gameId) => {
   persent3[gameId] = 0;
 
   if (jobIds[gameId]) {
-    jobIds[gameId].forEach(item => {
+    jobIds[gameId].forEach((item) => {
       RNFS.stopDownload(item);
     });
   }
   jobIds[gameId] = [];
 
-  return dispatch => {
+  return (dispatch) => {
     AsyncStorage.removeItem(gameId.toString());
 
     cancel &&
@@ -32,7 +32,7 @@ export const setCancelDownloadVariable = (cancel, gameId) => {
         setGameToLocalStore({
           gameId,
           json: undefined,
-          cancel: true
+          cancel: true,
         })
       );
 
@@ -44,7 +44,7 @@ export const setCancelDownloadVariable = (cancel, gameId) => {
           tour: 1,
           persent1: 0,
           persent2: 0,
-          persent3: 0
+          persent3: 0,
         })
       );
   };
@@ -53,19 +53,19 @@ export const setCancelDownloadVariable = (cancel, gameId) => {
 export function setDownloadSuccess(data) {
   return {
     type: "SET_DOWNLOAD_SUCCESS",
-    payload: data
+    payload: data,
   };
 }
 
 export function setGameToLocalStore(data) {
   return {
     type: "SET_GAME_TO_LOCAL_STORE",
-    payload: data
+    payload: data,
   };
 }
 
 export default function setDownload(data) {
-  return dispatch => {
+  return (dispatch) => {
     let tour = 1;
     jobIds[data.gameId] = [];
     number[data.gameId] = 0;
@@ -77,7 +77,7 @@ export default function setDownload(data) {
       setDownloadSuccess({
         persent: 0.1,
         gameId: data.gameId,
-        tour
+        tour,
       })
     );
 
@@ -86,17 +86,17 @@ export default function setDownload(data) {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        Authorization: "Bearer " + data.token
-      }
+        Authorization: "Bearer " + data.token,
+      },
     })
-      .then(res => res.json())
-      .then(async json => {
+      .then((res) => res.json())
+      .then(async (json) => {
         dispatch(
           setGameToLocalStore({
             gameId: data.gameId,
             json: undefined,
             tour: 1,
-            cancel: false
+            cancel: false,
           })
         );
 
@@ -111,20 +111,25 @@ export default function setDownload(data) {
           const promises = [];
 
           if (tour == 1) {
-            promises.push(
-              downloadGameBackground(
-                jsonString,
-                dispatch,
-                data,
-                filesCount,
-                tour
-              )
+            const res1 = await downloadGameBackground(
+              jsonString,
+              dispatch,
+              data,
+              filesCount,
+              tour
             );
-            promises.push(
-              blitzTimerMedia(jsonString, dispatch, data, filesCount, tour)
+            jsonString = res1;
+            const res2 = await blitzTimerMedia(
+              jsonString,
+              dispatch,
+              data,
+              filesCount,
+              tour
             );
+            jsonString = res2;
           }
 
+          console.log("Start download");
           while (dataScreen) {
             if (dataScreen.tour > tour) {
               tour = dataScreen.tour;
@@ -143,7 +148,13 @@ export default function setDownload(data) {
             dataScreen = game.nextScreen();
           }
 
-          await Promise.all(promises);
+          const resDownload = await Promise.all(promises);
+
+          resDownload.forEach((item) => {
+            for (let i = 0; i < item.prev.length; i++) {
+              jsonString = jsonString.replace(item.prev[i], item.new[i]);
+            }
+          });
         }
 
         await AsyncStorage.setItem(data.gameId, jsonString);
@@ -152,7 +163,7 @@ export default function setDownload(data) {
             gameId: data.gameId,
             json: JSON.parse(jsonString),
             tour,
-            cancel: false
+            cancel: false,
           })
         );
       });
@@ -185,13 +196,13 @@ const blitzTimerMedia = async (
   const blitzTimerMediaDownload = RNFS.downloadFile({
     fromUrl: blitzTimerMediaUrl,
     toFile: RNFS.DocumentDirectoryPath + "/" + blitzTimerMediaFileName,
-    begin: res => {
+    begin: (res) => {
       jobIds[data.gameId].push(res.jobId);
       // console.log("begin1");
     },
-    progress: res => {
+    progress: (res) => {
       // console.log("progress1", res);
-    }
+    },
   });
   const blitzTimerMediaResult = await blitzTimerMediaDownload.promise;
   if (cancelDownloadVariable) {
@@ -209,9 +220,11 @@ const blitzTimerMedia = async (
     setDownloadSuccess({
       persent: (number[data.gameId] / filesCount) * 100,
       gameId: data.gameId,
-      tour
+      tour,
     })
   );
+
+  return jsonString;
 };
 
 const downloadGameBackground = async (
@@ -240,14 +253,13 @@ const downloadGameBackground = async (
   const gameBackgroundDownload = RNFS.downloadFile({
     fromUrl: gameBackgroundUrl,
     toFile: RNFS.DocumentDirectoryPath + "/" + gameBackgroundFileName,
-    begin: res => {
+    begin: (res) => {
       jobIds[data.gameId].push(res.jobId);
-
       // console.log("begin3");
     },
-    progress: res => {
+    progress: (res) => {
       // console.log("progress3", res);
-    }
+    },
   });
   const gameBackgroundResult = await gameBackgroundDownload.promise;
   if (cancelDownloadVariable) {
@@ -265,9 +277,11 @@ const downloadGameBackground = async (
     setDownloadSuccess({
       persent: (number[data.gameId] / filesCount) * 100,
       gameId: data.gameId,
-      tour
+      tour,
     })
   );
+
+  return jsonString;
 };
 
 const download = async (
@@ -279,6 +293,8 @@ const download = async (
   data
 ) => {
   let jsnStr = JSON.stringify(dataScreen);
+  let urlArr = [];
+  let newUrlArr = [];
 
   while (jsnStr.indexOf("https://") != -1) {
     if (cancelDownloadVariable) {
@@ -290,18 +306,19 @@ const download = async (
     const url = jsnStr.slice(firstIndexOfHttps, lastLinkIndex);
     const splitUrl = url.split("/");
     const fileName = splitUrl[splitUrl.length - 1];
+    urlArr.push(url);
 
     const download = RNFS.downloadFile({
       fromUrl: url,
       toFile: RNFS.DocumentDirectoryPath + "/" + fileName,
-      begin: res => {
+      begin: (res) => {
         jobIds[data.gameId].push(res.jobId);
 
         // console.log("begin2", res.contentLength);
       },
-      progress: res => {
+      progress: (res) => {
         // console.log("progress2", res);
-      }
+      },
     });
     const result = await download.promise;
     if (cancelDownloadVariable) {
@@ -317,6 +334,8 @@ const download = async (
       "file://" + RNFS.DocumentDirectoryPath + "/" + fileName
     );
 
+    newUrlArr.push("file://" + RNFS.DocumentDirectoryPath + "/" + fileName);
+
     number[data.gameId]++;
 
     if (persent1[data.gameId] == 0 && tour - 1 >= 1) {
@@ -327,7 +346,7 @@ const download = async (
           gameId: data.gameId,
           json: JSON.parse(jsonString),
           tour,
-          cancel: cancelDownloadVariable
+          cancel: cancelDownloadVariable,
         })
       );
     }
@@ -340,7 +359,7 @@ const download = async (
           gameId: data.gameId,
           json: JSON.parse(jsonString),
           tour,
-          cancel: cancelDownloadVariable
+          cancel: cancelDownloadVariable,
         })
       );
     }
@@ -353,7 +372,7 @@ const download = async (
           gameId: data.gameId,
           json: JSON.parse(jsonString),
           tour,
-          cancel: cancelDownloadVariable
+          cancel: cancelDownloadVariable,
         })
       );
     }
@@ -365,8 +384,13 @@ const download = async (
         tour,
         persent1: persent1[data.gameId],
         persent2: persent2[data.gameId],
-        persent3: persent3[data.gameId]
+        persent3: persent3[data.gameId],
       })
     );
   }
+
+  return {
+    prev: urlArr,
+    new: newUrlArr,
+  };
 };
