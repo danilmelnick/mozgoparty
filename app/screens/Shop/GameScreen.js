@@ -129,7 +129,11 @@ class GameScreen extends Component {
       this.timerMedia.pause();
     }
 
-    this.setState({ pause: true });
+    this.setState({ pause: true }, () => {
+      const val = 25 - this.state.timer < 0 ? 0 : 25 - this.state.timer;
+      this.circularProgress &&
+        this.circularProgress.animate(val, 0, Easing.linear);
+    });
   };
 
   hidePause = () => {
@@ -145,13 +149,18 @@ class GameScreen extends Component {
       this.timerMedia.play();
     }
 
-    this.setState({ pause: false });
+    this.setState({ pause: false }, () => {
+      const val = 25 - this.state.timer < 0 ? 0 : 25 - this.state.timer;
+      this.circularProgress &&
+        this.circularProgress.animate(0, val * 1000 + 1000, Easing.linear);
+    });
   };
 
   renderPauseButton() {
     return (
       <TouchableOpacity
         onPress={() => {
+          console.log("pause");
           this.showPause();
         }}
         style={{
@@ -406,15 +415,6 @@ class GameScreen extends Component {
       if (this.whoosh) {
         this.whoosh.stop();
         this.audioPlayed = false;
-      }
-
-      if (this.state.data.type == "slide-timer") {
-        setTimeout(
-          () => {
-            this.showNextGame();
-          },
-          this.state.data.tour == 4 ? 51000 : 102000
-        );
       }
 
       console.log("PLAY FIRST TRACK", this.state.data.leading[0].params[0]);
@@ -702,63 +702,73 @@ class GameScreen extends Component {
         .gameBackground;
 
       return (
-        <ImageBackground
-          source={{ uri: backgroundImage }}
-          resizeMode={"cover"}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            bottom: 0,
-            right: 0,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Animated.View
-            style={{
-              transform: [{ scale: this.state.scale }],
-              opacity: this.state.opacity,
-            }}
-          >
-            <Text
-              style={{
-                color: "white",
-                fontSize: 70,
-                fontFamily: "Montserrat-Bold",
-              }}
-            >
-              {25 - this.state.timer < 0 ? 0 : 25 - this.state.timer}
-            </Text>
-          </Animated.View>
-          <AnimatedCircularProgress
+        <TouchableWithoutFeedback onPress={() => this.showButtons()}>
+          <ImageBackground
+            source={{ uri: backgroundImage }}
+            resizeMode={"cover"}
             style={{
               position: "absolute",
-              top: 40,
-              left:
-                Dimensions.get("window").width / 2 -
-                (Dimensions.get("window").height - 80) / 2,
-              transform: [
-                {
-                  rotateY: "-180deg",
-                },
-              ],
+              top: 0,
+              left: 0,
+              bottom: 0,
+              right: 0,
+              justifyContent: "center",
+              alignItems: "center",
             }}
-            ref={(ref) => (this.circularProgress = ref)}
-            size={Dimensions.get("window").height - 80}
-            width={15}
-            rotation={0}
-            fill={100}
-            prefill={100}
-            tintColor={"white"}
-            backgroundColor={"transparent"}
-          />
-          {this.state.buttons && this.renderPauseButton()}
-          {(this.state.buttons ||
-            this.state.data.properties.type == "repeat" ||
-            this.state.data.type == "slide-timer") &&
-            this.renderNextStepButton()}
-        </ImageBackground>
+          >
+            <Animated.View
+              style={{
+                transform: [{ scale: this.state.scale }],
+                opacity: this.state.opacity,
+              }}
+            >
+              <Text
+                style={{
+                  color: "white",
+                  fontSize: 70,
+                  fontFamily: "Montserrat-Bold",
+                }}
+              >
+                {25 - this.state.timer < 0 ? 0 : 25 - this.state.timer}
+              </Text>
+            </Animated.View>
+            <AnimatedCircularProgress
+              onAnimationComplete={(data) => {
+                if (data.finished && !this.state.pause && this.audioPlayed) {
+                  setTimeout(() => {
+                    this.showNextGame();
+                  }, 1000);
+                }
+              }}
+              style={{
+                position: "absolute",
+                top: 40,
+                left:
+                  Dimensions.get("window").width / 2 -
+                  (Dimensions.get("window").height - 80) / 2,
+                transform: [
+                  {
+                    rotateY: "-180deg",
+                  },
+                ],
+              }}
+              ref={(ref) => (this.circularProgress = ref)}
+              size={Dimensions.get("window").height - 80}
+              width={15}
+              rotation={0}
+              fill={100}
+              prefill={100}
+              tintColor={"white"}
+              backgroundColor={"transparent"}
+            />
+            {this.state.buttons && this.renderPauseButton()}
+            {(this.state.buttons ||
+              this.state.data.properties.type == "repeat" ||
+              this.state.data.type == "slide-timer") &&
+              this.renderNextStepButton()}
+            {this.renderPause()}
+          </ImageBackground>
+        </TouchableWithoutFeedback>
       );
     } else if (this.state.data.properties.text) {
       const backgroundImage = this.props.navigation.state.params.data.meta
