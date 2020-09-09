@@ -804,7 +804,7 @@ class GameScreen extends Component {
                 <Text
                   style={{
                     color: "white",
-                    fontSize: 28,
+                    fontSize: 25,
                     flex: 1,
                     alignSelf: "center",
                     textAlign: "center",
