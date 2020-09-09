@@ -40,215 +40,218 @@ const ShopStack = createStackNavigator({
   ShopScreen: {
     screen: ShopScreen,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+    },
   },
   BusketScreen: {
     screen: BusketScreen,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+    },
   },
   Payment: {
     screen: Payment,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+    },
   },
   CardGameScreen: {
     screen: CardGameScreen,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+    },
   },
   GameScreen: {
     screen: GameScreen,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+      gesturesEnabled: false,
+      swipeEnabled: false,
+    },
   },
   AuthScreen: {
     screen: AuthScreen,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+    },
   },
   PdfScreenn: {
     screen: PdfScreen,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+    },
   },
   RecoverScreeen: {
     screen: RecoverScreeen,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+    },
   },
   RegistrationScreeen: {
     screen: RegistrationScreeen,
     navigationOptions: {
-      headerShown: false
-    }
-  }
+      headerShown: false,
+    },
+  },
 });
 
 const SupportGroup = createStackNavigator({
   SupportScreen: {
     screen: SupportScreen,
     navigationOptions: {
-      headerShown: false
-    }
-  }
+      headerShown: false,
+    },
+  },
 });
 
 const FAQ = createStackNavigator({
   FAQScreen: {
     screen: FAQScreen,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+    },
   },
   AuthScreen: {
     screen: AuthScreen,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+    },
   },
   RecoverScreeen: {
     screen: RecoverScreeen,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+    },
   },
   RegistrationScreeen: {
     screen: RegistrationScreeen,
     navigationOptions: {
-      headerShown: false
-    }
-  }
+      headerShown: false,
+    },
+  },
 });
 
 const SettingsStack = createStackNavigator({
   SettingsScreen: {
     screen: SettingsScreen,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+    },
   },
   PdfScreen: {
     screen: PdfScreen,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+    },
   },
   GamesGuideScreen: {
     screen: GamesGuideScreen,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+    },
   },
   GameProgressScreen: {
     screen: GameProgressScreen,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+    },
   },
   AuthScreen: {
     screen: AuthScreen,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+    },
   },
   RecoverScreeen: {
     screen: RecoverScreeen,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+    },
   },
   RegistrationScreeen: {
     screen: RegistrationScreeen,
     navigationOptions: {
-      headerShown: false
-    }
-  }
+      headerShown: false,
+    },
+  },
 });
 
 const GamesGuide = createStackNavigator({
   GamesGuideScreen: {
     screen: GamesGuideScreen,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+    },
   },
   AuthScreen: {
     screen: AuthScreen,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+    },
   },
   RecoverScreeen: {
     screen: RecoverScreeen,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+    },
   },
   RegistrationScreeen: {
     screen: RegistrationScreeen,
     navigationOptions: {
-      headerShown: false
-    }
-  }
+      headerShown: false,
+    },
+  },
 });
 
 const MyGames = createStackNavigator({
   MyGamesScreen: {
     screen: MyGamesScreen,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+    },
   },
   CardGameScreen: {
     screen: CardGameScreen,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+    },
   },
   GameScreen: {
     screen: GameScreen,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+      gesturesEnabled: false,
+    },
   },
   LikeScreen: {
     screen: LikeScreen,
     navigationOptions: {
-      headerShown: true
-    }
-  }
+      headerShown: true,
+    },
+  },
 });
 
 const Favorites = createStackNavigator({
   Favorite: {
     screen: Favorite,
     navigationOptions: {
-      headerShown: true
-    }
-  }
+      headerShown: true,
+    },
+  },
 });
 const ShopCardStack = createStackNavigator({
   BusketScreen: {
     screen: BusketScreen,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+    },
   },
   Payment: {
     screen: Payment,
     navigationOptions: {
-      headerShown: false
-    }
-  }
+      headerShown: false,
+    },
+  },
 });
 
 const Auth = createStackNavigator(
@@ -256,18 +259,18 @@ const Auth = createStackNavigator(
     StartedScreen: {
       screen: StartedScreen,
       navigationOptions: {
-        headerShown: false
-      }
+        headerShown: false,
+      },
     },
     PdfScreen: {
       screen: PdfScreen,
       navigationOptions: {
-        headerShown: false
-      }
-    }
+        headerShown: false,
+      },
+    },
   },
   {
-    initialRouteName: "StartedScreen"
+    initialRouteName: "StartedScreen",
   }
 );
 
@@ -275,33 +278,33 @@ const Profile = createStackNavigator({
   PersonalArea: {
     screen: PersonalArea,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+    },
   },
   EditPersonalArea: {
     screen: EditPersonalArea,
     navigationOptions: {
-      headerShown: true
-    }
+      headerShown: true,
+    },
   },
   ChangePass: {
     screen: ChangePass,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+    },
   },
   RecoverProfileScreeen: {
     screen: RecoverScreeen,
     navigationOptions: {
-      headerShown: false
-    }
+      headerShown: false,
+    },
   },
   ShopCardStack: {
     screen: ShopCardStack,
     navigationOptions: {
-      headerShown: false
-    }
-  }
+      headerShown: false,
+    },
+  },
 });
 
 const AuthRoute = createStackNavigator(
@@ -309,30 +312,30 @@ const AuthRoute = createStackNavigator(
     AuthScreen: {
       screen: AuthScreen,
       navigationOptions: {
-        headerShown: false
-      }
+        headerShown: false,
+      },
     },
     RecoverScreeen: {
       screen: RecoverScreeen,
       navigationOptions: {
-        headerShown: false
-      }
+        headerShown: false,
+      },
     },
     RegistrationScreeen: {
       screen: RegistrationScreeen,
       navigationOptions: {
-        headerShown: false
-      }
+        headerShown: false,
+      },
     },
     PdfScreenn: {
       screen: PdfScreen,
       navigationOptions: {
-        headerShown: false
-      }
-    }
+        headerShown: false,
+      },
+    },
   },
   {
-    initialRouteName: "AuthScreen"
+    initialRouteName: "AuthScreen",
   }
 );
 
@@ -340,19 +343,27 @@ const MyDrawerNavigator = createDrawerNavigator(
   {
     Shop: ShopStack,
     Profile,
-    MyGames: MyGames,
+    MyGames: {
+      screen: MyGames,
+      navigationOptions: (state) => {
+        return {
+          drawerLockMode:
+            state.navigation.state.index == 0 ? undefined : "locked-closed",
+        };
+      },
+    },
     SettingsStack,
     Favorites,
     SupportGroup,
     Faq: FAQ,
     GamesGuide,
     AuthLoadingScreen,
-    AuthRoute
+    AuthRoute,
   },
   {
     contentComponent: drawerContentComponents,
     initialRouteName: "Shop",
-    unmountInactiveRoutes: true
+    unmountInactiveRoutes: true,
   }
 );
 
@@ -361,10 +372,10 @@ export const Navigation = createAppContainer(
     {
       AuthLoading: AuthLoadingScreen,
       Loading: Auth,
-      MyDrawerNavigator: MyDrawerNavigator
+      MyDrawerNavigator: MyDrawerNavigator,
     },
     {
-      initialRouteName: "AuthLoading"
+      initialRouteName: "AuthLoading",
     }
   )
 );
